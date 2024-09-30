@@ -1,0 +1,13 @@
+.navbar-nav .nav-link.active {
+    background-color: grey;
+    color: white;
+    border-radius: 5px;
+    font-weight: bold;
+}
+
+.navbar-nav .nav-link{
+    color: white;
+}
+.navbar-toggler{
+    background-color: white;
+}
