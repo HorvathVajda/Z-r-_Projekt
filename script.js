@@ -1,10 +1,15 @@
-var currentUrl = window.location.href;
+// Egyszerű form-ellenőrzés
+document.getElementById('searchForm').addEventListener('submit', function(event) {
+    event.preventDefault(); // Az űrlap beküldésének megakadályozása teszteléshez
 
-var navLinks = document.querySelectorAll('.navbar-nav .nav-link');
-navLinks.forEach(function(link) {
-    link.classList.remove('active');
+    // Hozzáférés a keresési mezők értékeihez
+    let szolgaltatas = document.querySelector('input[placeholder="Szolgáltatás"]').value;
+    let helyszin = document.querySelector('input[placeholder="Helyszín"]').value;
+    let datum = document.querySelector('input[type="date"]').value;
+    let idopont = document.querySelector('input[type="time"]').value;
 
-    if (link.href === currentUrl) {
-        link.classList.add('active');
-    }
+    // Egyszerű konzolos ellenőrzés
+    console.log(`Szolgáltatás: ${szolgaltatas}, Helyszín: ${helyszin}, Dátum: ${datum}, Időpont: ${idopont}`);
+
+    // További funkciók (pl.: ajax kérés küldése a szerverre) ide kerülhetnek
 });
