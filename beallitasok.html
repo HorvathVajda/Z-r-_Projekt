@@ -51,7 +51,6 @@
         .arrow-icon {
             color: #6c757d;
         }
-        /* Nyelv opciók stílus */
         .language-options {
             padding-left: 40px;
             padding-top: 10px;
@@ -72,15 +71,14 @@
         .check-icon {
             color: #0d6efd;
             margin-right: 10px;
-            display: none; /* Alapértelmezetten rejtve */
+            display: none;
         }
         .language-option.selected .check-icon {
-            display: inline; /* Kijelölve megjelenik */
+            display: inline;
         }
     </style>
 </head>
 <body>
-    <!-- Navigációs sáv -->
     <nav class="navbar navbar-expand-lg navbar-light bg-dark">
         <div class="container-fluid">
             <a class="navbar-brand" href="home.html">
@@ -95,19 +93,19 @@
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
                     <li class="nav-item">
-                        <a class="nav-link" href="home.html" style="color: white;">Főoldal</a>
+                        <a class="nav-link" href="home.html" style="color: white;" data-text-hu="Főoldal" data-text-en="Home">Főoldal</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="login.html" style="color: white;">Bejelentkezés</a>
+                        <a class="nav-link" href="login.html" style="color: white;" data-text-hu="Bejelentkezés" data-text-en="Login">Bejelentkezés</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="kapcsolat.html" style="color: white;">Kapcsolat</a>
+                        <a class="nav-link" href="kapcsolat.html" style="color: white;" data-text-hu="Kapcsolat" data-text-en="Contact">Kapcsolat</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="rolunk.html" style="color: white;">Rólunk</a>
+                        <a class="nav-link" href="rolunk.html" style="color: white;" data-text-hu="Rólunk" data-text-en="About">Rólunk</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="settings.html" style="color: white;">
+                        <a class="nav-link" href="settings.html" style="color: white;" data-text-hu="Beállítások" data-text-en="Settings">
                             <i class="fas fa-cog"></i> Beállítások
                         </a>
                     </li>
@@ -116,15 +114,13 @@
         </div>
     </nav>
 
-    <!-- Beállítások tartalom -->
     <div class="settings-container">
-        <h2 class="settings-header">Beállítások</h2>
+        <h2 class="settings-header" data-text-hu="Beállítások" data-text-en="Settings">Beállítások</h2>
         <div class="list-group">
-            <!-- Nyelv beállítás -->
             <div class="list-group-item">
                 <a data-bs-toggle="collapse" href="#languageOptions" role="button" aria-expanded="false" aria-controls="languageOptions">
                     <div>
-                        <i class="fas fa-language"></i> Nyelv
+                        <i class="fas fa-language"></i> <span data-text-hu="Nyelv" data-text-en="Language">Nyelv</span>
                     </div>
                     <i class="fas fa-chevron-down arrow-icon"></i>
                 </a>
@@ -137,89 +133,35 @@
                     </div>
                 </div>
             </div>
-            <!-- Profil beállítás -->
-            <div class="list-group-item">
-                <a href="#">
-                    <div>
-                        <i class="fas fa-user"></i> Profil
-                    </div>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
-                </a>
-            </div>
-            <!-- Értesítések beállítás -->
-            <div class="list-group-item">
-                <a href="#">
-                    <div>
-                        <i class="fas fa-bell"></i> Értesítések
-                    </div>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
-                </a>
-            </div>
-            <!-- Adatvédelem beállítás -->
-            <div class="list-group-item">
-                <a href="#">
-                    <div>
-                        <i class="fas fa-shield-alt"></i> Adatvédelem
-                    </div>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
-                </a>
-            </div>
-            <!-- Névjegy beállítás -->
-            <div class="list-group-item">
-                <a href="#">
-                    <div>
-                        <i class="fas fa-info-circle"></i> Névjegy
-                    </div>
-                    <i class="fas fa-chevron-right arrow-icon"></i>
-                </a>
-            </div>
         </div>
     </div>
 
     <!-- Font Awesome Script -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"></script>
-    <!-- Bootstrap Bundle JS (includes Popper) -->
+    <!-- Bootstrap Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', () => {
-            // Alapértelmezett nyelv beállítása (Magyar vagy Angol)
             let currentLanguage = localStorage.getItem('selectedLanguage') || 'hu';
-            // Jelöljük ki a megfelelő nyelvet
-            document.querySelector(`.language-option[data-language="${currentLanguage}"]`).classList.add('selected');
+            setLanguage(currentLanguage);
 
-            // Nyelv kiválasztás kezelése
             document.querySelectorAll('.language-option').forEach(option => {
                 option.addEventListener('click', () => {
                     const selectedLang = option.getAttribute('data-language');
                     if (selectedLang !== currentLanguage) {
-                        // Eltávolítjuk a 'selected' osztályt minden opcióból
-                        document.querySelectorAll('.language-option').forEach(opt => {
-                            opt.classList.remove('selected');
-                        });
-
-                        // Hozzáadjuk a 'selected' osztályt a kiválasztott opcióhoz
-                        option.classList.add('selected');
-
-                        // Frissítjük a jelenlegi nyelvet
                         currentLanguage = selectedLang;
-
-                        // Tároljuk a kiválasztott nyelvet a localStorage-ban
                         localStorage.setItem('selectedLanguage', currentLanguage);
-
-                        // Bezárjuk a legördülő nyelvi opciókat
-                        const languageOptions = document.getElementById('languageOptions');
-                        const bsCollapse = new bootstrap.Collapse(languageOptions, {
-                            toggle: false
-                        });
-                        bsCollapse.hide();
-
-                        // Itt adhatsz hozzá logikát a nyelv váltásához
-                        // Például betölthetsz egy nyelvi fájlt, vagy frissítheted a felület szövegeit
-                        alert(`Nyelv beállítva: ${selectedLang === 'hu' ? 'Magyar' : 'Angol'}`);
+                        setLanguage(currentLanguage);
                     }
                 });
             });
         });
+
+        function setLanguage(language) {
+            document.querySelectorAll('[data-text-hu]').forEach(element => {
+                element.textContent = language === 'hu' ? element.getAttribute('data-text-hu') : element.getAttribute('data-text-en');
+            });
+        }
     </script>
 </body>
 </html>
