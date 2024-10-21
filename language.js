@@ -1,9 +1,4 @@
-
-"https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/js/all.min.js"
-
-"https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"
-
-    document.addEventListener('DOMContentLoaded', () => {
+ document.addEventListener('DOMContentLoaded', () => {
         let currentLanguage = localStorage.getItem('selectedLanguage') || 'hu';
         setLanguage(currentLanguage);
 
