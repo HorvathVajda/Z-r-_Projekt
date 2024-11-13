@@ -1,6 +1,7 @@
 <template>
   <header>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <!-- Logo, amire kattintva a felhasználó visszakerül a főoldalra -->
         <router-link class="navbar-brand logo" to="/">BookMyTime</router-link>
@@ -58,6 +59,7 @@ html, body {
 .navbar {
   width: 100%;   /* Ezt adjuk hozzá */
   padding: 0.5rem 1rem;
+  margin-bottom: 10px;
 }
 
 .container-fluid {
@@ -69,6 +71,7 @@ html, body {
   font-size: 24px;
   font-weight: bold;
   color: #ffffff;
+  color: black;
   text-decoration: none;
 }
 
@@ -78,6 +81,12 @@ html, body {
 
 .nav-link {
   color: white;
+  color: goldenrod;
+  background: transparent;
+}
+
+.nav-link {
+  color: black;
   text-decoration: none;
 }
 
@@ -87,6 +96,15 @@ html, body {
 
 .nav-link.active {
   background-color: #ff007f;
+  color: gray;
+  background: transparent;
+}
+
+.nav-link.active:hover{
+  color: grey;
+}
+.nav-link.active {
+  background-color: goldenrod;
   color: white;
   border-radius: 5px;
   padding: 0.25rem 0.5rem;

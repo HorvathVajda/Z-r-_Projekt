@@ -40,6 +40,8 @@ html, body {
   width: 100%;
   background-color: #333;
   padding: 1rem;
+  padding: 1rem;
+  color:  black;
 }
 
 </style>
