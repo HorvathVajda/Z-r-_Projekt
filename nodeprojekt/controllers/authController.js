@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 // authController.js
 const bcrypt = require('bcrypt');
 const jwt = require('jsonwebtoken');
@@ -27,3 +28,21 @@ exports.login = async (req, res) => {
     res.status(200).json({ token });
   });
 };
+=======
+// controllers/bookingController.js
+const db = require('../config/db');  // Importáljuk a db kapcsolatot
+
+const getBookings = (req, res) => {
+  const query = 'SELECT * FROM foglalasok';
+  
+  db.query(query, (err, results) => {
+    if (err) {
+      console.error('Hiba a foglalások lekérésekor: ', err);
+      return res.status(500).json({ error: 'Adatbázis hiba' });
+    }
+    res.json(results);  // Visszaadjuk a foglalásokat JSON formátumban
+  });
+};
+
+module.exports = { getBookings };
+>>>>>>> 763291d0d2170a632805daadaf3a738a4983eb33
