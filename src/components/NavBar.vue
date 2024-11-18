@@ -2,10 +2,10 @@
   <header>
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <!-- Logo, amire kattintva a felhasználó visszakerül a főoldalra -->
         <router-link class="navbar-brand logo" to="/" @click="closeMenu">BookMyTime</router-link>
 
         <!-- Hamburger menü gomb -->
+
         <button
           class="navbar-toggler"
           type="button"
@@ -18,9 +18,9 @@
         </button>
 
         <!-- Navigációs menü -->
+
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
-            <!-- Navigációs linkek a megfelelő útvonalakhoz -->
             <li class="nav-item">
               <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
             </li>
@@ -106,27 +106,24 @@ html, body {
   height: 20px;
 }
 
-
-/* Az aktív linkeknél, de nem a Bejelentkezés linknél */
 .nav-link.active::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 2px; /* Alsó szegély vastagsága */
-  background-color: goldenrod; /* Arany szín */
-  transform: scaleX(0); /* Az aktív linkeknél csak akkor jelenjen meg, ha nem a Bejelentkezés gomb */
+  height: 2px;
+  background-color: goldenrod;
+  transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }
 
-/* Kivétel a Bejelentkezés gombra */
 .nav-link.active.login-link::after {
-  transform: scaleX(0); /* A Bejelentkezés gombnál nem jelenik meg a szegély */
+  transform: scaleX(0);
 }
 
 .container-fluid {
-  width: 100%;   /* Ezt is biztosítjuk */
+  width: 100%;
   padding: auto;
   margin: auto;
 }
@@ -171,26 +168,23 @@ html, body {
   background-color: goldenrod;
 }
 
-/* Alsó szegély az aktív linkekhez */
 .nav-link::after {
   content: "";
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
-  height: 2px; /* Alsó szegély vastagsága */
-  background-color: goldenrod; /* Arany szín */
+  height: 2px;
+  background-color: goldenrod;
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }
 
 .nav-link:hover::after {
-  transform: scaleX(1); /* A szegély megjelenik hover hatására */
+  transform: scaleX(1);
 }
 
-/* Törlés az aktív link extra padding-jából */
 .navbar .nav-link.active {
   padding: 10px 15px;
 }
-
 </style>
