@@ -36,12 +36,5 @@ html, body {
   flex-grow: 1; /* A container-kitöltés biztosítása */
 }
 
-.navbar {
-  width: 100%;
-  background-color: #333;
-  padding: 1rem;
-  padding: 1rem;
-  color:  black;
-}
 
 </style>

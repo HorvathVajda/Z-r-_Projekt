@@ -3,6 +3,7 @@ import HomePage from './components/HomePage.vue';
 import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
 import LoginPage from './components/LoginPage.vue';
+import RegistrationPage from './components/RegistrationPage.vue';
 
 const routes = [
   {
@@ -24,6 +25,11 @@ const routes = [
     path: '/login',
     name: 'Login',
     component: LoginPage
+  },
+  {
+    path: '/register',
+    name: 'Registration',
+    component: RegistrationPage
   }
 ];
 

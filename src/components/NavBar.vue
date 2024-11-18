@@ -1,6 +1,5 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
         <!-- Logo, amire kattintva a felhasználó visszakerül a főoldalra -->
@@ -57,57 +56,90 @@ html, body {
 
 /* Az alap navbar stílusok a Bootstrapra építve */
 .navbar {
-  width: 100%;   /* Ezt adjuk hozzá */
-  padding: 0.5rem 1rem;
-  margin-bottom: 10px;
+  position: fixed; /* Fixált a képernyő tetején */
+  top: 0;
+  left: 0;
+  width: 100%;
+  z-index: 1000;
+  background-color: white;
+  padding: 10px 0;
+  text-align: center;
+  font-family: 'Franklin Gothic Medium';
+  height: 50px;
+  transition: transform 0.3s ease-in-out; /* Zökkenőmentes animáció */
 }
+
+.navbar.hidden {
+  transform: translateY(-100%); /* Eltüntetjük a navbar-t */
+}
+
+
 
 .container-fluid {
   width: 100%;   /* Ezt is biztosítjuk */
-  padding: 0;
+  padding: auto;
+  margin: auto;
 }
 
 .logo {
-  font-size: 24px;
+  font-size: 30px;
   font-weight: bold;
-  color: #ffffff;
   color: black;
   text-decoration: none;
+  background: transparent;
 }
 
 .logo:hover {
-  color: #ff007f;
+  color: goldenrod;
 }
 
 .nav-link {
-  color: white;
+  color: black;
+  text-decoration: none;
+  background: transparent;
+  font-size: 18px;
+  padding: 10px 15px;
+  position: relative;
+  display: inline-block;
+  transition: color 0.3s, background-color 0.3s;
+}
+
+.nav-link:hover {
   color: goldenrod;
   background: transparent;
 }
 
-.nav-link {
+.nav-link.active {
+  background-color: gold;
   color: black;
-  text-decoration: none;
-}
-
-.nav-link:hover {
-  color: #dcdcdc;
-}
-
-.nav-link.active {
-  background-color: #ff007f;
-  color: gray;
-  background: transparent;
-}
-
-.nav-link.active:hover{
-  color: grey;
-}
-.nav-link.active {
-  background-color: goldenrod;
-  color: white;
   border-radius: 5px;
   padding: 0.25rem 0.5rem;
 }
-</style>
 
+.nav-link.active:hover {
+  background-color: goldenrod;
+}
+
+/* Alsó szegély az aktív linkekhez */
+.nav-link::after {
+  content: "";
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 100%;
+  height: 2px; /* Alsó szegély vastagsága */
+  background-color: goldenrod; /* Arany szín */
+  transform: scaleX(0);
+  transition: transform 0.3s ease-in-out;
+}
+
+.nav-link:hover::after {
+  transform: scaleX(1); /* A szegély megjelenik hover hatására */
+}
+
+/* Törlés az aktív link extra padding-jából */
+.navbar .nav-link.active {
+  padding: 10px 15px;
+}
+
+</style>

@@ -1,11 +1,6 @@
 <template>
+  <br>
   <div class="home-page">
-    <!-- Cookie Consent -->
-    <div v-if="showCookieConsent" id="cookie-consent">
-      <p>Az oldal sütiket használ a jobb felhasználói élmény érdekében.</p>
-      <button @click="acceptCookies" id="accept-btn">OK</button>
-    </div>
-
     <!-- Hero Section -->
     <section class="hero text-center">
       <h2>Kezdj el foglalni most!</h2>
@@ -16,10 +11,7 @@
           <input type="date" class="form-control mx-1" />
           <input type="time" class="form-control mx-1" />
           <button type="submit" class="custom-btn">Keress</button>
-          <button type="submit" class="custom-btn">
           <span></span><span></span><span></span><span></span>
-    Keresés
-</button>
 
         </form>
       </div>
@@ -32,19 +24,19 @@
         <div class="col-md-4">
           <div class="service-card">
             <i class="fas fa-cut"></i>
-            <h4>Fodrászat</h4>
+            <h4>TESZT</h4>
           </div>
         </div>
         <div class="col-md-4">
           <div class="service-card">
             <i class="fas fa-spa"></i>
-            <h4>Spa</h4>
+            <h4>TESZT</h4>
           </div>
         </div>
         <div class="col-md-4">
           <div class="service-card">
             <i class="fas fa-dumbbell"></i>
-            <h4>Edzőterem</h4>
+            <h4>TESZT</h4>
           </div>
         </div>
       </div>
@@ -69,81 +61,87 @@ export default {
 </script>
 
 <style scoped>
-/* Cookie consent */
-#cookie-consent {
-  position: fixed;
-  bottom: 0;
-  left: 0;
-  width: 100%;
-  background-color: #f8d7da;
-  color: #721c24;
-  text-align: center;
-  padding: 10px;
-  z-index: 9999;
-}
-
-#cookie-consent p {
-  margin: 0;
-}
-
-#accept-btn {
-  background-color: #28a745;
-  border: none;
-  padding: 5px 15px;
-  color: white;
-  cursor: pointer;
-}
-
 
 /* Hero szekció */
 .hero {
-  background: #f8f9fa;
+  background: white;
   padding: 60px 0;
+  margin-top: 10px;
 }
 
 .search-box {
-  max-width: 600px;
   margin: 0 auto;
 }
 
 .custom-btn {
-  background-color: #007bff;
-  color: white;
+  background-color: gold;
+  color: black;
+  padding: 0.8em 1.5em;
   border: none;
+  border-radius: 0.5em;
   padding: 10px 20px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  transition: background-color 0.3s, transform 0.3s;
 }
 
 .custom-btn:hover {
-  background-color: #0056b3;
+  background-color: goldenrod;
 }
 
 /* Szolgáltatások */
-.services .service-card {
-  background: #f1f1f1;
-  border: 1px solid #ddd;
-    --c: goldenrod;
-    color: var(--c);
-    font-size: 16px;
-    border: 0.3em solid var(--c);
-    border-radius: 0.5em;
-    width: 50em;
-    height: 3.5em;
-    text-transform: uppercase;
-    font-weight: bold;
-    font-family: sans-serif;
-    letter-spacing: 0.1em;
-    text-align: center;
-    line-height: 3em;
-    position: relative;
-    overflow: hidden;
-    z-index: 1;
-    transition: 0.5s;
-    margin: 1em;
-    background: none;
-    cursor: pointer;
+.services {
+  background-color: white;
+  padding: 3em 1em;
+  border-radius: 1em;
+  box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
 }
+
+.services h3 {
+  font-size: 2.5em;
+  color: var(--c);
+  margin-bottom: 1.5em;
+  text-transform: uppercase;
+  font-weight: bold;
+}
+
+.services .service-card {
+  background: white;
+  border: 1px solid var(--c);
+  color: var(--c);
+  font-size: 1.2em;
+  border-radius: 1em;
+  padding: 2em 1em;
+  text-transform: uppercase;
+  font-weight: bold;
+  font-family: sans-serif;
+  letter-spacing: 0.1em;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+  transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+
+.services .service-card i {
+  font-size: 3em;
+  margin-bottom: 0.5em;
+  color: var(--c);
+  transition: color 0.3s;
+}
+
+.services .service-card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
+  background-color: var(--c);
+  color: black;
+}
+
+.services .service-card:hover i {
+  color: black;
+}
+
 
 .custom-btn span {
     position: absolute;
@@ -195,8 +193,7 @@ export default {
 
 .services .service-card i {
   font-size: 40px;
-  color: #007bff;
-  color: goldenrod;
+  color: black;
 }
 
 .services .service-card h4 {
