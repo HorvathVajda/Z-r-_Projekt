@@ -3,18 +3,21 @@
     <NavBar />
     <!-- Itt jelenik meg a router által betöltött komponens -->
     <router-view></router-view>
+    <FooTer />
   </div>
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue';
+import Footer from './components/Footer.vue';
 
 export default {
   name: 'App',
   components: {
-    NavBar
+    NavBar,
+    Footer,
   },
-}
+};
 </script>
 
 <style>
@@ -33,4 +36,7 @@ html, body {
   width: 100%;  /* Teljes szélesség */
 }
 
+router-view {
+  flex: 1; /* A router által betöltött komponens kitölti a fennmaradó helyet */
+}
 </style>
