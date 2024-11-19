@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <router-link class="navbar-brand logo" to="/" @click="closeMenu">BookMyTime</router-link>
+        <router-link class="navbar-brand logo" to="/">BookMyTime</router-link>
 
         <!-- Hamburger menü gomb -->
 
@@ -20,6 +20,7 @@
         <!-- Navigációs menü -->
 
         <div class="collapse navbar-collapse" id="navbarNav">
+
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
@@ -58,17 +59,26 @@ html, body {
 }
 
 .navbar {
+  background: white;
   position: fixed;
   top: 0;
   left: 0;
+  right: 0;
   width: 100%;
   z-index: 1000;
-  background-color: white;
   padding: 10px 0;
   text-align: center;
   font-family: 'Franklin Gothic Medium';
-  height: 50px;
+  height: auto;
   transition: transform 0.3s ease-in-out;
+}
+
+.navbar-nav{
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
 }
 
 .navbar.hidden {
@@ -76,9 +86,8 @@ html, body {
 }
 
 .navbar-toggler {
-  background: white;
   padding: 8px 12px;
-  position: absolute;
+  position: fixed;
   right: 20px;
   top: 10px;
   z-index: 1050;
@@ -90,12 +99,11 @@ html, body {
 }
 
 .collapse.navbar-collapse {
-  position: fixed;
-  right: 0;
+  top: 0;
+  left: 0;
+  background: white;
   height: auto;
   width: auto;
-  background-color: white;
-  box-shadow: -2px 0 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s ease-in-out;
   z-index: 1040;
 }
@@ -186,5 +194,11 @@ html, body {
 
 .navbar .nav-link.active {
   padding: 10px 15px;
+}
+@media (max-width: 768px) {
+  .navbar-nav {
+    flex-direction: column;
+    align-items: center;
+  }
 }
 </style>

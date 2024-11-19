@@ -32,9 +32,5 @@ html, body {
   min-height: 100vh;
   width: 100%;  /* Teljes szélesség */
 }
-.container-fluid {
-  flex-grow: 1; /* A container-kitöltés biztosítása */
-}
-
 
 </style>
