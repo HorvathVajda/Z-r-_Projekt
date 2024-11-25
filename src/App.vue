@@ -1,7 +1,6 @@
 <template>
   <div id="app">
     <NavBar />
-    <!-- Itt jelenik meg a router által betöltött komponens -->
     <router-view></router-view>
     <FooTer />
   </div>
@@ -9,13 +8,13 @@
 
 <script>
 import NavBar from './components/NavBar.vue';
-import Footer from './components/Footer.vue';
+import FooTer from './components/FooTer.vue';
 
 export default {
   name: 'App',
   components: {
     NavBar,
-    Footer,
+    FooTer,
   },
 };
 </script>

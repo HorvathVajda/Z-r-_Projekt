@@ -19,17 +19,23 @@ export default {
 
 <style scoped>
 .footer {
-  background: #333;
-  color: #fff;
+  background: white;
+  color: black;
   padding: 20px 0;
   text-align: center;
-  border-top: 3px solid #28a745;
+  border-top: 3px solid black;
+
 }
 
 .footer-container {
-  max-width: 1200px;
+  max-width: 100%;
   margin: 0 auto;
   padding: 0 15px;
+  background: white;
+  color: black;
+  padding: 20px 0;
+  text-align: center;
+  border-top: 3px solid black;
 }
 
 .footer-nav {
@@ -37,7 +43,7 @@ export default {
 }
 
 .footer-link {
-  color: #28a745;
+  color: black;
   text-decoration: none;
   margin: 0 10px;
   font-weight: bold;
@@ -45,6 +51,7 @@ export default {
 }
 
 .footer-link:hover {
-  color: #fff;
+  color: black;
+  background: transparent;
 }
 </style>
