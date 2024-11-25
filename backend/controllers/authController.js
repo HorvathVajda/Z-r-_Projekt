@@ -1,37 +1,35 @@
-const bcrypt = require('bcryptjs');
-const jwt = require('jsonwebtoken');
-const passport = require('passport');
-const db = require('../config/db'); // Az adatbázis kapcsolat importálása
+const db = require('../config/db'); // Az adatbázis kapcsolat
+const bcrypt = require('bcrypt');
+const saltRounds = 10; // Sózás a bcrypthez
 
-// Regisztráció
-exports.register = async (req, res) => {
-    const { nev, email, jelszo, jogosultsag } = req.body;
+// Regisztrációs funkció
+const registerUser = async (req, res) => {
+  const { name, email, password, phone } = req.body;
 
-    const hashedPassword = await bcrypt.hash(jelszo, 10);
+  // Alapvető validáció
+  if (!name || !email || !password || !phone) {
+    return res.status(400).json({ error: 'Minden mezőt ki kell tölteni' });
+  }
 
-    db.query(
-        'INSERT INTO felhasznalo (nev, email, jelszo, jogosultsag) VALUES (?, ?, ?, ?)',
-        [nev, email, hashedPassword, jogosultsag],
-        (err, result) => {
-            if (err) return res.status(500).json({ message: 'Hiba történt a regisztráció során' });
-            return res.status(201).json({ message: 'Sikeres regisztráció' });
-        }
-    );
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  if (!emailRegex.test(email)) {
+    return res.status(400).json({ error: 'Érvénytelen email cím' });
+  }
+
+  try {
+    // Jelszó hashelése bcrypt-tel
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    // Adatbázis lekérdezés
+    const query = 'INSERT INTO felhasznalo (nev, email, jelszo, telefonszam) VALUES (?, ?, ?, ?)';
+    const [result] = await db.execute(query, [name, email, hashedPassword, phone]);
+
+    // Sikeres regisztráció válasz
+    res.status(201).json({ message: 'Sikeres regisztráció', userId: result.insertId });
+  } catch (err) {
+    console.error('Hiba a regisztráció során:', err);
+    res.status(500).json({ error: 'Regisztrációs hiba' });
+  }
 };
 
-// Bejelentkezés
-exports.login = (req, res) => {
-    const { email, jelszo } = req.body;
-
-    db.query('SELECT * FROM felhasznalo WHERE email = ?', [email], async (err, results) => {
-        if (err) return res.status(500).json({ message: 'Hiba történt a bejelentkezés során' });
-        if (results.length === 0) return res.status(400).json({ message: 'Felhasználó nem található' });
-
-        const user = results[0];
-        const isMatch = await bcrypt.compare(jelszo, user.jelszo);
-        if (!isMatch) return res.status(400).json({ message: 'Hibás jelszó' });
-
-        const token = jwt.sign({ id: user.id, jogosultsag: user.jogosultsag }, 'titkoskulcs', { expiresIn: '1h' });
-        res.json({ message: 'Bejelentkezve', token });
-    });
-};
+module.exports = { registerUser };

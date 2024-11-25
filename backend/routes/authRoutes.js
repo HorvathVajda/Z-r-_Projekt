@@ -1,9 +1,8 @@
 const express = require('express');
 const router = express.Router();
-const authController = require('../controllers/authController');
+const { registerUser } = require('../controllers/authController');
 
-// Példa útvonalak
-router.post('/register', authController.register);
-router.post('/login', authController.login);
+// Regisztráció végpont
+router.post('/register', registerUser);
 
 module.exports = router;

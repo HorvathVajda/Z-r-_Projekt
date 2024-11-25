@@ -1,21 +1,12 @@
-// config/db.js
-const mysql = require('mysql2');
+const mysql = require('mysql2/promise');
 
-// Csatlakozás az adatbázishoz
-const db = mysql.createConnection({
-  host: 'localhost',   // Az adatbázis hosztja
-  user: 'root',        // Az adatbázis felhasználója
-  password: '',        // Az adatbázis jelszava
-  database: 'bookmytime'  // Az adatbázis neve
+const pool = mysql.createPool({
+  host: 'localhost', // Az adatbázis szerver címe
+  user: 'root',      // Az adatbázis felhasználónév
+  password: '', // Az adatbázis jelszó
+  database: 'bookmytime', // Az adatbázis neve
+  waitForConnections: true,
+  connectionLimit: 10,
 });
 
-// Csatlakozás ellenőrzése
-db.connect((err) => {
-  if (err) {
-    console.error('Hiba az adatbázishoz való csatlakozáskor: ', err);
-    return;
-  }
-  console.log('Sikeresen csatlakoztunk az adatbázishoz!');
-});
-
-module.exports = db;
+module.exports = pool;

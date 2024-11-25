@@ -5,43 +5,19 @@
       <form @submit.prevent="handleRegistration">
         <div class="form-group">
           <label for="name">Név</label>
-          <input
-            type="text"
-            id="name"
-            v-model="name"
-            placeholder="Adja meg a nevét"
-            required
-          />
+          <input id="name" v-model="name" required />
         </div>
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input
-            type="email"
-            id="email"
-            v-model="email"
-            placeholder="Adja meg az e-mail címét"
-            required
-          />
+          <input id="email" v-model="email" type="email" required />
         </div>
         <div class="form-group">
           <label for="password">Jelszó</label>
-          <input
-            type="password"
-            id="password"
-            v-model="password"
-            placeholder="Adja meg a jelszavát"
-            required
-          />
+          <input id="password" v-model="password" type="password" required />
         </div>
         <div class="form-group">
           <label for="phone">Telefonszám</label>
-          <input
-            type="tel"
-            id="phone"
-            v-model="phone"
-            placeholder="Adja meg a telefonszámát"
-            required
-          />
+          <input id="phone" v-model="phone" type="tel" required />
         </div>
         <button type="submit" class="register-button">Regisztráció</button>
       </form>
@@ -49,23 +25,43 @@
   </div>
 </template>
 
-<script setup>
-import { ref } from 'vue';
-import { useRouter } from 'vue-router';
+<script>
+import axios from 'axios';
 
-const router = useRouter();
+export default {
+  data() {
+    return {
+      name: '',
+      email: '',
+      password: '',
+      phone: ''
+    };
+  },
+  methods: {
+    handleRegistration() {
+      const userData = {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        phone: this.phone,
+      };
 
-const name = ref('');
-const email = ref('');
-const password = ref('');
-const phone = ref('');
-
-const handleRegistration = () => {
-  // Az adatokat itt kezelheted (pl. API hívás)
-  console.log("Regisztráció adat:", { name: name.value, email: email.value, password: password.value, phone: phone.value });
-
-  // Ha a regisztráció sikeres, átirányítás a bejelentkezési oldalra
-  router.push('/login');
+      axios.post('http://localhost:5000/api/register', userData)
+        .then((response) => {
+          console.log('Regisztráció sikeres:', response.data);
+          alert(response.data.message);
+          this.name = '';
+          this.email = '';
+          this.password = '';
+          this.phone = '';
+          this.$router.push('/login');
+        })
+        .catch((error) => {
+          console.error('Regisztráció hiba:', error.response ? error.response.data : error.message);
+          alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
+        });
+    }
+  }
 };
 </script>
 
