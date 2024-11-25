@@ -26,12 +26,6 @@
               <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/kapcsolat" @click="toggleMenu">Kapcsolat</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/rolunk" @click="toggleMenu">Rólunk</router-link>
-            </li>
-            <li class="nav-item">
               <router-link class="nav-link active login-link" to="/login" @click="toggleMenu">Bejelentkezés</router-link>
             </li>
           </ul>

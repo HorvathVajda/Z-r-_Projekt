@@ -1,20 +1,37 @@
 <template>
   <div id="app">
     <NavBar />
+    <!-- Itt jelenik meg a router által betöltött komponens -->
     <router-view></router-view>
-    <FooTer />
+    <LabLec />
   </div>
 </template>
 
 <script>
 import NavBar from './components/NavBar.vue';
-import FooTer from './components/FooTer.vue';
+import LabLec from './components/LabLec.vue';
+import axios from 'axios'; // Axios importálása
 
 export default {
   name: 'App',
   components: {
     NavBar,
-    FooTer,
+    LabLec,
+  },
+  data() {
+    return {
+      apiMessage: '', // Az API-tól érkező üzenet tárolására
+    };
+  },
+  mounted() {
+    // API hívás az oldal betöltésekor
+    axios.get('/api')
+      .then(response => {
+        this.apiMessage = response.data.message; // Az API válasz beállítása
+      })
+      .catch(error => {
+        console.error('Hiba történt az API hívás során:', error);
+      });
   },
 };
 </script>
@@ -31,11 +48,7 @@ html, body {
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100vh;
+  min-height: 100%;
   width: 100%;  /* Teljes szélesség */
-}
-
-router-view {
-  flex: 1; /* A router által betöltött komponens kitölti a fennmaradó helyet */
 }
 </style>

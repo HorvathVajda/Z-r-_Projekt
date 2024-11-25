@@ -2,18 +2,24 @@
   <footer class="footer">
     <div class="footer-container">
       <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
-      <nav class="footer-nav">
-        <a href="#about" class="footer-link">Rólunk</a>
-        <a href="#contact" class="footer-link">Kapcsolat</a>
-        <a href="#privacy" class="footer-link">Adatvédelem</a>
-      </nav>
+      <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Kapcsolat" @click="toggleMenu"> Kapcsolat</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Rolunk" @click="toggleMenu">Rólunk</router-link>
+            </li>
+            <li class="nav-item">
+              <router-link class="nav-link" to="/Adatvedelem" @click="toggleMenu">Adatvédelem</router-link>
+            </li>
+          </ul>
     </div>
   </footer>
 </template>
 
 <script>
 export default {
-  name: "Footer",
+  name: "LabLec",
 };
 </script>
 
@@ -24,18 +30,13 @@ export default {
   padding: 20px 0;
   text-align: center;
   border-top: 3px solid black;
-
+  bottom: 0;
 }
 
 .footer-container {
-  max-width: 100%;
+  max-width: 1200px;
   margin: 0 auto;
   padding: 0 15px;
-  background: white;
-  color: black;
-  padding: 20px 0;
-  text-align: center;
-  border-top: 3px solid black;
 }
 
 .footer-nav {
@@ -52,6 +53,5 @@ export default {
 
 .footer-link:hover {
   color: black;
-  background: transparent;
 }
 </style>

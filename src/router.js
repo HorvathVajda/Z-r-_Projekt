@@ -4,6 +4,7 @@ import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
 import LoginPage from './components/LoginPage.vue';
 import RegistrationPage from './components/RegistrationPage.vue';
+import AdatVedelem from './components/AdatVedelem.vue';
 
 const routes = [
   {
@@ -30,6 +31,11 @@ const routes = [
     path: '/register',
     name: 'Registration',
     component: RegistrationPage
+  },
+  {
+    path: '/Adatvedelem',
+    name: 'Adatvedelem',
+    component: AdatVedelem
   }
 ];
 
