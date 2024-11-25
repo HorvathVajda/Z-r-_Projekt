@@ -1,21 +1,16 @@
 const jwt = require('jsonwebtoken');
 
-exports.authMiddleware = (req, res, next) => {
-    const token = req.header('Authorization');
-    if (!token) return res.status(401).json({ error: 'No token, authorization denied' });
+// Middleware a JWT token ellenőrzésére
+const authenticateToken = (req, res, next) => {
+  const token = req.header('Authorization')?.split(' ')[1]; // Az Authorization header-ből
 
-    try {
-        const decoded = jwt.verify(token, process.env.JWT_SECRET);
-        req.user = decoded;
-        next();
-    } catch (error) {
-        res.status(401).json({ error: 'Token is not valid' });
-    }
-};
+  if (!token) return res.status(401).json({ message: 'Nincs token' });
 
-exports.roleMiddleware = (role) => (req, res, next) => {
-    if (req.user.role !== role) {
-        return res.status(403).json({ error: 'Forbidden' });
-    }
+  jwt.verify(token, 'titkoskulcs', (err, user) => {
+    if (err) return res.status(403).json({ message: 'Érvénytelen token' });
+    req.user = user;
     next();
+  });
 };
+
+module.exports = authenticateToken;

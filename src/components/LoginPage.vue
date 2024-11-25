@@ -31,22 +31,36 @@
 </template>
 
 <script>
-import { useRouter } from 'vue-router';
+import { login } from "../API"; // Importáljuk a login API hívást
+import { useRouter } from "vue-router";
 
 export default {
   data() {
     return {
       email: "",
       password: "",
+      errorMessage: "", // Hibaüzenet
     };
   },
   methods: {
-    handleLogin() {
-      // Az űrlap adatainak ellenőrzése és a bejelentkezés logikája
-      alert(`Bejelentkezve: ${this.email}`);
+    async handleLogin() {
+      try {
+        // Az adatokat elküldjük a backendhez
+        const response = await login({
+          email: this.email,
+          jelszo: this.password,
+        });
 
-      // Bejelentkezés után átirányítás a főoldalra
-      this.$router.push('/');
+        // Ha sikeres, mentjük a JWT tokent a helyi tárolóba
+        localStorage.setItem("token", response.data.token);
+
+        // Átirányítás a főoldalra
+        this.$router.push("/");
+      } catch (error) {
+        // Hibakezelés
+        this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
+        alert(this.errorMessage);
+      }
     },
   },
 };
