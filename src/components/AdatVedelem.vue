@@ -50,7 +50,7 @@ export default {
         },
         {
           title: "Kapcsolatfelvétel",
-          content: `Ha bármilyen kérdése vagy panasza van az adatkezeléssel kapcsolatban, kérjük, vegye fel velünk a kapcsolatot! <br><a href='/kapcsolat' class="kapcsolat-link">Kapcsolatfelvétel</a>`,
+          content: `Ha bármilyen kérdése vagy panasza van az adatkezeléssel kapcsolatban, kérjük, vegye fel velünk a kapcsolatot! <br><a href='/kapcsolat' class="kapcsolat-link" style="background: transparent; text-decoration: none;">Kapcsolatfelvétel</a>`,
           active: false
         }
       ]
@@ -83,6 +83,7 @@ export default {
 
 .kapcsolat-link:hover {
   text-decoration: underline;
+  background: transparent;
 }
 .adatvedelem{
   padding-top: 15px;
