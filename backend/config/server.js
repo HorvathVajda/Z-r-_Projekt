@@ -1,19 +1,19 @@
-// backend/config/server.js
-const express = require('express');
+const express = require("express");
+const authRoutes = require("../routes/authRoutes");
+const cors = require("cors");
+const dotenv = require("dotenv");
+
+dotenv.config(); // Környezeti változók betöltése
+
 const app = express();
-const cors = require('cors');
-const authRoutes = require('../routes/authRoutes'); // Az authRoutes importálása helyes
 
-app.use(cors({
-  origin: 'http://localhost:5173', // Frontend URL
-  methods: ['GET', 'POST'],
-  credentials: true,
-}));
+// Middleware-k
+app.use(cors()); // CORS engedélyezése
+app.use(express.json()); // Express 4.16+ már tartalmazza a JSON feldolgozást
 
-app.use(express.json());
+// Útvonalak
+app.use("/api/auth", authRoutes); // Az autentikációs útvonal
 
-app.use('/api', authRoutes);
-
-app.listen(5000, () => {
-  console.log('Backend szerver fut a http://localhost:5000/ porton');
-});
+// Szerver indítása
+const PORT = process.env.PORT || 5000;
+app.listen(PORT, () => console.log(`Szerver fut a ${PORT} porton`));

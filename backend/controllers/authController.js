@@ -1,9 +1,39 @@
-const db = require('../config/db'); // Az adatbázis kapcsolat
-const bcrypt = require('bcrypt');
-const saltRounds = 10; // Sózás a bcrypthez
+const jwt = require("jsonwebtoken");
+const secretKey = process.env.SECRET_KEY; // Környezeti változóból olvasott kulcs
+const db = require("../config/db");
+const bcrypt = require("bcrypt");
+const saltRounds = 10;
+
+exports.login = async (req, res) => {
+  const { email, jelszo } = req.body;
+
+  try {
+    // Felhasználó keresése
+    const [user] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
+
+    if (!user) {
+      return res.status(404).json({ message: "A felhasználó nem található." });
+    }
+
+    // Jelszó ellenőrzése
+    const isMatch = await bcrypt.compare(jelszo, user.jelszo);
+    if (!isMatch) {
+      return res.status(401).json({ message: "Helytelen jelszó." });
+    }
+
+    // Token generálása
+    const token = jwt.sign({ id: user.id, email: user.email }, secretKey, { expiresIn: "1h" });
+
+    // Token visszaküldése
+    res.json({ token });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ message: "Szerverhiba." });
+  }
+};
 
 // Regisztrációs funkció
-const registerUser = async (req, res) => {
+exports.registerUser = async (req, res) => {
   const { name, email, password, phone } = req.body;
 
   // Alapvető validáció
@@ -17,6 +47,12 @@ const registerUser = async (req, res) => {
   }
 
   try {
+    // Ellenőrizzük, hogy létezik-e már az e-mail cím
+    const [existingUser] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
+    if (existingUser) {
+      return res.status(400).json({ error: 'Ez az e-mail cím már regisztrálva van' });
+    }
+
     // Jelszó hashelése bcrypt-tel
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
@@ -31,5 +67,3 @@ const registerUser = async (req, res) => {
     res.status(500).json({ error: 'Regisztrációs hiba' });
   }
 };
-
-module.exports = { registerUser };
