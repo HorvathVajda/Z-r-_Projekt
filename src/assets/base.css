@@ -1,5 +1,6 @@
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
+  --navbar-height: 60px;
   --vt-c-white: #ffffff;
   --vt-c-white-soft: #f8f8f8;
   --vt-c-white-mute: #f2f2f2;
@@ -38,6 +39,7 @@
 
 @media (prefers-color-scheme: dark) {
   :root {
+    --navbar-height: 80px;
     --color-background: var(--vt-c-black);
     --color-background-soft: var(--vt-c-black-soft);
     --color-background-mute: var(--vt-c-black-mute);
@@ -58,10 +60,20 @@
   font-weight: normal;
 }
 
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+  width: 100%;
+}     
 body {
+  padding-top: var(--navbar-height); 
+
   min-height: 100vh;
   color: var(--color-text);
   background: var(--color-background);
+  display: flex;
+  flex-direction: column;
   transition:
     color 0.5s,
     background-color 0.5s;

@@ -4,7 +4,7 @@
       <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
       <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/Kapcsolat" @click="toggleMenu"> Kapcsolat</router-link>
+              <router-link class="nav-link" to="/Kapcsolat" @click="toggleMenu"> Kapcsolatfelvétel</router-link>
             </li>
             <li class="nav-item">
               <router-link class="nav-link" to="/Rolunk" @click="toggleMenu">Rólunk</router-link>
@@ -25,6 +25,7 @@ export default {
 
 <style scoped>
 .footer {
+  width: auto;
   background: white;
   color: black;
   padding: 20px 0;

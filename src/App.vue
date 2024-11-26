@@ -1,8 +1,10 @@
 <template>
   <div id="app">
     <NavBar />
-    <!-- Itt jelenik meg a router által betöltött komponens -->
-    <router-view></router-view>
+    <!-- Tartalom -->
+    <main id="content">
+      <router-view />
+    </main>
     <LabLec />
   </div>
 </template>
@@ -10,7 +12,7 @@
 <script>
 import NavBar from './components/NavBar.vue';
 import LabLec from './components/LabLec.vue';
-import axios from 'axios'; // Axios importálása
+import axios from 'axios';
 
 export default {
   name: 'App',
@@ -20,16 +22,15 @@ export default {
   },
   data() {
     return {
-      apiMessage: '', // Az API-tól érkező üzenet tárolására
+      apiMessage: '',
     };
   },
   mounted() {
-    // API hívás az oldal betöltésekor
     axios.get('/api')
-      .then(response => {
-        this.apiMessage = response.data.message; // Az API válasz beállítása
+      .then((response) => {
+        this.apiMessage = response.data.message;
       })
-      .catch(error => {
+      .catch((error) => {
         console.error('Hiba történt az API hívás során:', error);
       });
   },
@@ -37,18 +38,32 @@ export default {
 </script>
 
 <style>
-/* Alapstílusok az App.vue-hoz */
+/* Reset alapstílusok */
 html, body {
   margin: 0;
   padding: 0;
-  height: 100%;   /* 100% magasság */
-  width: 100%;    /* 100% szélesség */
+  box-sizing: border-box;
+  width: 100%;
+  height: 100%;
 }
 
+/* Fő App beállítás */
 #app {
   display: flex;
   flex-direction: column;
-  min-height: 100%;
-  width: 100%;  /* Teljes szélesség */
+  min-height: 100vh;
+}
+
+/* Tartalom megfelelő eltolása */
+#content {
+  flex: 1; /* Tartalom kitölti a fennmaradó helyet */
+  margin-top: 60px; /* NavBar tényleges magassága */
+}
+
+/* Navigáció magasság kezelése mobil eszközökhöz */
+@media (max-width: 768px) {
+  #content {
+    margin-top: 80px; /* Mobil NavBar magasság */
+  }
 }
 </style>

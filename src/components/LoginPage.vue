@@ -24,7 +24,7 @@
           />
         </div>
         <button type="submit" class="login-button">Bejelentkezés</button>
-        <router-link class="nav-link" to="/register">Regisztráció</router-link>
+        <router-link class="nav-link" to="/register" style="padding-top: 5px;">Regisztráció</router-link>
       </form>
     </div>
   </div>

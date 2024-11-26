@@ -5,6 +5,9 @@
   margin: 0 auto;
   padding: 2rem;
   font-weight: normal;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;  /* Biztosítja, hogy az oldal teljesen kitöltse a képernyőt */
 }
 
 a,
