@@ -1,12 +1,10 @@
-const mysql = require('mysql2/promise');
+const mysql = require("mysql2");
 
-const pool = mysql.createPool({
-  host: 'localhost', // Az adatbázis szerver címe
-  user: 'root',      // Az adatbázis felhasználónév
-  password: '', // Az adatbázis jelszó
+const db = mysql.createPool({
+  host: 'localhost',
+  user: 'root', // Használj megfelelő felhasználónevet
+  password: '', // Add meg az adatbázis jelszót
   database: 'bookmytime', // Az adatbázis neve
-  waitForConnections: true,
-  connectionLimit: 10,
 });
 
-module.exports = pool;
+module.exports = db.promise(); // Promise-alapú API használata
