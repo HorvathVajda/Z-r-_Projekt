@@ -11,12 +11,18 @@ exports.login = async (req, res) => {
     // Felhasználó keresése
     const [user] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
 
-    if (!user) {
-      return res.status(404).json({ message: "A felhasználó nem található." });
+    // Ellenőrizd, hogy létezik-e a felhasználó és van jelszó
+    if (!user || !user.jelszo) {
+      return res.status(404).json({ message: "A felhasználó nem található vagy nincs jelszó." });
     }
+
+    // Naplózd ki a beírt jelszót és a tárolt hash-elt jelszót
+    console.log('Beírt jelszó:', jelszo);
+    console.log('Hash-elt jelszó:', user.jelszo);
 
     // Jelszó ellenőrzése
     const isMatch = await bcrypt.compare(jelszo, user.jelszo);
+
     if (!isMatch) {
       return res.status(401).json({ message: "Helytelen jelszó." });
     }
@@ -27,7 +33,7 @@ exports.login = async (req, res) => {
     // Token visszaküldése
     res.json({ token });
   } catch (error) {
-    console.error(error);
+    console.error('Szerverhiba:', error);
     res.status(500).json({ message: "Szerverhiba." });
   }
 };
