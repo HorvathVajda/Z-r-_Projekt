@@ -19,22 +19,8 @@ export default {
   components: {
     NavBar,
     LabLec,
-  },
-  data() {
-    return {
-      apiMessage: '',
-    };
-  },
-  mounted() {
-    axios.get('/api')
-      .then((response) => {
-        this.apiMessage = response.data.message;
-      })
-      .catch((error) => {
-        console.error('Hiba történt az API hívás során:', error);
-      });
-  },
-};
+  }
+}
 </script>
 
 <style>

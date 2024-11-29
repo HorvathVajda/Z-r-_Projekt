@@ -1,10 +1,10 @@
-const mysql = require("mysql2");
+const mysql = require('mysql2'); // importáld a mysql2 csomagot
 
 const db = mysql.createPool({
   host: 'localhost',
-  user: 'root', // Használj megfelelő felhasználónevet
-  password: '', // Add meg az adatbázis jelszót
-  database: 'bookmytime', // Az adatbázis neve
+  user: 'root', // a saját adatbázis felhasználóneved
+  password: '', // a saját adatbázis jelszavad
+  database: 'bookmytime', // az adatbázis neve
 });
 
-module.exports = db.promise(); // Promise-alapú API használata
+module.exports = db.promise(); // A db objektumot a promise módba konvertáljuk

@@ -46,7 +46,7 @@ export default {
         phone: this.phone,
       };
 
-      axios.post('http://localhost:5000/api/register', userData)
+      axios.post('http://localhost:5000/api/auth/register', userData)
         .then((response) => {
           console.log('Regisztráció sikeres:', response.data);
           alert(response.data.message);

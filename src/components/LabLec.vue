@@ -4,13 +4,13 @@
       <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
       <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/Kapcsolat" @click="toggleMenu"> Kapcsolatfelvétel</router-link>
+              <router-link class="nav-link" to="/Kapcsolat"> Kapcsolatfelvétel</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/Rolunk" @click="toggleMenu">Rólunk</router-link>
+              <router-link class="nav-link" to="/Rolunk">Rólunk</router-link>
             </li>
             <li class="nav-item">
-              <router-link class="nav-link" to="/Adatvedelem" @click="toggleMenu">Adatvédelem</router-link>
+              <router-link class="nav-link" to="/Adatvedelem">Adatvédelem</router-link>
             </li>
           </ul>
     </div>
