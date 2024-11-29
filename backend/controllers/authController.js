@@ -1,5 +1,5 @@
 const jwt = require("jsonwebtoken");
-const secretKey = process.env.SECRET_KEY; // Környezeti változóból olvasott kulcs
+const secretKey = "titkoskulcs";
 const db = require("../config/db");
 const bcrypt = require("bcrypt");
 const saltRounds = 10;
@@ -9,12 +9,20 @@ exports.login = async (req, res) => {
 
   try {
     // Felhasználó keresése
-    const [user] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
+    const [users] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
 
-    // Ellenőrizd, hogy létezik-e a felhasználó és van jelszó
-    if (!user || !user.jelszo) {
-      return res.status(404).json({ message: "A felhasználó nem található vagy nincs jelszó." });
+    // Ellenőrizzük, hogy van-e találat
+    if (users.length === 0) {
+      return res.status(404).json({ message: "A felhasználó nem található." });
     }
+
+    const user = users[0];
+
+    // Ellenőrizzük, hogy van-e jelszó
+    if (!user.jelszo) {
+      return res.status(400).json({ message: "A felhasználóhoz nincs jelszó társítva." });
+    }
+
 
     // Naplózd ki a beírt jelszót és a tárolt hash-elt jelszót
     console.log('Beírt jelszó:', jelszo);
@@ -54,10 +62,14 @@ exports.registerUser = async (req, res) => {
 
   try {
     // Ellenőrizzük, hogy létezik-e már az e-mail cím
-    const [existingUser] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
-    if (existingUser) {
-      return res.status(400).json({ error: 'Ez az e-mail cím már regisztrálva van' });
-    }
+    // Ellenőrizzük, hogy létezik-e már az e-mail cím
+const [existingUsers] = await db.query("SELECT * FROM felhasznalo WHERE email = ?", [email]);
+
+// Ha az eredmény tömb nem üres, akkor az e-mail már létezik
+if (existingUsers.length > 0) {
+  return res.status(400).json({ error: 'Ez az e-mail cím már regisztrálva van' });
+}
+
 
     // Jelszó hashelése bcrypt-tel
     const hashedPassword = await bcrypt.hash(password, saltRounds);
