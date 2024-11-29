@@ -1,19 +1,12 @@
 <template>
   <footer class="footer">
     <div class="footer-container">
-      <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
-      <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <router-link class="nav-link" to="/Kapcsolat"> Kapcsolatfelvétel</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/Rolunk">Rólunk</router-link>
-            </li>
-            <li class="nav-item">
-              <router-link class="nav-link" to="/Adatvedelem">Adatvédelem</router-link>
-            </li>
-          </ul>
+
+      <router-link class="nav-link" to="/Kapcsolat">Kapcsolatfelvétel</router-link>
+      <router-link class="nav-link" to="/Rolunk">Rólunk</router-link>
+      <router-link class="nav-link" to="/Adatvedelem">Adatvédelem</router-link>
     </div>
+    <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
   </footer>
 </template>
 
@@ -24,35 +17,72 @@ export default {
 </script>
 
 <style scoped>
+html, body {
+  margin: 0;
+  padding: 0;
+  height: 100%;
+}
+
 .footer {
-  width: auto;
+  width: 100%; /* Teljes szélesség */
   background: white;
   color: black;
-  padding: 20px 0;
+  padding: 20px 0px;
   text-align: center;
-  border-top: 3px solid black;
+  position: relative;
   bottom: 0;
 }
 
 .footer-container {
-  max-width: 1200px;
+  width: 100%;
   margin: 0 auto;
-  padding: 0 15px;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  gap: 20px;
+  flex-wrap: wrap;
+  text-align: center;
+  flex-direction: row;
 }
 
-.footer-nav {
-  margin-top: 10px;
+.footer p {
+  margin: 0;
+  padding-right: 10px;
 }
 
-.footer-link {
+.navbar-nav {
+  display: flex;
+  gap: 20px;
+  padding: 0;
+  flex-wrap: wrap;
+  justify-content: center;
+}
+
+.nav-item {
+  list-style-type: none;
+}
+
+.nav-link {
   color: black;
   text-decoration: none;
-  margin: 0 10px;
   font-weight: bold;
   transition: color 0.3s ease;
+  padding: 5px 10px;
+  margin: 0 10px;
+}
+.nav-link:hover {
+  color: black;
+  background: transparent;
 }
 
-.footer-link:hover {
-  color: black;
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .nav-link {
+    margin: 5px 0;
+  }
 }
 </style>

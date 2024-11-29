@@ -1,120 +1,68 @@
 <template>
-  <div class="adatvedelem">
-    <h1>Adatvédelmi nyilatkozat</h1>
+  <section class="adatvedelem">
+    <h1>Általános Szerződési Feltételek (ÁSZF)</h1>
+    <h2 id="hatalyos">Hatályos: 2024. Szeptember 01.</h2>
 
-    <div v-for="(section, index) in sections" :key="index" class="section">
-      <h2 @click="toggleSection(index)" :class="{'active': isActive(index)}">{{ section.title }}</h2>
-      <p v-if="isActive(index)" v-html="section.content"></p>
-    </div>
-  </div>
+    <p>Jelen Általános Szerződési Feltételek (ÁSZF) a [Projekt neve] által nyújtott online időpontfoglaló rendszer igénybevételének feltételeit tartalmazza. A rendszer használatával Ön elfogadja az alábbi feltételeket.
+    </p>
+    <h2>1. Szolgáltató adatai</h2>
+    <p>Szolgáltató neve: [Cégnév vagy magánszemély neve]
+      Székhely: [Cím]
+      Adószám: [Ha van]
+      Kapcsolattartó e-mail cím: [E-mail cím]
+      Kapcsolattartó telefonszám: [Telefonszám]</p>
+    <h2>2. A szolgáltatás célja</h2>
+    <p>A [Projekt neve] egy online platform, amely lehetővé teszi vállalkozások számára, hogy időpontokat kezeljenek, és lehetővé teszi az ügyfelek számára, hogy ezen vállalkozásokhoz időpontot foglaljanak.</p>
+
+    <h2>3. Regisztráció és felhasználói fiók</h2>
+    <p>Szolgáltatók számára:</p>
+    <p>Regisztráció után a vállalkozások (pl. fodrászok, autószerelők) saját időpontfoglalási rendszert hozhatnak létre. A szolgáltató köteles biztosítani a megadott adatok helyességét és naprakészségét.</p>
+
+    <p>Ügyfelek számára:</p>
+    <p>Az ügyfelek regisztrációval vagy vendégként is foglalhatnak időpontot. A foglaláshoz szükséges valós adatok megadása kötelező.</p>
+
+    <h2>4. Időpontfoglalás</h2>
+    <p>Az ügyfelek a rendszer segítségével valós időben választhatnak elérhető időpontokat. Az időpont foglalás sikerességéről e-mailben vagy más értesítési módon kapnak visszaigazolást. A rendszerben található foglalási naptár az adott szolgáltató által megadott időintervallumok alapján működik.</p>
+
+    <h2>5. Lemondás és módosítás</h2>
+    <p>Az időpontok lemondására vagy módosítására az időpont előtt legkésőbb [XX óra/nappal] van lehetőség. A lemondási határidő lejárta után a rendszer automatikusan zárolja az időpont módosítását. A szolgáltató fenntartja a jogot, hogy időpontokat töröljön, például vis maior helyzetekben, erről az ügyfeleket haladéktalanul értesíti.</p>
+
+    <h2>  6. Díjazás és fizetési feltétele:</h2>
+    <p>  Az ügyfelek a foglaláskor előleget vagy teljes összeget fizethetnek online, ha a szolgáltató ezt megköveteli. A fizetés bankkártyával vagy más online fizetési módszerrel történik. Lemondás esetén az előleg visszatérítésére a szolgáltató saját szabályai vonatkoznak.</p>
+
+    <h2>  7. Felelősség kizárása</h2>
+    <p>  A szolgáltató nem vállal felelősséget a foglalások során bekövetkező adatbeviteli hibákért vagy harmadik felek okozta technikai problémákért. A rendszer használata során fellépő hibák esetén kérjük, vegye fel velünk a kapcsolatot a [e-mail cím] címen.</p>
+
+    <h2>  8. Adatvédelem</h2>
+    <p>  Az időpontfoglaló rendszer használata során megadott adatokat a Szolgáltató bizalmasan kezeli, harmadik fél számára nem adja ki, kivéve jogszabályban előírt esetekben. Az adatkezeléssel kapcsolatos részletek az Adatvédelmi Szabályzatban találhatók.</p>
+
+    <h2>  9. Szerződés megszüntetése</h2>
+    <p>  Az ügyfelek bármikor megszüntethetik regisztrációjukat. A szolgáltató fenntartja a jogot a felhasználói fiókok törlésére, ha a felhasználók megszegik az ÁSZF-et.</p>
+
+    <h2>  10. Egyéb rendelkezések</h2>
+    <p>  A szolgáltató fenntartja a jogot az ÁSZF egyoldalú módosítására, amelyről a felhasználókat legalább [XX nappal] előzetesen értesíti. Az ÁSZF-ben nem szabályozott kérdésekre a magyar jog az irányadó.</p>
+  </section>
 </template>
 <script>
-export default {
-  data() {
-    return {
-      sections: [
-        {
-          title: "Az adatkezelő adatai",
-          content: "Adatkezelő neve: [Cégnév/üzemeltető neve], Elérhetőség: [E-mail cím, telefonszám, postacím], Adatvédelmi tisztviselő: [Név, elérhetőség] (ha van)",
-          active: false
-        },
-        {
-          title: "Gyűjtött adatok",
-          content: "A weboldal használata során az alábbi adatokat gyűjthetjük: Személyes adatok: Név, e-mail cím, telefonszám, foglalási információk. Technikai adatok: IP-cím, böngésző típusa, operációs rendszer, látogatási statisztikák. A személyes adatokat az alábbi célokra használjuk: Időpontfoglalások feldolgozása és visszaigazolása, Kapcsolattartás és ügyfélszolgálat, A szolgáltatásaink fejlesztése és testreszabása, Jogszabályi kötelezettségek teljesítése.",
-          active: false
-        },
-        {
-          title: "Az adatok megosztása",
-          content: "Az Ön adatait harmadik féllel kizárólag az alábbi esetekben osztjuk meg: A foglaláshoz szükséges partnerekkel (pl. szolgáltatók), Jogszabályi előírás alapján (pl. hatósági megkeresés esetén).",
-          active: false
-        },
-        {
-          title: "Adatok tárolása",
-          content: "Az adatokat biztonságos szervereken tároljuk, és csak addig őrizzük meg, amíg szükséges a fent megjelölt célok teljesítéséhez, vagy amíg a jogszabályok előírják.",
-          active: false
-        },
-        {
-          title: "Cookie-k és hasonló technológiák",
-          content: "A weboldalunk cookie-kat használ a felhasználói élmény javítása és a weboldal működésének biztosítása érdekében. További információ a Cookie Szabályzatunkban.",
-          active: false
-        },
-        {
-          title: "Adatbiztonság",
-          content: "Megfelelő technikai és szervezeti intézkedéseket alkalmazunk az adatok védelme érdekében, például titkosítást és hozzáférés-kezelést.",
-          active: false
-        },
-        {
-          title: "Módosítások",
-          content: "Az adatvédelmi nyilatkozatot időről időre frissíthetjük. Az aktuális verzió mindig elérhető ezen az oldalon. Kérjük, rendszeresen tekintse át a változásokat.",
-          active: false
-        },
-        {
-          title: "Kapcsolatfelvétel",
-          content: `Ha bármilyen kérdése vagy panasza van az adatkezeléssel kapcsolatban, kérjük, vegye fel velünk a kapcsolatot! <br><a href='/kapcsolat' class="kapcsolat-link" style="background: transparent; text-decoration: none;">Kapcsolatfelvétel</a>`,
-          active: false
-        }
-      ]
-    };
-  },
-  methods: {
-    toggleSection(index) {
-      // Ha a szakasz már nyitva van, akkor azt bezárjuk, különben megnyitjuk
-      if (this.isActive(index)) {
-        this.sections[index].active = false;
-      } else {
-        // Minden szakaszt bezárunk, majd az aktuális szakaszt nyitjuk meg
-        this.sections.forEach((section) => section.active = false);
-        this.sections[index].active = true;
-      }
-    },
-    isActive(index) {
-      return this.sections[index].active;
-    }
-  }
-};
+
 </script>
 
 <style scoped>
-
-.kapcsolat-link {
-  color: #0056b3;
-  text-decoration: none;
-}
-
-.kapcsolat-link:hover {
-  text-decoration: underline;
-  background: transparent;
-}
 .adatvedelem{
-  padding-top: 15px;
-  width: 800px;
+  padding-top: 20px;
+  font-family: 'Franklin Gothic Medium';
+  text-align: justify;
+  margin: auto;
+}
+h1{
+  text-align: center;
+  font-weight: bold;
+}
+#hatalyos{
+  text-align: center;
+}
+p{
+  text-align: justify;
 }
 
-.section {
-  margin-bottom: 2rem;
-}
-
-.section h2 {
-  cursor: pointer;
-  padding: 1rem;
-  background-color: #f4f4f4;
-  border-radius: 5px;
-  margin: 1rem 0;
-  transition: color 0.3s ease;
-}
-
-.section h2:hover {
-  color: goldenrod;
-}
-
-.section p {
-  margin: 1rem 0;
-  padding: 1rem;
-  background-color: #f9f9f9;
-  border-radius: 5px;
-}
-
-.active {
-  color: goldenrod;
-}
 </style>

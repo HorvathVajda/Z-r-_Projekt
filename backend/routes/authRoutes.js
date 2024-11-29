@@ -1,6 +1,9 @@
 const express = require("express");
+const jwt = require("jsonwebtoken");
+const dotenv = require("dotenv");
 const { registerUser, login } = require("../controllers/authController");
 
+dotenv.config();
 const router = express.Router();
 
 // Regisztrációs útvonal

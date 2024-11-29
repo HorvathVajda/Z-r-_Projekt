@@ -1,8 +1,8 @@
 <template>
   <div class="login-container">
     <div class="login-card">
-      <h2>Bejelentkezés</h2>
-      <form @submit.prevent="handleLogin">
+      <h2>{{ $store.isLoggedIn ? "Kijelentkezés" : "Bejelentkezés" }}</h2>
+      <form @submit.prevent="handleLogin" v-if="!$store.isLoggedIn">
         <div class="form-group">
           <label for="email">E-mail</label>
           <input
@@ -32,7 +32,6 @@
 
 <script>
 import { login } from "../API"; // Importáljuk a login API hívást
-import { useRouter } from "vue-router";
 
 export default {
   data() {
@@ -44,24 +43,31 @@ export default {
   },
   methods: {
     async handleLogin() {
-      try {
-        // Az adatokat elküldjük a backendhez
-        const response = await login({
-          email: this.email,
-          jelszo: this.password,
-        });
+  try {
+    const response = await login({
+      email: this.email,
+      jelszo: this.password,
+    });
 
-        // Ha sikeres, mentjük a JWT tokent a helyi tárolóba
-        localStorage.setItem("token", response.data.token);
+    // A válaszban kapott token tárolása localStorage-ban
+    const token = response.data.token;
 
-        // Átirányítás a főoldalra
-        this.$router.push("/");
-      } catch (error) {
-        // Hibakezelés
-        this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
-        alert(this.errorMessage);
-      }
-    },
+    // A token tárolásakor beágyazzuk az emailt
+    const tokenWithEmail = JSON.stringify({ token, email: this.email });
+
+    // Mentés a localStorage-ba
+    localStorage.setItem("authData", tokenWithEmail);
+
+    // A store frissítése
+    this.$store.isLoggedIn = true;
+
+    // Átirányítás a főoldalra
+    this.$router.push("/");
+  } catch (error) {
+    this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
+    alert(this.errorMessage);
+  }
+},
   },
 };
 </script>
