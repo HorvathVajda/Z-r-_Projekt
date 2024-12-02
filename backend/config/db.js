@@ -1,12 +1,11 @@
 const mysql = require('mysql2/promise');
 
-const pool = mysql.createPool({
-  host: 'localhost', // Az adatbázis szerver címe
-  user: 'root',      // Az adatbázis felhasználónév
-  password: '', // Az adatbázis jelszó
+const db = mysql.createPool({
+  host: 'localhost', // vagy az adatbázis IP-címe
+  user: 'root',      // MySQL felhasználónév
+  password: '', // MySQL jelszó
   database: 'bookmytime', // Az adatbázis neve
-  waitForConnections: true,
-  connectionLimit: 10,
+  port: 3306
 });
 
-module.exports = pool;
+module.exports = db;

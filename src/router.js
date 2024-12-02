@@ -5,6 +5,7 @@ import RolunkPage from './components/RolunkPage.vue';
 import LoginPage from './components/LoginPage.vue';
 import RegistrationPage from './components/RegistrationPage.vue';
 import AdatVedelem from './components/AdatVedelem.vue';
+import Profil from './components/Profil.vue';
 
 const routes = [
   {
@@ -18,7 +19,7 @@ const routes = [
     component: KapcsolatPage
   },
   {
-    path: '/rolunk',  // Figyelj arra, hogy az útvonal pontosan egyezzen a linkkel
+    path: '/rolunk',
     name: 'Rolunk',
     component: RolunkPage
   },
@@ -36,7 +37,12 @@ const routes = [
     path: '/Adatvedelem',
     name: 'Adatvedelem',
     component: AdatVedelem
-  }
+  },
+  {
+    path: '/Profil',
+    name: 'Profil',
+    component: Profil
+  },
 ];
 
 const router = createRouter({

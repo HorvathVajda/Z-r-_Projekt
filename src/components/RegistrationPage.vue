@@ -5,21 +5,33 @@
       <form @submit.prevent="handleRegistration">
         <div class="form-group">
           <label for="name">Név</label>
-          <input id="name" v-model="name" required />
+          <input id="name" v-model="name" required placeholder="*Teljes név"/>
         </div>
         <div class="form-group">
           <label for="email">E-mail</label>
-          <input id="email" v-model="email" type="email" required />
+          <input id="email" v-model="email" type="email" required placeholder="*E-mail cím"/>
         </div>
         <div class="form-group">
           <label for="password">Jelszó</label>
-          <input id="password" v-model="password" type="password" required />
+          <input id="password" v-model="password" type="password" required placeholder="*Jelszó" />
+          <div v-if="password && passwordStrength !== 'strong'" class="password-strength">
+            <p v-if="password.length < 8">Jelszónak legalább 8 karakternek kell lennie.</p>
+            <p v-if="!/[a-z]/.test(password)">Jelszónak kisbetűt kell tartalmaznia.</p>
+            <p v-if="!/[A-Z]/.test(password)">Jelszónak nagybetűt kell tartalmaznia.</p>
+            <p v-if="!/[0-9]/.test(password)">Jelszónak számot kell tartalmaznia.</p>
+          </div>
+        </div>
+        <div class="form-group">
+          <label for="confirmPassword">Jelszó megerősítése</label>
+          <input id="confirmPassword" v-model="confirmPassword" type="password" required placeholder="*Jelszó megerősítése" />
+          <p v-if="confirmPassword && confirmPassword !== password" class="error-message">A két jelszó nem egyezik!</p>
         </div>
         <div class="form-group">
           <label for="phone">Telefonszám</label>
-          <input id="phone" v-model="phone" type="tel" required />
+          <input id="phone" v-model="phone" type="tel" required placeholder="*Telefonszám" />
+          <p v-if="phone && !phone.match(/^\+?(\d{1,3})?(\d{8})$/)" class="error-message">Kérjük, érvényes telefonszámot adjon meg!</p>
         </div>
-        <button type="submit" class="register-button">Regisztráció</button>
+        <button type="submit" class="register-button" :disabled="!isFormValid">Regisztráció</button>
       </form>
     </div>
   </div>
@@ -34,25 +46,44 @@ export default {
       name: '',
       email: '',
       password: '',
+      confirmPassword: '',
       phone: ''
     };
   },
+  computed: {
+    passwordStrength() {
+      const password = this.password;
+      if (password.length >= 8 && /[a-z]/.test(password) && /[A-Z]/.test(password) && /[0-9]/.test(password)) {
+        return 'strong';
+      }
+      return 'weak';
+    },
+    isFormValid() {
+      return (
+        this.password === this.confirmPassword &&
+        this.passwordStrength === 'strong' &&
+        this.phone.match(/^\+?(\d{1,3})?(\d{8})$/)
+      );
+    }
+  },
   methods: {
     handleRegistration() {
+      // Elhagyjuk a confirmPassword mezőt, mivel azt nem küldjük el
       const userData = {
         name: this.name,
         email: this.email,
-        password: this.password,
-        phone: this.phone,
+        password: this.password, // Csak a jelszó megy fel
+        phone: this.phone
       };
 
-      axios.post('http://localhost:5000/api/register', userData)
+      axios.post('http://localhost:5000/api/auth/register', userData)
         .then((response) => {
           console.log('Regisztráció sikeres:', response.data);
           alert(response.data.message);
           this.name = '';
           this.email = '';
           this.password = '';
+          this.confirmPassword = '';
           this.phone = '';
           this.$router.push('/login');
         })

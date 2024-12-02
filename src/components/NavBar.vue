@@ -5,7 +5,6 @@
         <router-link class="navbar-brand logo" to="/">BookMyTime</router-link>
 
         <!-- Hamburger menü gomb -->
-
         <button
           class="navbar-toggler"
           type="button"
@@ -18,15 +17,26 @@
         </button>
 
         <!-- Navigációs menü -->
-
         <div class="collapse navbar-collapse" id="navbarNav">
-
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
               <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
             </li>
+
+            <!-- Profil menü és bejelentkezés/gomb dinamikusan -->
             <li class="nav-item">
-              <router-link class="nav-link active login-link" to="/login" @click="toggleMenu">Bejelentkezés</router-link>
+              <router-link v-if="isLoggedIn" class="nav-link" to="/Profil" @click="toggleMenu">
+                Profil
+              </router-link>
+            </li>
+
+            <li class="nav-item">
+              <button v-if="!isLoggedIn" @click="goToLogin" class="nav-link login-link">
+                Bejelentkezés
+              </button>
+              <button v-if="isLoggedIn" @click="handleLogout" class="nav-link login-link">
+                Kijelentkezés
+              </button>
             </li>
           </ul>
         </div>
@@ -36,6 +46,35 @@
 </template>
 
 <script setup>
+import { useRouter } from "vue-router";
+import { ref, watch } from "vue";
+import { store } from "../store"; // A globális állapot importálása
+
+watch(() => store.isLoggedIn, (newValue) => {
+  isLoggedIn.value = newValue;
+});
+
+const router = useRouter();
+
+// Használunk egy `ref`-et a bejelentkezés állapotának tárolására
+const isLoggedIn = ref(store.isLoggedIn);  // A store-ból jövő állapot
+
+// A localStorage változása alapján automatikusan frissítjük az állapotot
+watch(() => store.isLoggedIn, (newValue) => {
+  isLoggedIn.value = newValue;
+});
+
+function goToLogin() {
+  router.push("/login");
+}
+
+function handleLogout() {
+  // Eltávolítjuk a token-t a helyi tárolóból
+  localStorage.removeItem("token");
+  store.isLoggedIn = false;  // A store frissítése
+  router.push("/");
+}
+
 function toggleMenu() {
   const navbar = document.querySelector('#navbarNav');
   if (navbar) {
@@ -43,6 +82,7 @@ function toggleMenu() {
   }
 }
 </script>
+
 
 <style scoped>
 html, body {
@@ -189,6 +229,7 @@ html, body {
 .navbar .nav-link.active {
   padding: 10px 15px;
 }
+
 @media (max-width: 768px) {
   .navbar-nav {
     flex-direction: column;

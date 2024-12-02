@@ -41,7 +41,7 @@
 
 <script>
 export default {
-  name: "ContactForm",
+  name: "KapcsolatPage",
   data() {
     return {
       formData: {
@@ -90,16 +90,18 @@ main {
   width: 100%;
 }
 
+/* Fix szélességű form */
 .contact-form {
   border: 3px solid black;
   background: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 100%;
-  max-width: 400px;
+  width: 600px; /* Fix szélesség */
+  max-width: 100%; /* Ne lépje túl a képernyőt mobilon */
 }
 
+/* Form elemek */
 .contact-form label {
   display: block;
   margin: 10px 0 5px;
@@ -133,7 +135,7 @@ main {
   background: goldenrod;
 }
 
-/* Reszponzivitás */
+/* Reszponzív módosítások (mobil nézet) */
 @media (max-width: 600px) {
   header h1 {
     font-size: 1.5em;
