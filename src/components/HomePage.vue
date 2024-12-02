@@ -234,6 +234,7 @@ export default {
   color: black;
   padding: 3em 1em;
   border-radius: 1em;
+  text-align: center;
 }
 
 .cta-btn {
@@ -251,9 +252,32 @@ export default {
   background-color: goldenrod;
 }
 
-.linkek{
-
+/* Style for the registration and login links */
+.linkek {
+  font-size: 1.2em;
+  text-decoration: none;
+  color: var(--c); /* Use a primary color for consistency */
+  font-weight: bold;
+  transition: color 0.3s, transform 0.3s;
 }
+
+.linkek:hover {
+  color: goldenrod; /* Change to a hover color (or customize) */
+  transform: scale(1.1); /* Slightly enlarge the text when hovered */
+}
+
+.linkek:focus {
+  outline: none; /* Remove the default focus outline */
+}
+
+/* Centering the "vagy" text and styling */
+p {
+  display: inline-block;
+  font-size: 1.2em;
+  margin: 0 15px;
+  color: #555;
+}
+
 
 /* Map */
 .map-section {
