@@ -17,8 +17,28 @@ export default {
   components: {
     NavBar,
     LabLec
-  }
+  },
+  methods: {
+  restoreSession() {
+    const authData = localStorage.getItem("authData");
+
+    if (authData) {
+      const { token, email, expirationTime } = JSON.parse(authData);
+
+      // Ellenőrizd, hogy a token még érvényes-e
+      if (Date.now() < expirationTime) {
+        this.$store.isLoggedIn = true;
+        this.$store.userEmail = email;
+      } else {
+        // Ha lejárt, töröld a tokeneket
+        localStorage.removeItem("authData");
+        this.$store.isLoggedIn = false;
+      }
+    }
+  },
+},
 }
+
 </script>
 
 <style>

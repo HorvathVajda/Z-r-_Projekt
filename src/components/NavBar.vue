@@ -47,17 +47,13 @@
 
 <script setup>
 import { useRouter } from "vue-router";
-import { ref, watch } from "vue";
+import { ref, watch, onMounted } from "vue";
 import { store } from "../store"; // A globális állapot importálása
 
-watch(() => store.isLoggedIn, (newValue) => {
-  isLoggedIn.value = newValue;
-});
+// Inicializálás a localStorage-ból
+const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
 
 const router = useRouter();
-
-// Használunk egy `ref`-et a bejelentkezés állapotának tárolására
-const isLoggedIn = ref(store.isLoggedIn);  // A store-ból jövő állapot
 
 // A localStorage változása alapján automatikusan frissítjük az állapotot
 watch(() => store.isLoggedIn, (newValue) => {
@@ -70,9 +66,10 @@ function goToLogin() {
 
 function handleLogout() {
   // Eltávolítjuk a token-t a helyi tárolóból
-  localStorage.removeItem("token");
+  localStorage.removeItem("authData");
+  isLoggedIn.value = false;  // Frissítjük az állapotot
   store.isLoggedIn = false;  // A store frissítése
-  router.push("/");
+  router.push("/login");
 }
 
 function toggleMenu() {
@@ -82,6 +79,7 @@ function toggleMenu() {
   }
 }
 </script>
+
 
 
 <style scoped>

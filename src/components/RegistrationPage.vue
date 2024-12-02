@@ -31,7 +31,14 @@
           <input id="phone" v-model="phone" type="tel" required placeholder="*Telefonszám" />
           <p v-if="phone && !phone.match(/^\+?(\d{1,3})?(\d{8})$/)" class="error-message">Kérjük, érvényes telefonszámot adjon meg!</p>
         </div>
-        <button type="submit" class="register-button" :disabled="!isFormValid">Regisztráció</button>
+        <div class="form-group">
+          <input type="checkbox" id="terms" v-model="termsAccepted" />
+          <label for="terms">
+            Elfogadom az <a href="/aszf" target="_blank">ÁSZF-et</a>
+          </label>
+          <p v-if="!termsAccepted && formSubmitted" class="error-message">Az ÁSZF-et el kell fogadni a regisztrációhoz!</p>
+        </div>
+        <button type="submit" class="register-button" :disabled="!isFormValid || !termsAccepted">Regisztráció</button>
       </form>
     </div>
   </div>
@@ -47,7 +54,9 @@ export default {
       email: '',
       password: '',
       confirmPassword: '',
-      phone: ''
+      phone: '',
+      termsAccepted: false,
+      formSubmitted: false,
     };
   },
   computed: {
@@ -60,39 +69,41 @@ export default {
     },
     isFormValid() {
       return (
+        this.name &&
+        this.email &&
         this.password === this.confirmPassword &&
         this.passwordStrength === 'strong' &&
         this.phone.match(/^\+?(\d{1,3})?(\d{8})$/)
       );
-    }
+    },
   },
   methods: {
     handleRegistration() {
-      // Elhagyjuk a confirmPassword mezőt, mivel azt nem küldjük el
+      this.formSubmitted = true;
+      if (!this.isFormValid || !this.termsAccepted) {
+        alert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
+        return;
+      }
+
       const userData = {
         name: this.name,
         email: this.email,
-        password: this.password, // Csak a jelszó megy fel
-        phone: this.phone
+        password: this.password,
+        phone: this.phone,
       };
 
       axios.post('http://localhost:5000/api/auth/register', userData)
         .then((response) => {
           console.log('Regisztráció sikeres:', response.data);
           alert(response.data.message);
-          this.name = '';
-          this.email = '';
-          this.password = '';
-          this.confirmPassword = '';
-          this.phone = '';
           this.$router.push('/login');
         })
         .catch((error) => {
-          console.error('Regisztráció hiba:', error.response ? error.response.data : error.message);
+          console.error('Regisztráció hiba:', error.response?.data || error.message);
           alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
         });
-    }
-  }
+    },
+  },
 };
 </script>
 

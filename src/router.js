@@ -6,6 +6,7 @@ import LoginPage from './components/LoginPage.vue';
 import RegistrationPage from './components/RegistrationPage.vue';
 import AdatVedelem from './components/AdatVedelem.vue';
 import Profil from './components/Profil.vue';
+import editProfile from './components/editProfile.vue';
 
 const routes = [
   {
@@ -42,6 +43,11 @@ const routes = [
     path: '/Profil',
     name: 'Profil',
     component: Profil
+  },
+  {
+    path: '/editprofile',
+    name: 'editProfile',
+    component: editProfile
   },
 ];
 

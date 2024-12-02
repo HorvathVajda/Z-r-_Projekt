@@ -38,30 +38,26 @@ export default {
     return {
       email: "",
       password: "",
-      errorMessage: "", // Hibaüzenet
+      errorMessage: "",
     };
   },
   methods: {
     async handleLogin() {
-  try {
+        try {
     const response = await login({
       email: this.email,
       jelszo: this.password,
     });
 
-    // A válaszban kapott token tárolása localStorage-ban
     const token = response.data.token;
 
-    // A token tárolásakor beágyazzuk az emailt
-    const tokenWithEmail = JSON.stringify({ token, email: this.email });
+    // Token mentése lejárati idővel
+    const expirationTime = Date.now() + 3600 * 1000;
+    const authData = JSON.stringify({ token, email: this.email, expirationTime });
 
-    // Mentés a localStorage-ba
-    localStorage.setItem("authData", tokenWithEmail);
+    localStorage.setItem("authData", authData);
 
-    // A store frissítése
     this.$store.isLoggedIn = true;
-
-    // Átirányítás a főoldalra
     this.$router.push("/");
   } catch (error) {
     this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
@@ -69,7 +65,10 @@ export default {
   }
 },
   },
+
 };
+
+
 </script>
 
 <style scoped>

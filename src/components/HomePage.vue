@@ -11,7 +11,6 @@
           <input type="date" class="form-control mx-1" />
           <input type="time" class="form-control mx-1" />
           <button type="submit" class="custom-btn">Keress</button>
-          <span></span><span></span><span></span><span></span>
 
         </form>
       </div>
@@ -41,6 +40,46 @@
         </div>
       </div>
     </section>
+
+    <section class="testimonials text-center py-5">
+      <h3>Vélemények</h3>
+      <div class="row mt-4">
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <p>"Nagyon elégedett voltam a szolgáltatással!"</p>
+            <h5>- Péter</h5>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <p>"Profik, gyorsak és segítőkészek!"</p>
+            <h5>- Anna</h5>
+          </div>
+        </div>
+        <div class="col-md-4">
+          <div class="testimonial-card">
+            <p>"Mindenkinek ajánlom őket!"</p>
+            <h5>- Gábor</h5>
+          </div>
+        </div>
+      </div>
+    </section>
+
+
+    <section class="cta text-center py-5">
+      <h3>Foglalj most, és élvezd a szolgáltatásokat!</h3>
+      <router-link class="linkek" to="/register">Regisztrálj itt!</router-link>
+      <p>vagy</p>
+      <router-link class="linkek" to="/login">Belépés</router-link>
+    </section>
+
+    <!-- Map Section -->
+    <section class="map-section py-5">
+      <h3>Találd meg a legközelebbi szolgáltatót!</h3>
+      <div id="map"></div>
+    </section>
+
+
   </div>
 </template>
 
@@ -143,44 +182,6 @@ export default {
 }
 
 
-.custom-btn span {
-    position: absolute;
-    width: 25%;
-    height: 100%;
-    background-color: var(--c);
-    transform: translateY(150%);
-    border-radius: 50%;
-    left: calc((var(--n) - 1) * 25%);
-    transition: 0.5s;
-    transition-delay: calc((var(--n) - 1) * 0.1s);
-    z-index: -1;
-}
-
-.custom-btn:hover {
-    color: black;
-}
-
-.custom-btn:hover span {
-    transform: translateY(0) scale(2);
-}
-
-.custom-btn span:nth-child(1) {
-    --n: 1;
-}
-
-.custom-btn span:nth-child(2) {
-    --n: 2;
-}
-
-.custom-btn span:nth-child(3) {
-    --n: 3;
-}
-
-.custom-btn span:nth-child(4) {
-    --n: 4;
-}
-
-
 
 /* Szolgáltatások */
 .services .service-card {
@@ -200,4 +201,72 @@ export default {
   margin-top: 10px;
   font-size: 18px;
 }
+
+/* Testimonials */
+.testimonials {
+  background-color: #f9f9f9;
+  padding: 2em 1em;
+}
+
+.testimonial-card {
+  background: #fff;
+  border: 1px solid #ddd;
+  padding: 1.5em;
+  border-radius: 1em;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 20px;
+}
+
+.testimonial-card p {
+  font-style: italic;
+  font-size: 1.1em;
+}
+
+.testimonial-card h5 {
+  margin-top: 10px;
+  font-weight: bold;
+  font-size: 1.2em;
+}
+
+/* CTA */
+.cta {
+  background-color: white;
+  color: black;
+  padding: 3em 1em;
+  border-radius: 1em;
+}
+
+.cta-btn {
+  background-color: gold;
+  color: black;
+  padding: 15px 30px;
+  font-size: 1.2em;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.cta-btn:hover {
+  background-color: goldenrod;
+}
+
+.linkek{
+
+}
+
+/* Map */
+.map-section {
+  background-color: #f9f9f9;
+  padding: 2em 1em;
+  text-align: center;
+}
+
+#map {
+  width: 100%;
+  height: 300px;
+  background-color: #ccc;
+  border-radius: 10px;
+}
+
 </style>
