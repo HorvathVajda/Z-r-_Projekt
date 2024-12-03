@@ -48,7 +48,7 @@
 <script setup>
 import { useRouter } from "vue-router";
 import { ref, watch, onMounted } from "vue";
-import { store } from "../store"; // A globális állapot importálása
+import { store } from "../../store"; // A globális állapot importálása
 
 // Inicializálás a localStorage-ból
 const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);

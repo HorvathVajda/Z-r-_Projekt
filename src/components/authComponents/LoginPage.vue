@@ -24,14 +24,14 @@
           />
         </div>
         <button type="submit" class="login-button">Bejelentkezés</button>
-        <router-link class="nav-link" to="/register" style="padding-top: 5px;">Regisztráció</router-link>
+        <router-link class="nav-link" to="/registerChoose" style="padding-top: 5px;">Regisztráció</router-link>
       </form>
     </div>
   </div>
 </template>
 
 <script>
-import { login } from "../API"; // Importáljuk a login API hívást
+import { login } from "../../API"; // Importáljuk a login API hívást
 
 export default {
   data() {

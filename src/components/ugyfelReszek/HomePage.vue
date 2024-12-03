@@ -82,7 +82,7 @@
 
 <script>
 import { ref, watch, onMounted } from "vue";
-import { store } from '../store';
+import { store } from '../../store';
 
 const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
 

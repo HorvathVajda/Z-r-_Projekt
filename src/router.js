@@ -1,12 +1,15 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from './components/HomePage.vue';
+import HomePage from './components/ugyfelReszek/HomePage.vue';
 import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
-import LoginPage from './components/LoginPage.vue';
-import RegistrationPage from './components/RegistrationPage.vue';
+import LoginPage from './components/authComponents/LoginPage.vue';
+import RegistrationPage from './components/authComponents/RegistrationPage.vue';
 import AdatVedelem from './components/AdatVedelem.vue';
-import Profil from './components/Profil.vue';
-import editProfile from './components/editProfile.vue';
+import Profil from './components/layout/Profil.vue';
+import editProfile from './components/vallalkozoReszek/editProfile.vue';
+import vallalkozoHome from './components/vallalkozoReszek/vallalkozoHome.vue';
+import registerChoose from './components/authComponents/registerChoose.vue';
+
 
 const routes = [
   {
@@ -48,6 +51,16 @@ const routes = [
     path: '/editprofile',
     name: 'editProfile',
     component: editProfile
+  },
+  {
+    path: '/vallalkozoHome',
+    name: 'vallalkozoHome',
+    component: vallalkozoHome
+  },
+  {
+    path: '/registerChoose',
+    name: 'registerChoose',
+    component: registerChoose
   },
 ];
 
