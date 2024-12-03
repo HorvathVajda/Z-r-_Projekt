@@ -1,5 +1,5 @@
 <template>
-  <br>
+  <br />
   <div class="home-page">
     <!-- Hero Section -->
     <section class="hero text-center">
@@ -77,25 +77,28 @@
       <h3>Találd meg a legközelebbi szolgáltatót!</h3>
       <div id="map"></div>
     </section>
-
   </div>
 </template>
 
 <script>
+import { ref, watch, onMounted } from "vue";
 import { store } from '../store';
+
+const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
+
+watch(() => store.isLoggedIn, (newValue) => {
+  isLoggedIn.value = newValue;
+});
 
 export default {
   name: 'HomePage',
   computed: {
     store() {
-      return store;  // Itt biztosítjuk, hogy a store-t jól importáljuk
+      return store;
     },
   },
 };
 </script>
-
-
-
 
 <style scoped>
 
