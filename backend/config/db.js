@@ -11,7 +11,7 @@ const db = mysql.createPool({
   database: process.env.DB_NAME || 'bookmytime', 
   port: process.env.DB_PORT || 3306,
   waitForConnections: true, // Kapcsolat várakozás engedélyezése
-  connectionLimit: 10,      // Maximum kapcsolatok száma
+  connectionLimit: 2,      // Maximum kapcsolatok száma
   queueLimit: 0             // Végtelen várakozás, ha elérte a kapcsolatlimitet
 });
 
