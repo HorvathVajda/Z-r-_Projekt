@@ -66,7 +66,7 @@
     </section>
 
 
-    <section class="cta text-center py-5">
+    <section v-if="!store.isLoggedIn" class="cta text-center py-5">
       <h3>Foglalj most, és élvezd a szolgáltatásokat!</h3>
       <router-link class="linkek" to="/register">Regisztrálj itt!</router-link>
       <p>vagy</p>
@@ -84,16 +84,13 @@
 </template>
 
 <script>
+import { store } from '../store';
+
 export default {
   name: 'HomePage',
-  data() {
-    return {
-      showCookieConsent: true, // Cookie consent kezdetben látható
-    };
-  },
-  methods: {
-    acceptCookies() {
-      this.showCookieConsent = false; // Elrejti a cookie consentet
+  computed: {
+    store() {
+      return store;
     },
   },
 };
