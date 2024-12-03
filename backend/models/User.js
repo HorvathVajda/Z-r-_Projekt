@@ -1,7 +1,7 @@
 const db = require('../db');
 const bcrypt = require('bcrypt');
 
-// Új felhasználó létrehozása (regisztráció)
+
 exports.createUser = async (name, email, password) => {
   const hashedPassword = await bcrypt.hash(password, 10);
   const [result] = await db.query(
@@ -11,7 +11,7 @@ exports.createUser = async (name, email, password) => {
   return result.insertId;
 };
 
-// Felhasználó keresése email alapján (bejelentkezéshez)
+
 exports.findUserByEmail = async (email) => {
   const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
   return rows[0];

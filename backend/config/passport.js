@@ -5,11 +5,11 @@ passport.use(new GoogleStrategy({
     clientSecret: 'GOOGLE_CLIENT_SECRET',
     callbackURL: 'http://localhost:3000/auth/google/callback'
 }, (accessToken, refreshToken, profile, done) => {
-    // Profil kezelése, új felhasználó létrehozása vagy létező felhasználó keresése
+    
     db.query('SELECT * FROM felhasznalo WHERE email = ?', [profile.emails[0].value], (err, results) => {
         if (err) return done(err);
         if (results.length === 0) {
-            // Új felhasználó hozzáadása
+            
             db.query('INSERT INTO felhasznalo (nev, email, jogosultsag) VALUES (?, ?, ?)', [profile.displayName, profile.emails[0].value, 'ugyfel'], (err, result) => {
                 if (err) return done(err);
                 return done(null, result);
@@ -60,7 +60,7 @@ const checkRole = (roles) => {
     };
 };
 
-// Példa a middleware használatára
+
 app.post('/api/some-endpoint', checkRole(['ugyfel', 'vallalkozo']), (req, res) => {
     res.send('Felhasználói jogosultság ellenőrzés sikerült');
 });

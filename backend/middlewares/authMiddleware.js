@@ -1,8 +1,8 @@
 const jwt = require('jsonwebtoken');
 
-// Middleware a JWT token ellenőrzésére
+
 const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; // Az Authorization header-ből
+  const token = req.header('Authorization')?.split(' ')[1]; 
 
   if (!token) return res.status(401).json({ message: 'Nincs token' });
 
