@@ -93,15 +93,16 @@ export default {
       };
 
       axios.post('http://localhost:5000/api/auth/register', userData)
-        .then((response) => {
-          console.log('Regisztráció sikeres:', response.data);
-          alert(response.data.message);
-          this.$router.push('/login');
-        })
-        .catch((error) => {
-          console.error('Regisztráció hiba:', error.response?.data || error.message);
-          alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
-        });
+  .then((response) => {
+    console.log('Regisztráció sikeres:', response.data);
+    alert(response.data.message);
+    this.$router.push('/login');
+  })
+  .catch((error) => {
+    console.error('Regisztráció hiba:', error.response?.data || error.message);
+    alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
+  });
+
     },
   },
 };

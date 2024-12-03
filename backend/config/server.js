@@ -16,8 +16,8 @@ app.use((err, req, res, next) => {
 
 // CORS beállítások
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173/", // A frontend URL-je
-  credentials: true
+  origin: process.env.FRONTEND_URL || "http://localhost:5173", // A frontend URL-je, ha nincs beállítva, alapértelmezett érték
+  credentials: true // Engedélyezi a sütik használatát
 }));
 
 // JSON adatok kezelése
