@@ -11,7 +11,6 @@
           <input type="date" class="form-control mx-1" />
           <input type="time" class="form-control mx-1" />
           <button type="submit" class="custom-btn">Keress</button>
-
         </form>
       </div>
     </section>
@@ -65,8 +64,8 @@
       </div>
     </section>
 
-
-    <section v-if="!store.isLoggedIn" class="cta text-center py-5">
+    <!-- CTA (Call to Action) Section -->
+    <section v-if="!store.authData" class="cta text-center py-5">
       <h3>Foglalj most, és élvezd a szolgáltatásokat!</h3>
       <router-link class="linkek" to="/register">Regisztrálj itt!</router-link>
       <p>vagy</p>
@@ -79,7 +78,6 @@
       <div id="map"></div>
     </section>
 
-
   </div>
 </template>
 
@@ -90,11 +88,14 @@ export default {
   name: 'HomePage',
   computed: {
     store() {
-      return store;
+      return store;  // Itt biztosítjuk, hogy a store-t jól importáljuk
     },
   },
 };
 </script>
+
+
+
 
 <style scoped>
 
