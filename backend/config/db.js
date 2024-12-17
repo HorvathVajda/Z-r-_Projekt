@@ -1,29 +1,24 @@
-const mysql = require('mysql2/promise');
+const mongoose = require('mongoose');
 const dotenv = require('dotenv');
 
 dotenv.config(); // Betölti a .env fájlt
 
-// Adatbázis kapcsolat létrehozása környezeti változókból
-const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'bookmytime',
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true, // Kapcsolat várakozás engedélyezése
-  connectionLimit: 2,      // Maximum kapcsolatok száma
-  queueLimit: 0             // Végtelen várakozás, ha elérte a kapcsolatlimitet
-});
+// MongoDB kapcsolat beállítása
+const connectDB = async () => {
+  try {
+    await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://<felhasznalonev>:<jelszo>@cluster0.uwswx.mongodb.net/bookmytime', {
+      useNewUrlParser: true,
+      useUnifiedTopology: true
+    });
+    console.log('Sikeres kapcsolat a MongoDB-vel');
+  } catch (err) {
+    console.error('Hiba a MongoDB kapcsolódásakor:', err);
+    process.exit(1); // Kilépés hiba esetén
+  }
+};
 
-// Kapcsolat tesztelése
-db.getConnection()
-  .then(connection => {
-    console.log("Kapcsolat az adatbázishoz sikeresen létrejött!");
-    connection.release(); // Kapcsolat visszaadása a pool-ba
-  })
-  .catch(err => {
-    console.error("Adatbázis kapcsolódási hiba:", err);
-    process.exit(1); // A folyamat leállítása hiba esetén
-  });
+// Kapcsolat létrehozása
+connectDB();
 
-module.exports = db;
+// Az exportálás most a kapcsolatot tartalmazza
+module.exports = mongoose;
