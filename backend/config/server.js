@@ -8,17 +8,6 @@ dotenv.config();
 
 const app = express();
 
-// MongoDB kapcsolat beállítása
-mongoose.connect(process.env.MONGO_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-})
-  .then(() => {
-    console.log("Sikeres MongoDB kapcsolódás");
-  })
-  .catch((err) => {
-    console.error("Hiba a MongoDB kapcsolódásakor:", err);
-  });
 
 // MySQL kapcsolat beállítása
 const connectDB = async () => {
