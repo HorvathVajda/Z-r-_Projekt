@@ -1,24 +1,26 @@
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 
 dotenv.config(); // Betölti a .env fájlt
 
-// MongoDB kapcsolat beállítása
+// MySQL kapcsolat beállítása
 const connectDB = async () => {
   try {
-    await mongoose.connect(process.env.MONGO_URI || 'mongodb+srv://<felhasznalonev>:<jelszo>@cluster0.uwswx.mongodb.net/bookmytime', {
-      useNewUrlParser: true,
-      useUnifiedTopology: true
+    const connection = await mysql.createConnection({
+      host: process.env.MYSQL_HOST || 'localhost',
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: process.env.MYSQL_DATABASE || 'bookmytime'
     });
-    console.log('Sikeres kapcsolat a MongoDB-vel');
+    console.log('Sikeres kapcsolat a MySQL adatbázissal');
+    return connection;
   } catch (err) {
-    console.error('Hiba a MongoDB kapcsolódásakor:', err);
+    console.error('Hiba a MySQL kapcsolódáskor:', err);
     process.exit(1); // Kilépés hiba esetén
   }
 };
 
 // Kapcsolat létrehozása
-connectDB();
-
-// Az exportálás most a kapcsolatot tartalmazza
-module.exports = mongoose;
+connectDB().then(connection => {
+  module.exports = connection;
+});

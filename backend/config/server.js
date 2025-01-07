@@ -2,7 +2,7 @@ const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const mongoose = require("mongoose"); // MongoDB kapcsolat importálása
+const mysql = require("mysql2/promise"); // MySQL kapcsolat importálása
 
 dotenv.config();
 
@@ -19,6 +19,29 @@ mongoose.connect(process.env.MONGO_URI, {
   .catch((err) => {
     console.error("Hiba a MongoDB kapcsolódásakor:", err);
   });
+
+// MySQL kapcsolat beállítása
+const connectDB = async () => {
+  try {
+    const connection = await mysql.createConnection({
+      host: process.env.MYSQL_HOST || 'localhost',
+      user: process.env.MYSQL_USER || 'root',
+      password: process.env.MYSQL_PASSWORD || '',
+      database: process.env.MYSQL_DATABASE || 'bookmytime'
+    });
+    console.log("Sikeres MySQL kapcsolódás");
+    return connection;
+  } catch (err) {
+    console.error("Hiba a MySQL kapcsolódáskor:", err);
+    process.exit(1); // Kilépés hiba esetén
+  }
+};
+
+// Kapcsolat létrehozása
+let dbConnection;
+connectDB().then(connection => {
+  dbConnection = connection;
+});
 
 // Hibakezelő middleware
 app.use((err, req, res, next) => {
@@ -47,9 +70,8 @@ app.get("/", (req, res) => {
 // Példa: Foglalások listázása
 app.get("/api/bookings", async (req, res) => {
   try {
-    const Booking = mongoose.model('Booking'); // Booking modell használata
-    const bookings = await Booking.find();
-    res.json(bookings);
+    const [rows] = await dbConnection.execute("SELECT * FROM bookings");
+    res.json(rows);
   } catch (err) {
     console.error(err);
     res.status(500).send("Adatbázis hiba");
@@ -61,9 +83,10 @@ app.post("/api/bookings", async (req, res) => {
   const { user_id, service_id, appointment_time } = req.body;
 
   try {
-    const Booking = mongoose.model('Booking'); // Booking modell használata
-    const newBooking = new Booking({ user_id, service_id, appointment_time });
-    await newBooking.save();
+    await dbConnection.execute(
+      "INSERT INTO bookings (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
+      [user_id, service_id, appointment_time]
+    );
     res.status(201).send("Foglalás sikeresen hozzáadva");
   } catch (err) {
     console.error(err);
