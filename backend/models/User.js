@@ -1,18 +1,12 @@
-const db = require('../db');
-const bcrypt = require('bcrypt');
+const mongoose = require('mongoose');
 
+// Felhasználó modell
+const userSchema = new mongoose.Schema({
+  nev: { type: String, required: true },
+  email: { type: String, required: true, unique: true },
+  jogosultsag: { type: String, required: true }
+});
 
-exports.createUser = async (name, email, password) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const [result] = await db.query(
-    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-    [name, email, hashedPassword]
-  );
-  return result.insertId;
-};
+const User = mongoose.model('User', userSchema);
 
-
-exports.findUserByEmail = async (email) => {
-  const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-  return rows[0];
-};
+module.exports = User;

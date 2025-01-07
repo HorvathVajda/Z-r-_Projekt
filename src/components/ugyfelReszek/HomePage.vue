@@ -75,7 +75,8 @@
     <!-- Map Section -->
     <section class="map-section py-5">
       <h3>Találd meg a legközelebbi szolgáltatót!</h3>
-      <div id="map"></div>
+      <!-- Itt hozhatod be a Map komponenst -->
+      <Map />
     </section>
   </div>
 </template>
@@ -83,6 +84,8 @@
 <script>
 import { ref, watch, onMounted } from "vue";
 import { store } from '../../store';
+// Importáljuk a Map komponenst
+import Map from "@/components/Map.vue";
 
 const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
 
@@ -92,6 +95,9 @@ watch(() => store.isLoggedIn, (newValue) => {
 
 export default {
   name: 'HomePage',
+  components: {
+    Map // Regisztráljuk a Map komponenst a komponensben
+  },
   computed: {
     store() {
       return store;
