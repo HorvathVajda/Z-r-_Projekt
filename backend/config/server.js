@@ -9,9 +9,9 @@ dotenv.config();
 const app = express();
 
 // MongoDB kapcsolat beállítása
-mongoose.connect(process.env.MONGO_URI, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
+mongoose.connect(process.env.MONGO_URI, {
+  useNewUrlParser: true,
+  useUnifiedTopology: true
 })
   .then(() => {
     console.log("Sikeres MongoDB kapcsolódás");
@@ -59,7 +59,7 @@ app.get("/api/bookings", async (req, res) => {
 // Példa: Foglalás hozzáadása
 app.post("/api/bookings", async (req, res) => {
   const { user_id, service_id, appointment_time } = req.body;
-  
+
   try {
     const Booking = mongoose.model('Booking'); // Booking modell használata
     const newBooking = new Booking({ user_id, service_id, appointment_time });
