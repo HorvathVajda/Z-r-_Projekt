@@ -64,3 +64,4 @@ const checkRole = (roles) => {
 app.post('/api/some-endpoint', checkRole(['ugyfel', 'vallalkozo']), (req, res) => {
     res.send('Felhasználói jogosultság ellenőrzés sikerült');
 });
+
