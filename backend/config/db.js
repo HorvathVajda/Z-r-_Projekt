@@ -1,4 +1,4 @@
-const mongoose = require('mongoose');
+const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
 
 dotenv.config(); // Betölti a .env fájlt
