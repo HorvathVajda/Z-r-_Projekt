@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <router-link class="navbar-brand logo" to="/">BookMyTime</router-link>
+        <a class="navbar-brand logo" href="/">BookMyTime</a>
 
         <!-- Hamburger menü gomb -->
         <button
@@ -20,30 +20,28 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
+              <a class="nav-link" href="/" @click="toggleMenu">Főoldal</a>
             </li>
             <li class="nav-item">
-              <router-link v-if="isLoggedIn" class="nav-link" to="/Profil" @click="toggleMenu">
-                Profil
-              </router-link>
+              <a v-if="isLoggedIn" class="nav-link" href="/Profil" @click="toggleMenu">Profil</a>
             </li>
             <li class="nav-item">
-              <router-link
-
+              <a
+                v-if="!isLoggedIn"
                 class="nav-link login-link"
-                to="/login"
+                href="/login"
                 @click="toggleMenu"
               >
                 Bejelentkezés
-              </router-link>
-              <router-link
+              </a>
+              <a
                 v-if="isLoggedIn"
                 class="nav-link login-link"
-                to="/login"
+                href="/login"
                 @click="handleLogout"
               >
                 Kijelentkezés
-              </router-link>
+              </a>
             </li>
           </ul>
         </div>
@@ -73,7 +71,6 @@ function toggleMenu() {
 }
 </script>
 
-
 <style scoped>
 html, body {
   margin: 0;
@@ -97,7 +94,7 @@ html, body {
   transition: transform 0.3s ease-in-out;
 }
 
-.navbar-nav{
+.navbar-nav {
   padding: 0;
   margin: 0;
   display: flex;

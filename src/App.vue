@@ -1,44 +1,48 @@
 <template>
   <div id="app">
-    <NavBar />
+    <NavBar /> <!-- A navigációs sáv -->
     <main id="content">
-      <router-view />
+      <router-view></router-view> <!-- A dinamikusan betöltődő komponens -->
     </main>
-    <LabLec />
+    <LabLec /> <!-- A lábléc -->
   </div>
 </template>
 
 <script>
-import NavBar from './components/NavBar.vue';
-import LabLec from './components/LabLec.vue';
+import NavBar from './components/NavBar.vue'; // NavBar komponens importálása
+import LabLec from './components/LabLec.vue'; // LabLec komponens importálása
 
 export default {
   name: 'App',
   components: {
-    NavBar,
-    LabLec
+    NavBar, // NavBar komponens regisztrálása
+    LabLec, // LabLec komponens regisztrálása
   },
   methods: {
-  restoreSession() {
-    const authData = localStorage.getItem("authData");
+    // Bejelentkezési session visszaállítása
+    restoreSession() {
+      const authData = localStorage.getItem("authData");
 
-    if (authData) {
-      const { token, email, expirationTime } = JSON.parse(authData);
+      if (authData) {
+        const { token, email, expirationTime } = JSON.parse(authData);
 
-      // Ellenőrizd, hogy a token még érvényes-e
-      if (Date.now() < expirationTime) {
-        this.$store.isLoggedIn = true;
-        this.$store.userEmail = email;
-      } else {
-        // Ha lejárt, töröld a tokeneket
-        localStorage.removeItem("authData");
-        this.$store.isLoggedIn = false;
+        // Ellenőrizzük, hogy a token még érvényes-e
+        if (Date.now() < expirationTime) {
+          this.$store.isLoggedIn = true;
+          this.$store.userEmail = email;
+        } else {
+          // Ha lejárt a token, töröljük a localStorage-ból
+          localStorage.removeItem("authData");
+          this.$store.isLoggedIn = false;
+        }
       }
-    }
+    },
   },
-},
-}
-
+  created() {
+    // A session visszaállítása az alkalmazás betöltésekor
+    this.restoreSession();
+  },
+};
 </script>
 
 <style>
@@ -58,12 +62,12 @@ html, body {
 
 #content {
   flex: 1;
-  margin-top: 60px;
+  margin-top: 60px; /* Navbar helyének biztosítása */
 }
 
 @media (max-width: 768px) {
   #content {
-    margin-top: 80px;
+    margin-top: 80px; /* Mobil nézetnél egy kicsit nagyobb margó */
   }
 }
 </style>

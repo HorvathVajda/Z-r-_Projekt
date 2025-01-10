@@ -8,7 +8,7 @@ import '@fortawesome/fontawesome-free/css/all.min.css';
 import { store } from './store'; // Importáljuk a store-t
 
 const app = createApp(App);
-app.use(store);
-app.config.globalProperties.$store = store; // A store-t globálisan elérhetővé tesszük
-app.use(router);
+app.use(store); // Store használata
+app.config.globalProperties.$store = store; // A store globális elérhetősége
+app.use(router); // Router használata
 app.mount('#app');
