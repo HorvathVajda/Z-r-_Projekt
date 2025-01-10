@@ -9,8 +9,8 @@
 </template>
 
 <script>
-import NavBar from './components/layout/NavBar.vue';
-import LabLec from './components/layout/LabLec.vue';
+import NavBar from './components/NavBar.vue';
+import LabLec from './components/LabLec.vue';
 
 export default {
   name: 'App',

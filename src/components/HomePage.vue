@@ -83,7 +83,7 @@
 
 <script>
 import { ref, watch, onMounted } from "vue";
-import { store } from '../../store';
+import { store } from '../store';
 // Importáljuk a Map komponenst
 import Map from "@/components/Map.vue";
 

@@ -22,21 +22,28 @@
             <li class="nav-item">
               <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
             </li>
-
-            <!-- Profil menü és bejelentkezés/gomb dinamikusan -->
             <li class="nav-item">
               <router-link v-if="isLoggedIn" class="nav-link" to="/Profil" @click="toggleMenu">
                 Profil
               </router-link>
             </li>
-
             <li class="nav-item">
-              <button v-if="!isLoggedIn" @click="goToLogin" class="nav-link login-link">
+              <router-link
+                v-if="!isLoggedIn"
+                class="nav-link login-link"
+                to="/login"
+                @click="toggleMenu"
+              >
                 Bejelentkezés
-              </button>
-              <button v-if="isLoggedIn" @click="handleLogout" class="nav-link login-link">
+              </router-link>
+              <router-link
+                v-if="isLoggedIn"
+                class="nav-link login-link"
+                to="/login"
+                @click="handleLogout"
+              >
                 Kijelentkezés
-              </button>
+              </router-link>
             </li>
           </ul>
         </div>
@@ -46,40 +53,25 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { ref, watch, onMounted } from "vue";
-import { store } from "../../store"; // A globális állapot importálása
-
-// Inicializálás a localStorage-ból
-const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
+import { store } from "../store";
 
 const router = useRouter();
-
-// A localStorage változása alapján automatikusan frissítjük az állapotot
-watch(() => store.isLoggedIn, (newValue) => {
-  isLoggedIn.value = newValue;
-});
-
-function goToLogin() {
-  router.push("/login");
-}
+const isLoggedIn = computed(() => store.isLoggedIn);
 
 function handleLogout() {
-  // Eltávolítjuk a token-t a helyi tárolóból
-  localStorage.removeItem("authData");
-  isLoggedIn.value = false;  // Frissítjük az állapotot
-  store.isLoggedIn = false;  // A store frissítése
+  store.clearAuthData();
   router.push("/login");
 }
 
 function toggleMenu() {
-  const navbar = document.querySelector('#navbarNav');
+  const navbar = document.querySelector("#navbarNav");
   if (navbar) {
-    navbar.classList.toggle('show');
+    navbar.classList.toggle("show");
   }
 }
 </script>
-
 
 
 <style scoped>
