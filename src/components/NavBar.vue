@@ -29,7 +29,7 @@
             </li>
             <li class="nav-item">
               <router-link
-                v-if="!isLoggedIn"
+
                 class="nav-link login-link"
                 to="/login"
                 @click="toggleMenu"
