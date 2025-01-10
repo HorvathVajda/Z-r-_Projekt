@@ -2,23 +2,11 @@ const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const mongoose = require("mongoose"); // MongoDB kapcsolat importálása
+const db = require("./db"); // Adatbázis kapcsolat importálása
 
 dotenv.config();
 
 const app = express();
-
-// MongoDB kapcsolat beállítása
-mongoose.connect(process.env.MONGO_URI, { 
-  useNewUrlParser: true, 
-  useUnifiedTopology: true 
-})
-  .then(() => {
-    console.log("Sikeres MongoDB kapcsolódás");
-  })
-  .catch((err) => {
-    console.error("Hiba a MongoDB kapcsolódásakor:", err);
-  });
 
 // Hibakezelő middleware
 app.use((err, req, res, next) => {
@@ -45,30 +33,32 @@ app.get("/", (req, res) => {
 });
 
 // Példa: Foglalások listázása
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const Booking = mongoose.model('Booking'); // Booking modell használata
-    const bookings = await Booking.find();
-    res.json(bookings);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
+app.get("/api/bookings", (req, res) => {
+  db.query("SELECT * FROM foglalasok", (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Adatbázis hiba");
+    } else {
+      res.json(results);
+    }
+  });
 });
 
 // Példa: Foglalás hozzáadása
-app.post("/api/bookings", async (req, res) => {
+app.post("/api/bookings", (req, res) => {
   const { user_id, service_id, appointment_time } = req.body;
-  
-  try {
-    const Booking = mongoose.model('Booking'); // Booking modell használata
-    const newBooking = new Booking({ user_id, service_id, appointment_time });
-    await newBooking.save();
-    res.status(201).send("Foglalás sikeresen hozzáadva");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
+  db.query(
+    "INSERT INTO foglalasok (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
+    [user_id, service_id, appointment_time],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Adatbázis hiba");
+      } else {
+        res.status(201).send("Foglalás sikeresen hozzáadva");
+      }
+    }
+  );
 });
 
 // Szerver indítása
@@ -77,5 +67,3 @@ const HOST = process.env.HOST || "0.0.0.0"; // Hálózati eléréshez
 app.listen(PORT, HOST, () => {
   console.log(`Szerver fut a következő címen: http://${HOST}:${PORT}`);
 });
-
-//

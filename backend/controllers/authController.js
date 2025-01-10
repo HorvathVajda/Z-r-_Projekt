@@ -83,4 +83,3 @@ if (existingUsers.length > 0) {
     res.status(500).json({ error: 'Regisztrációs hiba' });
   }
 };
-
