@@ -67,3 +67,5 @@ const HOST = process.env.HOST || "0.0.0.0"; // Hálózati eléréshez
 app.listen(PORT, HOST, () => {
   console.log(`Szerver fut a következő címen: http://${HOST}:${PORT}`);
 });
+
+//
