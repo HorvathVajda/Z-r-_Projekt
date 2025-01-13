@@ -2,35 +2,11 @@ const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const mysql = require("mysql2/promise"); // MySQL kapcsolat importálása
+const db = require("./db"); // Adatbázis kapcsolat importálása
 
 dotenv.config();
 
 const app = express();
-
-
-// MySQL kapcsolat beállítása
-const connectDB = async () => {
-  try {
-    const connection = await mysql.createConnection({
-      host: process.env.MYSQL_HOST || 'localhost',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: process.env.MYSQL_DATABASE || 'bookmytime'
-    });
-    console.log("Sikeres MySQL kapcsolódás");
-    return connection;
-  } catch (err) {
-    console.error("Hiba a MySQL kapcsolódáskor:", err);
-    process.exit(1); // Kilépés hiba esetén
-  }
-};
-
-// Kapcsolat létrehozása
-let dbConnection;
-connectDB().then(connection => {
-  dbConnection = connection;
-});
 
 // Hibakezelő middleware
 app.use((err, req, res, next) => {
@@ -57,30 +33,32 @@ app.get("/", (req, res) => {
 });
 
 // Példa: Foglalások listázása
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const [rows] = await dbConnection.execute("SELECT * FROM bookings");
-    res.json(rows);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
+app.get("/api/bookings", (req, res) => {
+  db.query("SELECT * FROM foglalasok", (err, results) => {
+    if (err) {
+      console.error(err);
+      res.status(500).send("Adatbázis hiba");
+    } else {
+      res.json(results);
+    }
+  });
 });
 
 // Példa: Foglalás hozzáadása
-app.post("/api/bookings", async (req, res) => {
+app.post("/api/bookings", (req, res) => {
   const { user_id, service_id, appointment_time } = req.body;
-
-  try {
-    await dbConnection.execute(
-      "INSERT INTO bookings (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
-      [user_id, service_id, appointment_time]
-    );
-    res.status(201).send("Foglalás sikeresen hozzáadva");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
+  db.query(
+    "INSERT INTO foglalasok (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
+    [user_id, service_id, appointment_time],
+    (err, result) => {
+      if (err) {
+        console.error(err);
+        res.status(500).send("Adatbázis hiba");
+      } else {
+        res.status(201).send("Foglalás sikeresen hozzáadva");
+      }
+    }
+  );
 });
 
 // Szerver indítása
@@ -89,4 +67,3 @@ const HOST = process.env.HOST || "0.0.0.0"; // Hálózati eléréshez
 app.listen(PORT, HOST, () => {
   console.log(`Szerver fut a következő címen: http://${HOST}:${PORT}`);
 });
-
