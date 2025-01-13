@@ -3,6 +3,7 @@
     <div class="register-card">
       <h2>Regisztráció</h2>
       <form @submit.prevent="handleRegistration">
+        <input type="hidden" name="tipus" value="vallalkozo" />
         <div class="form-group">
           <label for="name">Név</label>
           <input id="name" v-model="name" required placeholder="*Teljes név"/>
@@ -34,7 +35,7 @@
         <div class="form-group">
           <input type="checkbox" id="terms" v-model="termsAccepted" />
           <label for="terms">
-            Elfogadom az <a href="/aszf" target="_blank">ÁSZF-et</a>
+            Elfogadom az <a href="/Adatvedelem" target="_blank">ÁSZF-et</a>
           </label>
           <p v-if="!termsAccepted && formSubmitted" class="error-message">Az ÁSZF-et el kell fogadni a regisztrációhoz!</p>
         </div>
@@ -90,6 +91,7 @@ export default {
         email: this.email,
         password: this.password,
         phone: this.phone,
+        tipus: 'vallalkozo',
       };
 
       axios.post('http://localhost:5000/api/auth/register', userData)

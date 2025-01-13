@@ -3,6 +3,7 @@
     <div class="register-card">
       <h2>Regisztráció</h2>
       <form @submit.prevent="handleRegistration">
+        <input type="hidden" name="tipus" value="felhasznalo" />
         <div class="form-group">
           <label for="name">Név</label>
           <input id="name" v-model="name" required placeholder="*Teljes név"/>
@@ -90,6 +91,7 @@ export default {
         email: this.email,
         password: this.password,
         phone: this.phone,
+        tipus: 'felhasznalo',
       };
 
       axios.post('http://localhost:5000/api/auth/register', userData)
