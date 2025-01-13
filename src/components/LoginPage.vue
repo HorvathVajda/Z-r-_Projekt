@@ -58,23 +58,21 @@ export default {
     localStorage.setItem("authData", authData);
 
     this.$store.isLoggedIn = true;
-    this.$router.push("/");
+    this.$router.push("/"); // Átirányítás a főoldalra
   } catch (error) {
     this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
     alert(this.errorMessage);
   }
 },
   },
-
 };
-
-
 </script>
 
 <style scoped>
-.nav-link {
-  color: black;
-  background: transparent;
+/* Általános stílusok */
+body {
+  margin: 0;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
 }
 
 .login-container {
@@ -82,73 +80,86 @@ export default {
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: white; /* Fehér háttér */
-  font-family: Arial, sans-serif;
+  background: url('/path/to/your/image.jpg') no-repeat center center fixed; /* Helyezd ide a háttérkép URL-jét */
+  background-size: cover;
+  position: relative;
 }
 
 .login-card {
-  background-color: white;
-  border: 3px solid black; /* Fekete szegély */
-  padding: 2em;
+  background-color: rgba(255, 255, 255, 0.8); /* Fehér háttér átlátszóval */
+  padding: 2rem;
+  border-radius: 10px;
   width: 100%;
   max-width: 400px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
   text-align: center;
-  border-radius: 0.5em;
 }
 
-.login-card h2 {
-  margin-bottom: 1.5em;
-  color: black; /* Fekete szöveg */
-  font-weight: bold;
-  font-size: 1.8em;
+h2 {
+  color: #333;
+  font-size: 2rem;
+  margin-bottom: 1rem;
 }
 
 .form-group {
-  margin-bottom: 1.5em;
+  margin-bottom: 1.5rem;
   text-align: left;
 }
 
 .form-group label {
-  display: block;
   font-weight: bold;
-  margin-bottom: 0.5em;
-  color: black; /* Fekete szöveg */
+  color: #555;
 }
 
 .form-group input {
   width: 100%;
-  padding: 0.8em;
-  border: 2px solid black; /* Fekete szegély */
-  border-radius: 0.5em;
-  font-size: 1em;
-  background-color: white; /* Fehér háttér */
-  color: black; /* Fekete szöveg */
-  outline: none;
-  transition: border-color 0.3s;
+  padding: 0.8rem;
+  font-size: 1rem;
+  border: 1px solid #ccc;
+  border-radius: 8px;
+  background-color: #f9f9f9;
+  color: #333;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
 .form-group input:focus {
-  border-color: goldenrod; /* Arany kiemelés */
+  border-color: rgb(219, 190, 21); /* Kék szín fókuszáláskor */
+  box-shadow: 0 0 10px rgba(108, 92, 247, 0.2); /* Fókusz effekt */
 }
 
 .login-button {
-  background-color: gold; /* Arany gomb */
+  background-color: gold; /* Modern kék szín */
   color: black;
-  font-size: 1.2em;
+  font-size: 1.1rem;
   font-weight: bold;
-  padding: 0.8em 1.5em;
+  padding: 0.8rem 1.5rem;
   border: none;
-  border-radius: 0.5em;
+  border-radius: 8px;
   cursor: pointer;
+  width: 100%;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .login-button:hover {
-  background-color: #d4af37; /* Világosabb arany hover */
-  transform: scale(1.05); /* Kicsit nagyobb hover effekt */
+  background-color: gold; /* Sötétebb kék hover */
+  transform: translateY(-2px); /* Enyhe emelkedés */
 }
 
 .login-button:active {
-  transform: scale(1); /* Visszaállás kattintáskor */
+  background-color: rgba(255, 217, 0, 0.781); /* Még sötétebb szín kattintáskor */
+  transform: translateY(0);
 }
+
+.nav-link {
+  color: black;
+  text-decoration: none;
+  font-size: 0.9rem;
+  margin-top: 10px;
+  display: inline-block;
+}
+
+.nav-link:hover {
+  text-decoration: underline;
+}
+
 </style>
