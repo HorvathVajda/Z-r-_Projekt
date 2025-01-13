@@ -20,9 +20,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a class="nav-link" href="/" @click="toggleMenu">Főoldal</a>
-            </li>
-            <li class="nav-item">
               <a v-if="isLoggedIn" class="nav-link" href="/Profil" @click="toggleMenu">Profil</a>
             </li>
             <li class="nav-item">
@@ -80,7 +77,7 @@ html, body {
 }
 
 .navbar {
-  background: white;
+  background: transparent;
   position: fixed;
   top: 0;
   left: 0;
@@ -122,7 +119,7 @@ html, body {
 .collapse.navbar-collapse {
   top: 0;
   left: 0;
-  background: white;
+  background: transparent;
   height: auto;
   width: auto;
   transition: transform 0.3s ease-in-out;
