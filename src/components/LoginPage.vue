@@ -31,7 +31,7 @@
 </template>
 
 <script>
-import { login } from "../../API"; // Importáljuk a login API hívást
+import { login } from "../API"; // Importáljuk a login API hívást
 
 export default {
   data() {

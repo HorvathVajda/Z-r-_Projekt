@@ -2,7 +2,7 @@
   <header>
     <nav class="navbar navbar-expand-lg">
       <div class="container-fluid">
-        <router-link class="navbar-brand logo" to="/">BookMyTime</router-link>
+        <a class="navbar-brand logo" href="/">BookMyTime</a>
 
         <!-- Hamburger menü gomb -->
         <button
@@ -20,23 +20,28 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <router-link class="nav-link" to="/" @click="toggleMenu">Főoldal</router-link>
+              <a class="nav-link" href="/" @click="toggleMenu">Főoldal</a>
             </li>
-
-            <!-- Profil menü és bejelentkezés/gomb dinamikusan -->
             <li class="nav-item">
-              <router-link v-if="isLoggedIn" class="nav-link" to="/Profil" @click="toggleMenu">
-                Profil
-              </router-link>
+              <a v-if="isLoggedIn" class="nav-link" href="/Profil" @click="toggleMenu">Profil</a>
             </li>
-
             <li class="nav-item">
-              <button v-if="!isLoggedIn" @click="goToLogin" class="nav-link login-link">
+              <a
+                v-if="!isLoggedIn"
+                class="nav-link login-link"
+                href="/login"
+                @click="toggleMenu"
+              >
                 Bejelentkezés
-              </button>
-              <button v-if="isLoggedIn" @click="handleLogout" class="nav-link login-link">
+              </a>
+              <a
+                v-if="isLoggedIn"
+                class="nav-link login-link"
+                href="/login"
+                @click="handleLogout"
+              >
                 Kijelentkezés
-              </button>
+              </a>
             </li>
           </ul>
         </div>
@@ -46,41 +51,25 @@
 </template>
 
 <script setup>
+import { computed } from "vue";
 import { useRouter } from "vue-router";
-import { ref, watch, onMounted } from "vue";
-import { store } from "../../store"; // A globális állapot importálása
-
-// Inicializálás a localStorage-ból
-const isLoggedIn = ref(localStorage.getItem('authData') ? true : false);
+import { store } from "../store";
 
 const router = useRouter();
-
-// A localStorage változása alapján automatikusan frissítjük az állapotot
-watch(() => store.isLoggedIn, (newValue) => {
-  isLoggedIn.value = newValue;
-});
-
-function goToLogin() {
-  router.push("/login");
-}
+const isLoggedIn = computed(() => store.isLoggedIn);
 
 function handleLogout() {
-  // Eltávolítjuk a token-t a helyi tárolóból
-  localStorage.removeItem("authData");
-  isLoggedIn.value = false;  // Frissítjük az állapotot
-  store.isLoggedIn = false;  // A store frissítése
+  store.clearAuthData();
   router.push("/login");
 }
 
 function toggleMenu() {
-  const navbar = document.querySelector('#navbarNav');
+  const navbar = document.querySelector("#navbarNav");
   if (navbar) {
-    navbar.classList.toggle('show');
+    navbar.classList.toggle("show");
   }
 }
 </script>
-
-
 
 <style scoped>
 html, body {
@@ -105,7 +94,7 @@ html, body {
   transition: transform 0.3s ease-in-out;
 }
 
-.navbar-nav{
+.navbar-nav {
   padding: 0;
   margin: 0;
   display: flex;

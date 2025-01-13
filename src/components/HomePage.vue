@@ -67,10 +67,11 @@
     <!-- CTA (Call to Action) Section -->
     <section v-if="!store.authData" class="cta text-center py-5">
       <h3>Foglalj most, és élvezd a szolgáltatásokat!</h3>
-      <router-link class="linkek" to="/register">Regisztrálj itt!</router-link>
+      <a class="linkek" href="/registerChoose">Regisztrálj itt!</a>
       <p>vagy</p>
-      <router-link class="linkek" to="/login">Belépés</router-link>
+      <a class="linkek" href="/login">Belépés</a>
     </section>
+
 
     <!-- Map Section -->
     <section class="map-section py-5">
@@ -83,7 +84,7 @@
 
 <script>
 import { ref, watch, onMounted } from "vue";
-import { store } from '../../store';
+import { store } from '../store';
 // Importáljuk a Map komponenst
 import Map from "@/components/Map.vue";
 

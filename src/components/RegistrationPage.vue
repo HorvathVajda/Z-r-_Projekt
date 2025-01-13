@@ -34,7 +34,7 @@
         <div class="form-group">
           <input type="checkbox" id="terms" v-model="termsAccepted" />
           <label for="terms">
-            Elfogadom az <a href="/aszf" target="_blank">ÁSZF-et</a>
+            Elfogadom az <a href="/Adatvedelem" target="_blank">ÁSZF-et</a>
           </label>
           <p v-if="!termsAccepted && formSubmitted" class="error-message">Az ÁSZF-et el kell fogadni a regisztrációhoz!</p>
         </div>

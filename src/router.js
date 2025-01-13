@@ -1,72 +1,33 @@
 import { createRouter, createWebHistory } from 'vue-router';
-import HomePage from './components/ugyfelReszek/HomePage.vue';
+import HomePage from './components/HomePage.vue';
 import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
-import LoginPage from './components/authComponents/LoginPage.vue';
-import RegistrationPage from './components/authComponents/RegistrationPage.vue';
+import LoginPage from './components/LoginPage.vue';
+import RegistrationPage from './components/RegistrationPage.vue';
 import AdatVedelem from './components/AdatVedelem.vue';
-import Profil from './components/layout/Profil.vue';
-import editProfile from './components/vallalkozoReszek/editProfile.vue';
-import vallalkozoHome from './components/vallalkozoReszek/vallalkozoHome.vue';
-import registerChoose from './components/authComponents/registerChoose.vue';
-
+import Profil from './components/Profil.vue';
+import editProfile from './components/editProfile.vue';
+import vallalkozoHome from './components/vallalkozoHome.vue';
+import registerChoose from './components/registerChoose.vue';
+import vallalkozoRegister from './components/vallalkozoRegister.vue';
 
 const routes = [
-  {
-    path: '/',
-    name: 'Home',
-    component: HomePage
-  },
-  {
-    path: '/kapcsolat',
-    name: 'Kapcsolat',
-    component: KapcsolatPage
-  },
-  {
-    path: '/rolunk',
-    name: 'Rolunk',
-    component: RolunkPage
-  },
-  {
-    path: '/login',
-    name: 'login',
-    component: LoginPage
-  },
-  {
-    path: '/register',
-    name: 'Registration',
-    component: RegistrationPage
-  },
-  {
-    path: '/Adatvedelem',
-    name: 'Adatvedelem',
-    component: AdatVedelem
-  },
-  {
-    path: '/Profil',
-    name: 'Profil',
-    component: Profil
-  },
-  {
-    path: '/editprofile',
-    name: 'editProfile',
-    component: editProfile
-  },
-  {
-    path: '/vallalkozoHome',
-    name: 'vallalkozoHome',
-    component: vallalkozoHome
-  },
-  {
-    path: '/registerChoose',
-    name: 'registerChoose',
-    component: registerChoose
-  },
+  { path: '/', name: 'Home', component: HomePage },
+  { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
+  { path: '/rolunk', name: 'Rolunk', component: RolunkPage },
+  { path: '/login', name: 'login', component: LoginPage },
+  { path: '/register', name: 'Registration', component: RegistrationPage },
+  { path: '/Adatvedelem', name: 'Adatvedelem', component: AdatVedelem },
+  { path: '/Profil', name: 'Profil', component: Profil },
+  { path: '/editprofile', name: 'editProfile', component: editProfile },
+  { path: '/vallalkozoHome', name: 'vallalkozoHome', component: vallalkozoHome },
+  { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
+  { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
 ];
 
 const router = createRouter({
   history: createWebHistory(),
-  routes
+  routes,
 });
 
 export default router;

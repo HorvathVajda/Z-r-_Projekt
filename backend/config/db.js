@@ -3,25 +3,27 @@ const dotenv = require('dotenv');
 
 dotenv.config(); // Betölti a .env fájlt
 
-// MySQL kapcsolat beállítása
-const connectDB = async () => {
-  try {
-    const connection = await mysql.createConnection({
-      host: process.env.MYSQL_HOST || 'localhost',
-      user: process.env.MYSQL_USER || 'root',
-      password: process.env.MYSQL_PASSWORD || '',
-      database: process.env.MYSQL_DATABASE || 'bookmytime'
-    });
-    console.log('Sikeres kapcsolat a MySQL adatbázissal');
-    return connection;
-  } catch (err) {
-    console.error('Hiba a MySQL kapcsolódáskor:', err);
-    process.exit(1); // Kilépés hiba esetén
-  }
-};
-
-// Kapcsolat létrehozása
-connectDB().then(connection => {
-  module.exports = connection;
+// Adatbázis kapcsolat létrehozása környezeti változókból
+const db = mysql.createPool({
+  host: process.env.DB_HOST || 'localhost',
+  user: process.env.DB_USER || 'root',
+  password: process.env.DB_PASS || '',
+  database: process.env.DB_NAME || 'bookmytime',
+  port: process.env.DB_PORT || 3306,
+  waitForConnections: true, // Kapcsolat várakozás engedélyezése
+  connectionLimit: 2,      // Maximum kapcsolatok száma
+  queueLimit: 0             // Végtelen várakozás, ha elérte a kapcsolatlimitet
 });
 
+// Kapcsolat tesztelése
+db.getConnection()
+  .then(connection => {
+    console.log("Kapcsolat az adatbázishoz sikeresen létrejött!");
+    connection.release(); // Kapcsolat visszaadása a pool-ba
+  })
+  .catch(err => {
+    console.error("Adatbázis kapcsolódási hiba:", err);
+    process.exit(1); // A folyamat leállítása hiba esetén
+  });
+
+module.exports = db;
