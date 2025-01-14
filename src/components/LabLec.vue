@@ -19,12 +19,14 @@ export default {
 <style scoped>
 .footer {
   width: 100%;
-  background: white;
+  height: 60px;
+  background-color: #F4F4F4 !important;
   color: black;
   padding: 20px 0;
   text-align: center;
   position: relative;
   bottom: 0;
+  margin-bottom: 25px;
 }
 
 .footer-container {

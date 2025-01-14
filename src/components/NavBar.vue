@@ -1,6 +1,6 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg">
+    <nav class="navbar navbar-expand-lg" :class="navbarClass">
       <div class="container-fluid">
         <a class="navbar-brand logo" href="/">BookMyTime</a>
 
@@ -48,12 +48,13 @@
 </template>
 
 <script setup>
-import { computed } from "vue";
+import { computed, ref, onMounted, onBeforeUnmount } from "vue";
 import { useRouter } from "vue-router";
 import { store } from "../store";
 
 const router = useRouter();
 const isLoggedIn = computed(() => store.isLoggedIn);
+const navbarClass = ref("normal-navbar");
 
 function handleLogout() {
   store.clearAuthData();
@@ -66,6 +67,24 @@ function toggleMenu() {
     navbar.classList.toggle("show");
   }
 }
+
+// Scroll event handler to add margin-top to the navbar
+onMounted(() => {
+  const handleScroll = () => {
+    if (window.scrollY > 5) {
+      navbarClass.value = "scrolled-navbar";
+    } else {
+      navbarClass.value = "normal-navbar";
+    }
+  };
+
+  window.addEventListener("scroll", handleScroll);
+
+  // Cleanup event listener when the component is destroyed
+  onBeforeUnmount(() => {
+    window.removeEventListener("scroll", handleScroll);
+  });
+});
 </script>
 
 <style scoped>
@@ -80,19 +99,31 @@ html, body {
   background: rgba(255, 255, 255, 0.7); /* Félig átlátszó fehér háttér */
   backdrop-filter: blur(10px); /* Elmosás effekt */
   position: fixed;
-  top: 0;
   left: 0;
   right: 0;
-  width: 100%;
+  width: 99%; /* Kisebb szélesség */
   z-index: 1000;
   padding: 0 20px; /* Csökkentett padding */
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-family: 'Franklin Gothic Medium';
-  height: 60px; /* Fix magasság */
-  transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+  height: 70px; /* Fix magasság */
+  transition: top 0.3s ease-in-out, background 0.3s ease-in-out;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Enyhe árnyék */
+  border-radius: 25px; /* Lekerekített sarkak */
+  margin-top: 5px;
+  left: 50%; /* A navbar bal széle a képernyő közepére kerül */
+  transform: translateX(-50%); /* A navbar középre igazítása */
+}
+
+
+.navbar.normal-navbar {
+  top: 0; /* Alapértelmezett top */
+}
+
+.navbar.scrolled-navbar {
+  top: 20px; /* Görgetéskor megnövelt top */
 }
 
 .navbar-brand.logo {

@@ -71,7 +71,6 @@ html, body {
 
 #content {
   flex: 1;
-  margin-top: 60px;
 }
 
 @media (max-width: 768px) {
