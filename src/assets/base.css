@@ -1,3 +1,6 @@
+* {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
 /* color palette from <https://github.com/vuejs/theme> */
 :root {
   --navbar-height: 60px;
@@ -65,7 +68,7 @@ html, body {
   padding: 0;
   height: 100%;
   width: 100%;
-  font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }     
 body {
   padding-top: var(--navbar-height); 

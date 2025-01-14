@@ -160,7 +160,6 @@ export default {
   padding: 2em 1em;
   text-transform: uppercase;
   font-weight: bold;
-  font-family: sans-serif;
   letter-spacing: 0.1em;
   text-align: center;
   position: relative;

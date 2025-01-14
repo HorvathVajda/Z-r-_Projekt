@@ -77,105 +77,97 @@ html, body {
 }
 
 .navbar {
-  background: transparent;
+  background: rgba(255, 255, 255, 0.7); /* Félig átlátszó fehér háttér */
+  backdrop-filter: blur(10px); /* Elmosás effekt */
   position: fixed;
   top: 0;
   left: 0;
   right: 0;
   width: 100%;
   z-index: 1000;
-  padding: 10px 0;
-  text-align: center;
+  padding: 0 20px; /* Csökkentett padding */
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
   font-family: 'Franklin Gothic Medium';
-  height: auto;
-  transition: transform 0.3s ease-in-out;
+  height: 60px; /* Fix magasság */
+  transition: transform 0.3s ease-in-out, background 0.3s ease-in-out;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Enyhe árnyék */
+}
+
+.navbar-brand.logo {
+  font-size: 40px; /* Betűméret */
+  font-weight: bold; /* Félkövér szöveg */
+  text-decoration: none; /* Aláhúzás eltávolítása */
+  color: black; /* Szöveg színe */
+  margin: 0; /* Margin eltávolítása */
+  padding: 0; /* Padding eltávolítása */
+  line-height: 60px; /* Az elem középre igazítása a navbar magasságával */
+  transition: color 0.3s; /* Színváltozás animáció */
+}
+
+.navbar-brand.logo:hover {
+  color: goldenrod; /* Hover szín */
+  background: transparent;
 }
 
 .navbar-nav {
-  padding: 0;
-  margin: 0;
   display: flex;
-  flex-direction: column;
-  align-items: center;
-}
-
-.navbar.hidden {
-  transform: translateY(-100%);
+  flex-direction: row; /* Sorba rendezi az elemeket */
+  align-items: center; /* Középre igazítja őket függőlegesen */
+  gap: 20px; /* Elemenkénti távolság */
+  margin: 0;
+  padding: 0;
+  list-style: none; /* Lista stílus eltávolítása */
 }
 
 .navbar-toggler {
   padding: 8px 12px;
-  position: fixed;
-  right: 20px;
-  top: 10px;
-  z-index: 1050;
-  transition: background-color 0.3s, border-color 0.3s;
+  background: transparent;
+  border: none;
+  font-size: 24px;
+  cursor: pointer;
+  transition: background-color 0.3s;
 }
 
 .navbar-toggler:hover {
   background: goldenrod;
-}
-
-.collapse.navbar-collapse {
-  top: 0;
-  left: 0;
-  background: transparent;
-  height: auto;
-  width: auto;
-  transition: transform 0.3s ease-in-out;
-  z-index: 1040;
+  color: white;
 }
 
 .navbar-toggler-icon {
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3E%3Cpath stroke='black' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3E%3C/svg%3E");
-  width: 20px;
-  height: 20px;
+  width: 24px;
+  height: 2px;
+  background-color: black;
+  position: relative;
 }
 
-.nav-link.active::after {
+.navbar-toggler-icon::before,
+.navbar-toggler-icon::after {
   content: "";
   position: absolute;
-  bottom: 0;
   left: 0;
-  width: 100%;
+  width: 24px;
   height: 2px;
-  background-color: goldenrod;
-  transform: scaleX(0);
-  transition: transform 0.3s ease-in-out;
+  background-color: black;
+  transition: transform 0.3s;
 }
 
-.nav-link.active.login-link::after {
-  transform: scaleX(0);
+.navbar-toggler-icon::before {
+  top: -8px;
 }
 
-.container-fluid {
-  width: 100%;
-  padding: auto;
-  margin: auto;
-}
-
-.logo {
-  font-size: 30px;
-  font-weight: bold;
-  color: black;
-  text-decoration: none;
-  background: transparent;
-}
-
-.logo:hover {
-  color: goldenrod;
+.navbar-toggler-icon::after {
+  top: 8px;
 }
 
 .nav-link {
   color: black;
   text-decoration: none;
-  background: transparent;
-  font-size: 18px;
-  padding: 10px 15px;
+  font-size: 16px;
+  padding: 0 15px; /* Csökkentett padding */
   position: relative;
-  display: inline-block;
   transition: color 0.3s, background-color 0.3s;
-  margin-right: 20px;
 }
 
 .nav-link:hover {
@@ -187,11 +179,7 @@ html, body {
   background-color: gold;
   color: black;
   border-radius: 5px;
-  padding: 0.25rem 0.5rem;
-}
-
-.nav-link.active:hover {
-  background-color: goldenrod;
+  padding: 5px 10px;
 }
 
 .nav-link::after {
@@ -210,10 +198,7 @@ html, body {
   transform: scaleX(1);
 }
 
-.navbar .nav-link.active {
-  padding: 10px 15px;
-}
-
+/* Mobilnézet */
 @media (max-width: 768px) {
   .navbar-nav {
     flex-direction: column;

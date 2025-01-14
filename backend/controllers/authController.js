@@ -10,17 +10,18 @@ exports.login = async (req, res) => {
   try {
     const [users] = await db.query(
       `
-      SELECT 'felhasznalo' AS tipus, id, nev, email, jelszo
+      SELECT 'felhasznalo' AS tipus, felhasznalo_id AS id, nev, email, jelszo
       FROM felhasznalo
       WHERE email = ?
       UNION
-      SELECT 'vallalkozo' AS tipus, id, nev, email, jelszo
+      SELECT 'vallalkozo' AS tipus, vallalkozo_id AS id, nev, email, jelszo
       FROM vallalkozo
       WHERE email = ?
       `,
       [email, email]
     );
 
+    // Ha nincs ilyen felhasználó
     if (users.length === 0) {
       return res.status(404).json({ message: "A felhasználó nem található." });
     }
@@ -45,22 +46,27 @@ exports.login = async (req, res) => {
 
     // Token generálás
     const token = jwt.sign(
-      { id: user.id, email: user.email, tipus: user.tipus }, // A típus hozzáadása a tokenhez
+      { id: user.id, email: user.email, tipus: user.tipus }, // Az aliasolt 'id' mező
       secretKey,
       { expiresIn: "1h" }
     );
+
+    // A token lejárati ideje is küldésre kerül
+    const expirationTime = Date.now() + 3600 * 1000; // 1 óra
 
     // Válasz a típus alapján
     res.json({
       message: `Sikeres bejelentkezés ${user.tipus === 'felhasznalo' ? 'felhasználóként' : 'vállalkozóként'}.`,
       token,
+      expirationTime, // Token lejárati idő
       tipus: user.tipus, // Felhasználási célokra
     });
   } catch (error) {
     console.error('Szerverhiba:', error);
-    res.status(500).json({ message: "Szerverhiba." });
+    res.status(500).json({ message: "Szerverhiba történt. Kérjük próbálja újra később." });
   }
 };
+
 
 
 

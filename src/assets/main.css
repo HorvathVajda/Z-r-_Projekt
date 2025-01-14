@@ -1,5 +1,7 @@
 @import './base.css';
-
+* {
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+}
 /* A body és html a teljes szélességet és magasságot használja */
 html, body {
   margin: 0;

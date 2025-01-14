@@ -31,22 +31,23 @@ export default {
     };
   },
   methods: {
-    restoreSession() {
-      const authData = localStorage.getItem("authData");
+  restoreSession() {
+    const authData = localStorage.getItem("authData");
 
-      if (authData) {
-        const { token, email, expirationTime } = JSON.parse(authData);
+    if (authData) {
+      const { token, email, expirationTime } = JSON.parse(authData);
 
-        if (Date.now() < expirationTime) {
-          this.$store.isLoggedIn = true;
-          this.$store.userEmail = email;
-        } else {
-          localStorage.removeItem("authData");
-          this.$store.isLoggedIn = false;
-        }
+      if (Date.now() < expirationTime) {
+        // Frissítjük az authData-t és a store-t
+        this.$store.updateAuthData({ token, email, expirationTime });
+        this.$store.userEmail = email;  // Ez csak példaként szerepel, ha szükséges más adatot is tárolni
+      } else {
+        localStorage.removeItem("authData");
+        this.$store.clearAuthData();
       }
-    },
+    }
   },
+},
   created() {
     this.restoreSession();
   },

@@ -42,31 +42,43 @@ export default {
     };
   },
   methods: {
-    async handleLogin() {
-        try {
-    const response = await login({
-      email: this.email,
-      jelszo: this.password,
-    });
+  async handleLogin() {
+    try {
+      const response = await login({
+        email: this.email,
+        jelszo: this.password,
+      });
 
-    const token = response.data.token;
+      const { token, expirationTime, tipus } = response.data;
 
-    // Token mentése lejárati idővel
-    const expirationTime = Date.now() + 3600 * 1000;
-    const authData = JSON.stringify({ token, email: this.email, expirationTime });
+      // Token mentése lejárati idővel
+      const authData = {
+        token,
+        email: this.email,
+        expirationTime,
+        tipus,
+      };
 
-    localStorage.setItem("authData", authData);
+      this.$store.updateAuthData(authData);
 
-    this.$store.isLoggedIn = true;
-    this.$router.push("/"); // Átirányítás a főoldalra
-  } catch (error) {
-    this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
-    alert(this.errorMessage);
-  }
-},
+      if(tipus == "vallalkozo"){
+        this.$router.push("/vallalkozoHome");
+
+      }
+      else{
+        this.$router.push("/");
+      }
+
+    } catch (error) {
+      this.errorMessage = error.response?.data?.message || "Hiba történt a bejelentkezés során";
+      alert(this.errorMessage);
+    }
   },
+},
+
 };
 </script>
+
 
 <style scoped>
 /* Általános stílusok */
