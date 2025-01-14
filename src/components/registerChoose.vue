@@ -1,10 +1,8 @@
 <template>
   <div>
-    <!-- Ha nem a regisztrációs oldalon vagyunk, akkor jelenjen meg a labelcet -->
     <labelcet v-if="!isRegistrationPage" />
 
     <div class="container-fluid d-flex p-0 m-0 min-vh-100">
-      <!-- Bal oldali tartalom (szöveg és gombok) -->
       <div class="left-col d-flex justify-content-center align-items-center">
         <div class="content text-center">
           <h1>Válassza ki a regisztráció típusát</h1>
@@ -16,7 +14,6 @@
           </button>
         </div>
       </div>
-      <!-- Jobb oldali kép -->
       <div class="right-col">
         <div class="image-container">
           <img src="/foto.jpg" alt="Regisztráció kép" />
@@ -31,9 +28,8 @@ import { useRouter } from 'vue-router';
 import { ref } from 'vue';
 
 const router = useRouter();
-const isRegistrationPage = ref(false);  // Alapértelmezett állapot
+const isRegistrationPage = ref(false);
 
-// Ellenőrzés, hogy melyik oldalon vagyunk
 if (router.currentRoute.value.name === 'registerChoose') {
   isRegistrationPage.value = true;
 }
@@ -61,14 +57,14 @@ body, html {
 
 .container-fluid {
   display: flex;
-  height: 100vh; /* Teljes magasság */
+  height: 100vh;
   padding: 0;
   margin: 0;
 }
 
 .left-col, .right-col {
-  height: 100%; /* Teljes magasság */
-  flex: 1; /* A két oszlop egyenlő arányban osztozik a teljes szélességen */
+  height: 100%;
+  flex: 1;
 }
 
 .left-col {
@@ -141,4 +137,5 @@ body, html {
     padding: 15px 30px;
   }
 }
+
 </style>
