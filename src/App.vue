@@ -1,44 +1,56 @@
 <template>
   <div id="app">
-    <NavBar />
+    <NavBar /> <!-- A navigációs sáv -->
     <main id="content">
-      <router-view />
+      <router-view></router-view> <!-- A dinamikusan betöltődő komponens -->
     </main>
-    <LabLec />
+    <!-- Csak akkor jelenik meg a lábléc, ha nem a kizárt oldalon vagyunk -->
+    <LabLec v-if="!isExcludedPage" />
   </div>
 </template>
 
 <script>
-import NavBar from './components/layout/NavBar.vue';
-import LabLec from './components/layout/LabLec.vue';
+import NavBar from './components/NavBar.vue'; // NavBar komponens importálása
+import LabLec from './components/LabLec.vue'; // LabLec komponens importálása
+import { computed } from 'vue';
+import { useRoute } from 'vue-router';
 
 export default {
   name: 'App',
   components: {
     NavBar,
-    LabLec
+    LabLec,
+  },
+  setup() {
+    const route = useRoute();
+    const excludedPages = ['/registerChoose', '/login', '/register', '/vallalkozoRegister']; // Ide add hozzá a kizárt oldalakat
+    const isExcludedPage = computed(() => excludedPages.includes(route.path));
+
+    return {
+      isExcludedPage,
+    };
   },
   methods: {
-  restoreSession() {
-    const authData = localStorage.getItem("authData");
+    restoreSession() {
+      const authData = localStorage.getItem("authData");
 
-    if (authData) {
-      const { token, email, expirationTime } = JSON.parse(authData);
+      if (authData) {
+        const { token, email, expirationTime } = JSON.parse(authData);
 
-      // Ellenőrizd, hogy a token még érvényes-e
-      if (Date.now() < expirationTime) {
-        this.$store.isLoggedIn = true;
-        this.$store.userEmail = email;
-      } else {
-        // Ha lejárt, töröld a tokeneket
-        localStorage.removeItem("authData");
-        this.$store.isLoggedIn = false;
+        if (Date.now() < expirationTime) {
+          this.$store.isLoggedIn = true;
+          this.$store.userEmail = email;
+        } else {
+          localStorage.removeItem("authData");
+          this.$store.isLoggedIn = false;
+        }
       }
-    }
+    },
   },
-},
-}
-
+  created() {
+    this.restoreSession();
+  },
+};
 </script>
 
 <style>
