@@ -130,7 +130,7 @@ html, body {
   font-size: 40px; /* Betűméret */
   font-weight: bold; /* Félkövér szöveg */
   text-decoration: none; /* Aláhúzás eltávolítása */
-  color: black; /* Szöveg színe */
+  color: #6327A2; /* Szöveg színe */
   margin: 0; /* Margin eltávolítása */
   padding: 0; /* Padding eltávolítása */
   line-height: 60px; /* Az elem középre igazítása a navbar magasságával */
@@ -138,7 +138,7 @@ html, body {
 }
 
 .navbar-brand.logo:hover {
-  color: goldenrod; /* Hover szín */
+  color: #F4C542; /* Hover szín */
   background: transparent;
 }
 
@@ -162,7 +162,7 @@ html, body {
 }
 
 .navbar-toggler:hover {
-  background: goldenrod;
+  background: #6327A2;
   color: white;
 }
 
@@ -193,16 +193,16 @@ html, body {
 }
 
 .nav-link {
-  color: black;
+  color: #6327A2;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 23px;
   padding: 0 15px; /* Csökkentett padding */
   position: relative;
   transition: color 0.3s, background-color 0.3s;
 }
 
 .nav-link:hover {
-  color: goldenrod;
+  color: #F4C542;
   background: transparent;
 }
 
@@ -220,7 +220,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: goldenrod;
+  background-color: #F4C542;
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }

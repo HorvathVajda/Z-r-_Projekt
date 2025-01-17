@@ -76,9 +76,10 @@ body, html {
 
 .content h1 {
   font-size: 48px;
-  color: #b8860b;
+  font-weight: bold;
+  color: #6327A2;
   margin-bottom: 20px;
-  font-family: 'Georgia', serif;
+  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
 
 .gold-button {

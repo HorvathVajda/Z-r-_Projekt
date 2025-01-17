@@ -1,46 +1,15 @@
 <template>
-  <div class="register-container">
-    <div class="register-card">
-      <h2>Regisztráció</h2>
-      <form @submit.prevent="handleRegistration">
-        <input type="hidden" name="tipus" value="vallalkozo" />
-        <div class="form-group">
-          <label for="name">Név</label>
-          <input id="name" v-model="name" required placeholder="*Teljes név"/>
-        </div>
-        <div class="form-group">
-          <label for="email">E-mail</label>
-          <input id="email" v-model="email" type="email" required placeholder="*E-mail cím"/>
-        </div>
-        <div class="form-group">
-          <label for="password">Jelszó</label>
-          <input id="password" v-model="password" type="password" required placeholder="*Jelszó" />
-          <div v-if="password && passwordStrength !== 'strong'" class="password-strength">
-            <p v-if="password.length < 8">Jelszónak legalább 8 karakternek kell lennie.</p>
-            <p v-if="!/[a-z]/.test(password)">Jelszónak kisbetűt kell tartalmaznia.</p>
-            <p v-if="!/[A-Z]/.test(password)">Jelszónak nagybetűt kell tartalmaznia.</p>
-            <p v-if="!/[0-9]/.test(password)">Jelszónak számot kell tartalmaznia.</p>
-          </div>
-        </div>
-        <div class="form-group">
-          <label for="confirmPassword">Jelszó megerősítése</label>
-          <input id="confirmPassword" v-model="confirmPassword" type="password" required placeholder="*Jelszó megerősítése" />
-          <p v-if="confirmPassword && confirmPassword !== password" class="error-message">A két jelszó nem egyezik!</p>
-        </div>
-        <div class="form-group">
-          <label for="phone">Telefonszám</label>
-          <input id="phone" v-model="phone" type="tel" required placeholder="*Telefonszám" />
-          <p v-if="phone && !phone.match(/^\+?(\d{1,3})?(\d{8})$/)" class="error-message">Kérjük, érvényes telefonszámot adjon meg!</p>
-        </div>
-        <div class="form-group">
-          <input type="checkbox" id="terms" v-model="termsAccepted" />
-          <label for="terms">
-            Elfogadom az <a href="/Adatvedelem" target="_blank">ÁSZF-et</a>
-          </label>
-          <p v-if="!termsAccepted && formSubmitted" class="error-message">Az ÁSZF-et el kell fogadni a regisztrációhoz!</p>
-        </div>
-        <button type="submit" class="register-button" :disabled="!isFormValid || !termsAccepted">Regisztráció</button>
-      </form>
+  <div class="main-container">
+    <nav class="navbar">
+      <!-- Ide kerül a navbar tartalma -->
+    </nav>
+    <div class="register-container">
+      <div class="register-card">
+        <h2>Regisztráció</h2>
+        <form @submit.prevent="handleRegistration">
+          <!-- Űrlap mezők itt -->
+        </form>
+      </div>
     </div>
   </div>
 </template>
@@ -111,18 +80,36 @@ export default {
 </script>
 
 <style scoped>
+.main-container {
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+}
+
+.navbar {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  background-color: #333;
+  color: white;
+  padding: 10px 0;
+  text-align: center;
+  z-index: 1000; /* A navbar legyen mindig a tartalom felett */
+}
+
 .register-container {
+  margin-top: 70px; /* A navbar magassága, hogy a tartalom ne érintkezzen vele */
   display: flex;
   justify-content: center;
   align-items: center;
   min-height: 100vh;
-  background-color: white; /* Fehér háttér */
-  font-family: Arial, sans-serif;
+  background-color: white;
 }
 
 .register-card {
   background-color: white;
-  border: 3px solid black; /* Fekete szegély */
+  border: 3px solid black;
   padding: 2em;
   width: 100%;
   max-width: 400px;
@@ -132,7 +119,7 @@ export default {
 
 .register-card h2 {
   margin-bottom: 1.5em;
-  color: black; /* Fekete szöveg */
+  color: black;
   font-weight: bold;
   font-size: 1.8em;
 }
@@ -146,27 +133,27 @@ export default {
   display: block;
   font-weight: bold;
   margin-bottom: 0.5em;
-  color: black; /* Fekete szöveg */
+  color: black;
 }
 
 .form-group input {
   width: 100%;
   padding: 0.8em;
-  border: 2px solid black; /* Fekete szegély */
+  border: 2px solid black;
   border-radius: 0.5em;
   font-size: 1em;
-  background-color: white; /* Fehér háttér */
-  color: black; /* Fekete szöveg */
+  background-color: white;
+  color: black;
   outline: none;
   transition: border-color 0.3s;
 }
 
 .form-group input:focus {
-  border-color: goldenrod; /* Arany kiemelés */
+  border-color: goldenrod;
 }
 
 .register-button {
-  background-color: gold; /* Arany gomb */
+  background-color: gold;
   color: black;
   font-size: 1.2em;
   font-weight: bold;
@@ -178,11 +165,11 @@ export default {
 }
 
 .register-button:hover {
-  background-color: #d4af37; /* Világosabb arany hover */
-  transform: scale(1.05); /* Kicsit nagyobb hover effekt */
+  background-color: #d4af37;
+  transform: scale(1.05);
 }
 
 .register-button:active {
-  transform: scale(1); /* Visszaállás kattintáskor */
+  transform: scale(1);
 }
 </style>
