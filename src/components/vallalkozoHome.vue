@@ -29,21 +29,27 @@
         <div class="form-container">
           <form @submit.prevent="addBusiness">
             <h2>Új Vállalkozás Hozzáadása</h2>
-            <div>
+            <div class="form-group">
               <label for="name">Vállalkozás neve:</label>
-              <input type="text" id="name" v-model="newBusiness.name" required />
+              <input type="text" id="name" v-model="newBusiness.name" placeholder="Add meg a vállalkozás nevét" required />
             </div>
-            <div>
+            <div class="form-group">
               <label for="category">Kategória:</label>
-              <input type="text" id="category" v-model="newBusiness.category" required />
+              <select id="category" v-model="newBusiness.category" required>
+                <option value="" disabled selected>Válassz kategóriát</option>
+                <option value="Szépségszalon">Szépségszalon</option>
+                <option value="Autószerviz">Autószerviz</option>
+                <option value="Étterem">Étterem</option>
+                <option value="Büfé">Büfé</option>
+              </select>
             </div>
-            <div>
+            <div class="form-group">
               <label for="description">Leírás:</label>
-              <textarea id="description" v-model="newBusiness.description"></textarea>
+              <textarea id="description" v-model="newBusiness.description" placeholder="Rövid leírás a vállalkozásról"></textarea>
             </div>
             <div class="form-buttons">
-              <button type="submit">Hozzáadás</button>
-              <button type="button" @click="showForm = false">Mégse</button>
+              <button type="submit" class="submit-button">Hozzáadás</button>
+              <button type="button" @click="showForm = false" class="cancel-button">Mégse</button>
             </div>
           </form>
         </div>
@@ -72,6 +78,8 @@ export default {
         // Itt lehet az adatbázisba küldeni az adatokat vagy frissíteni a listát
         this.newBusiness = { name: "", category: "", description: "" };
         this.showForm = false;
+      } else {
+        alert("Kérlek, töltsd ki az összes kötelező mezőt!");
       }
     },
   },
@@ -179,7 +187,7 @@ export default {
 }
 
 .add-business-card:hover {
-  background-color: #D3A537;
+  background-color: white;
   transform: scale(1.05);
 }
 
@@ -199,34 +207,96 @@ export default {
 
 /* Felugró ablak konténer */
 .form-container {
-  background: white;
-  padding: 2rem;
-  border-radius: 8px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  background: linear-gradient(to bottom right, #ffffff, #f3f1ff);
+  padding: 2rem 3rem;
+  border-radius: 15px;
+  border: 2px solid #5a3472;
+  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
   width: 100%;
-  max-width: 400px;
+  max-width: 450px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 1.5rem; /* Egyenletes távolság az elemek között */
 }
 
+/* Formázás a címekhez */
+.form-container h2 {
+  text-align: center;
+  font-size: 22px;
+  color: #5a3472;
+}
+
+/* Űrlap mezők */
+.form-group {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem; /* Távolság a címke és az input között */
+}
+
+.form-group label {
+  font-size: 14px;
+  color: #5a3472;
+  text-align: left; /* Balra igazított címkék */
+}
+
+.form-group input,
+.form-group textarea,
+.form-group select {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid #c3b1e1;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: box-shadow 0.3s, border-color 0.3s;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+  box-shadow: 0 0 8px rgba(138, 81, 189, 0.5);
+  border-color: #5a3472;
+}
+
+/* Gombok */
 .form-buttons {
   display: flex;
-  gap: 1rem;
-  margin-top: 1rem;
+  justify-content: space-between;
+  width: 100%;
+  padding: 20px;
 }
 
 button {
-  padding: 0.5rem 1rem;
+  flex: 1; /* Gombok egyenlő méretűek */
+  padding: 0.7rem 1.5rem;
   border: none;
-  border-radius: 4px;
+  border-radius: 8px;
+  font-size: 14px;
   cursor: pointer;
+  transition: background-color 0.3s, transform 0.3s;
+  margin: 0 0.5rem; /* Távolság a két gomb között */
 }
 
-button[type="submit"] {
-  background-color: #4caf50;
+.submit-button {
+  background: #6327A2;
   color: white;
 }
 
-button[type="button"] {
-  background-color: #f44336;
-  color: white;
+.submit-button:hover {
+  transform: scale(1.05);
+}
+
+.cancel-button {
+  background: white;
+  border-color: #e74c3c; /* Szegély a gomb színével */
+  color: black;
+
+}
+
+.cancel-button:hover {
+  background: white;
+  transform: scale(1.05);
 }
 </style>
