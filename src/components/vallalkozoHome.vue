@@ -7,7 +7,6 @@
         <li><a href="#">Beállítások</a></li>
         <li><a href="#">Profil</a></li>
         <li><a href="#">Értesítések</a></li>
-        <li><a href="#">Kijelentkezés</a></li>
       </ul>
     </aside>
 
@@ -20,8 +19,33 @@
         <!-- Példa kockák -->
         <div class="business-card">Vállalkozás 1</div>
         <!-- Új vállalkozás négyzet -->
-        <div class="business-card add-business-card">
+        <div class="business-card add-business-card" @click="showForm = true">
           <span>+</span>
+        </div>
+      </div>
+
+      <!-- Új vállalkozás űrlap -->
+      <div v-if="showForm" class="form-overlay">
+        <div class="form-container">
+          <form @submit.prevent="addBusiness">
+            <h2>Új Vállalkozás Hozzáadása</h2>
+            <div>
+              <label for="name">Vállalkozás neve:</label>
+              <input type="text" id="name" v-model="newBusiness.name" required />
+            </div>
+            <div>
+              <label for="category">Kategória:</label>
+              <input type="text" id="category" v-model="newBusiness.category" required />
+            </div>
+            <div>
+              <label for="description">Leírás:</label>
+              <textarea id="description" v-model="newBusiness.description"></textarea>
+            </div>
+            <div class="form-buttons">
+              <button type="submit">Hozzáadás</button>
+              <button type="button" @click="showForm = false">Mégse</button>
+            </div>
+          </form>
         </div>
       </div>
     </main>
@@ -31,6 +55,26 @@
 <script>
 export default {
   name: "VallalkozoHome",
+  data() {
+    return {
+      showForm: false,
+      newBusiness: {
+        name: "",
+        category: "",
+        description: "",
+      },
+    };
+  },
+  methods: {
+    addBusiness() {
+      if (this.newBusiness.name && this.newBusiness.category) {
+        alert(`Új vállalkozás hozzáadva: ${this.newBusiness.name}`);
+        // Itt lehet az adatbázisba küldeni az adatokat vagy frissíteni a listát
+        this.newBusiness = { name: "", category: "", description: "" };
+        this.showForm = false;
+      }
+    },
+  },
 };
 </script>
 
@@ -75,14 +119,14 @@ export default {
 }
 
 .sidebar ul li a:hover {
-  color: grey; /* Aranysárga */
+  color: grey;
 }
 
 /* Fő tartalom */
 .main-content {
   flex-grow: 1;
   padding: 20px;
-  background-color: #EDEDED; /* Világos szürke */
+  background-color: #EDEDED;
   margin-top: 70px;
 }
 
@@ -108,13 +152,12 @@ export default {
 
 .business-card {
   background-color: white;
-  border: 1px solid #C3B1E1; /* Pasztell lila */
+  border: 1px solid #C3B1E1;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
-
 }
 
 .business-card:hover {
@@ -129,14 +172,61 @@ export default {
   align-items: center;
   font-size: 32px;
   font-weight: bold;
-  color: #5A3472; /* Lila */
-  background-color: white; /* Aranysárga */
+  color: #5A3472;
+  background-color: white;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
 }
 
 .add-business-card:hover {
-  background-color: #D3A537; /* Sötétebb aranysárga */
+  background-color: #D3A537;
   transform: scale(1.05);
+}
+
+/* Felugró ablak háttér */
+.form-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+/* Felugró ablak konténer */
+.form-container {
+  background: white;
+  padding: 2rem;
+  border-radius: 8px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  width: 100%;
+  max-width: 400px;
+}
+
+.form-buttons {
+  display: flex;
+  gap: 1rem;
+  margin-top: 1rem;
+}
+
+button {
+  padding: 0.5rem 1rem;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+}
+
+button[type="submit"] {
+  background-color: #4caf50;
+  color: white;
+}
+
+button[type="button"] {
+  background-color: #f44336;
+  color: white;
 }
 </style>
