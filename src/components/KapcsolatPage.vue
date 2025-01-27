@@ -79,7 +79,7 @@ export default {
 header {
   text-align: center;
   padding: 20px;
-  color: #fff;
+  color:black;
 }
 
 main {

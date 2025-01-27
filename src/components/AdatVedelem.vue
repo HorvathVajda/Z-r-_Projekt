@@ -6,14 +6,14 @@
     <p>Jelen Általános Szerződési Feltételek (ÁSZF) a [Projekt neve] által nyújtott online időpontfoglaló rendszer igénybevételének feltételeit tartalmazza. A rendszer használatával Ön elfogadja az alábbi feltételeket.</p>
 
     <h2>1. Szolgáltató adatai</h2>
-    <p>Szolgáltató neve: [Cégnév vagy magánszemély neve]</p>
-    <p>Székhely: [Cím]</p>
+    <p>Szolgáltató neve: Book My Time</p>
+    <p>Székhely: Városföld Béke utca 2.</p>
     <p>Adószám: [Ha van]</p>
     <p>Kapcsolattartó e-mail cím: [E-mail cím]</p>
     <p>Kapcsolattartó telefonszám: [Telefonszám]</p>
 
     <h2>2. A szolgáltatás célja</h2>
-    <p>A [Projekt neve] egy online platform, amely lehetővé teszi vállalkozások számára, hogy időpontokat kezeljenek, és lehetővé teszi az ügyfelek számára, hogy ezen vállalkozásokhoz időpontot foglaljanak.</p>
+    <p>A Book My Time egy online platform, amely lehetővé teszi vállalkozások számára, hogy időpontokat kezeljenek, és lehetővé teszi az ügyfelek számára, hogy ezen vállalkozásokhoz időpontot foglaljanak.</p>
 
     <h2>3. Regisztráció és felhasználói fiók</h2>
     <p><strong>Szolgáltatók számára:</strong> Regisztráció után a vállalkozások (pl. fodrászok, autószerelők) saját időpontfoglalási rendszert hozhatnak létre. A szolgáltató köteles biztosítani a megadott adatok helyességét és naprakészségét.</p>
