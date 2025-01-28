@@ -4,9 +4,9 @@
     <aside class="sidebar">
       <h2>Dashboard</h2>
       <ul>
-        <li><a href="#">Beállítások</a></li>
-        <li><a href="#">Profil</a></li>
-        <li><a href="#">Értesítések</a></li>
+        <li><router-link to="/vallalkozoHome/beallitasok">Beállítások</router-link></li>
+        <li><router-link to="/vallalkozoHome/profil">Profil</router-link></li>
+        <li><router-link to="/vallalkozoHome/ertesitesek">Értesítések</router-link></li>
       </ul>
     </aside>
 
@@ -15,10 +15,11 @@
       <header>
         <h1>Vállalkozásaim</h1>
       </header>
+      
       <div class="business-grid">
-        <!-- Példa kockák -->
-        <div class="business-card">Vállalkozás 1</div>
-        <!-- Új vállalkozás négyzet -->
+        <div v-for="(business, index) in businesses" :key="index" class="business-card">
+          {{ business.name }}
+        </div>
         <div class="business-card add-business-card" @click="showForm = true">
           <span>+</span>
         </div>
@@ -31,21 +32,20 @@
             <h2>Új Vállalkozás Hozzáadása</h2>
             <div class="form-group">
               <label for="name">Vállalkozás neve:</label>
-              <input type="text" id="name" v-model="newBusiness.name" placeholder="Add meg a vállalkozás nevét" required />
+              <input type="text" id="name" v-model="newBusiness.name" required />
             </div>
             <div class="form-group">
               <label for="category">Kategória:</label>
               <select id="category" v-model="newBusiness.category" required>
                 <option value="" disabled selected>Válassz kategóriát</option>
-                <option value="Szépségszalon">Szépségszalon</option>
-                <option value="Autószerviz">Autószerviz</option>
-                <option value="Étterem">Étterem</option>
-                <option value="Büfé">Büfé</option>
+                <option value="Fodraszat">Fodrászat</option>
+                <option value="Autoszerviz">Autószerviz</option>
+                <option value="Fogaszat">Fogászat</option>
               </select>
             </div>
             <div class="form-group">
               <label for="description">Leírás:</label>
-              <textarea id="description" v-model="newBusiness.description" placeholder="Rövid leírás a vállalkozásról"></textarea>
+              <textarea id="description" v-model="newBusiness.description"></textarea>
             </div>
             <div class="form-buttons">
               <button type="submit" class="submit-button">Hozzáadás</button>
@@ -54,6 +54,9 @@
           </form>
         </div>
       </div>
+
+      <!-- Router view csak egyszer -->
+      <router-view></router-view>
     </main>
   </div>
 </template>
@@ -69,20 +72,20 @@ export default {
         category: "",
         description: "",
       },
+      businesses: []
     };
   },
   methods: {
     addBusiness() {
       if (this.newBusiness.name && this.newBusiness.category) {
-        alert(`Új vállalkozás hozzáadva: ${this.newBusiness.name}`);
-        // Itt lehet az adatbázisba küldeni az adatokat vagy frissíteni a listát
+        this.businesses.push({ ...this.newBusiness });
         this.newBusiness = { name: "", category: "", description: "" };
         this.showForm = false;
       } else {
-        alert("Kérlek, töltsd ki az összes kötelező mezőt!");
+        alert("Kérlek, töltsd ki az összes mezőt!");
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
