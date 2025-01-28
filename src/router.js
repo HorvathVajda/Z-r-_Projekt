@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router';
+import { createRouter, createWebHistory } from 'vue-router'; 
 import HomePage from './components/HomePage.vue';
 import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
@@ -11,6 +11,10 @@ import vallalkozoHome from './components/vallalkozoHome.vue';
 import registerChoose from './components/registerChoose.vue';
 import vallalkozoRegister from './components/vallalkozoRegister.vue';
 
+//import Dashboard from './components/Dashboard.vue'; // Dashboard most külön fájlban
+import Settings from './components/Beallitasok.vue';
+import Notifications from './components/Ertesitesek.vue';
+
 const routes = [
   { path: '/', name: 'Home', component: HomePage },
   { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
@@ -18,11 +22,20 @@ const routes = [
   { path: '/login', name: 'login', component: LoginPage },
   { path: '/register', name: 'Registration', component: RegistrationPage },
   { path: '/Adatvedelem', name: 'Adatvedelem', component: AdatVedelem },
-  { path: '/Profil', name: 'Profil', component: Profil },
   { path: '/editprofile', name: 'editProfile', component: editProfile },
-  { path: '/vallalkozoHome', name: 'vallalkozoHome', component: vallalkozoHome },
   { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
+
+  {
+    path: '/vallalkozoHome',
+    component: vallalkozoHome,
+    children: [
+      //{ path: '', name: 'Dashboard', component: Dashboard }, // Dashboard most külön fájlban
+      { path: 'beallitasok', name: 'Beallitasok', component: Settings },
+      { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
+      { path: 'Profil', name: 'Profil', component: Profil }
+    ]
+  }
 ];
 
 const router = createRouter({
