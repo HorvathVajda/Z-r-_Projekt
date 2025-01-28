@@ -16,59 +16,45 @@ exports.login = async (req, res) => {
       UNION
       SELECT 'vallalkozo' AS tipus, vallalkozo_id AS id, nev, email, jelszo
       FROM vallalkozo
-      WHERE email = ?
-      `,
+      WHERE email = ?`,
       [email, email]
     );
 
-    // Ha nincs ilyen felhasználó
     if (users.length === 0) {
       return res.status(404).json({ message: "A felhasználó nem található." });
     }
 
-    const user = users[0]; // Az első találat
-    console.log(`Felhasználótípus: ${user.tipus}`); // Debugginghez
+    const user = users[0];
 
-    // Ellenőrizzük, hogy van-e jelszó
     if (!user.jelszo) {
       return res.status(400).json({ message: "A felhasználóhoz nincs jelszó társítva." });
     }
 
-    console.log('Beírt jelszó:', jelszo);
-    console.log('Hash-elt jelszó:', user.jelszo);
-
-    // Jelszó ellenőrzése
     const isMatch = await bcrypt.compare(jelszo, user.jelszo);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Helytelen jelszó." });
     }
 
-    // Token generálás
     const token = jwt.sign(
-      { id: user.id, email: user.email, tipus: user.tipus }, // Az aliasolt 'id' mező
+      { id: user.id, email: user.email, tipus: user.tipus },
       secretKey,
       { expiresIn: "1h" }
     );
 
-    // A token lejárati ideje is küldésre kerül
-    const expirationTime = Date.now() + 3600 * 1000; // 1 óra
+    const expirationTime = Date.now() + 3600 * 1000;
 
-    // Válasz a típus alapján
     res.json({
       message: `Sikeres bejelentkezés ${user.tipus === 'felhasznalo' ? 'felhasználóként' : 'vállalkozóként'}.`,
       token,
-      expirationTime, // Token lejárati idő
-      tipus: user.tipus, // Felhasználási célokra
+      expirationTime,
+      tipus: user.tipus,
     });
   } catch (error) {
     console.error('Szerverhiba:', error);
     res.status(500).json({ message: "Szerverhiba történt. Kérjük próbálja újra később." });
   }
 };
-
-
-
 
 exports.registerUser = async (req, res) => {
   const { name, email, password, phone, tipus } = req.body;
@@ -98,6 +84,33 @@ exports.registerUser = async (req, res) => {
     res.status(201).json({ message: `Sikeres regisztráció ${tipus}-ként.`, userId: result.insertId });
   } catch (err) {
     console.error('Hiba a regisztráció során:', err);
+    res.status(500).json({ error: 'Regisztrációs hiba.' });
+  }
+};
+
+// Vállalkozói regisztráció
+exports.registerBusiness = async (req, res) => {
+  const { name, email, password, phone, companyName } = req.body;
+
+  if (!name || !email || !password || !phone || !companyName) {
+    return res.status(400).json({ error: 'Minden mezőt ki kell tölteni' });
+  }
+
+  try {
+    const [existingUsers] = await db.query(`SELECT * FROM vallalkozo WHERE email = ?`, [email]);
+
+    if (existingUsers.length > 0) {
+      return res.status(400).json({ error: "Ez az e-mail cím már regisztrálva van vállalkozóként." });
+    }
+
+    const hashedPassword = await bcrypt.hash(password, saltRounds);
+
+    const query = `INSERT INTO vallalkozo (nev, email, jelszo, telefonszam, vallalkozas_neve) VALUES (?, ?, ?, ?, ?)`;
+    const [result] = await db.execute(query, [name, email, hashedPassword, phone, companyName]);
+
+    res.status(201).json({ message: "Sikeres vállalkozói regisztráció.", businessId: result.insertId });
+  } catch (err) {
+    console.error('Hiba a vállalkozói regisztráció során:', err);
     res.status(500).json({ error: 'Regisztrációs hiba.' });
   }
 };

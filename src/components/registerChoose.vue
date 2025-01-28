@@ -89,7 +89,7 @@ body, html {
   font-size: 22px;
   font-weight: bold;
   color: #fff;
-  background: linear-gradient(90deg, #f9a602, #d6a307);
+  background: #6327A2;
   border: none;
   border-radius: 10px;
   cursor: pointer;
@@ -98,12 +98,10 @@ body, html {
 
 .gold-button:hover {
   transform: scale(1.);
-  box-shadow: 0 10px 20px rgba(217, 175, 55, 0.6);
 }
 
 .gold-button:active {
   transform: scale(1);
-  box-shadow: 0 6px 15px rgba(217, 175, 55, 0.8);
 }
 
 .right-col {
