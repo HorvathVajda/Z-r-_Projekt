@@ -3,7 +3,7 @@
     <div class="register-card">
       <h2>Regisztráció</h2>
       <form @submit.prevent="handleRegistration">
-        <input type="hidden" name="tipus" value="felhasznalo" />
+        <input type="hidden" name="tipus" value="vallalkozo" />
         <div class="form-group">
           <label for="name">Név</label>
           <input id="name" v-model="name" required placeholder="*Teljes név"/>
