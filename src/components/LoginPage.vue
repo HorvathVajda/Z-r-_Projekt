@@ -177,6 +177,7 @@ h2 {
 
 .nav-link:hover {
   text-decoration: underline;
+  background: transparent;
 }
 
 .right-col {
