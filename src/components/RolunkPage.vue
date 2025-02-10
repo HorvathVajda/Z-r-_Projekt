@@ -52,7 +52,7 @@
 
 .about-card h2 {
   font-size: 2.5rem;
-  color: #ffffff;
+  color: #000000;
   margin-bottom: 1.5rem;
   text-align: center;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); /* Szöveg árnyék */
@@ -60,7 +60,7 @@
 
 .about-card h3 {
   font-size: 1.8rem;
-  color: #e0e0e0;
+  color: #000000;
   margin-top: 2rem;
   margin-bottom: 1rem;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Szöveg árnyék */
@@ -69,7 +69,7 @@
 .about-card p {
   font-size: 1.2rem;
   line-height: 1.8;
-  color: #f0f0f0;
+  color: #000000;
   margin-bottom: 1rem;
 }
 
@@ -86,7 +86,7 @@
   background: rgba(255, 255, 255, 0.15); /* Enyhén áttetsző elem */
   border-radius: 10px;
   transition: background-color 0.3s ease;
-  color: #ffffff;
+  color: #000000;
 }
 
 .about-card ul li:hover {
