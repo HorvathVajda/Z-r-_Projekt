@@ -15,7 +15,7 @@
       <header>
         <h1>Vállalkozásaim</h1>
       </header>
-      
+
       <div class="business-grid">
         <div v-for="(business, index) in businesses" :key="index" class="business-card">
           {{ business.name }}

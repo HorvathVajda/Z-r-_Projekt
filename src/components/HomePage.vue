@@ -25,7 +25,7 @@ export default {
   data() {
     return {
       searchQuery: "",
-      businesses: [], // Itt tárolod az adatbázisból lekért vállalkozásokat
+      businesses: [],
       filteredBusinesses: [],
     };
   },
@@ -37,11 +37,9 @@ export default {
     },
   },
   mounted() {
-    // Adatok betöltése az adatbázisból vagy API hívás
     this.businesses = [
       { id: 1, name: "Fodrász", type: "Szolgáltatás" },
       { id: 2, name: "Autószerelő", type: "Szolgáltatás" },
-      // További adatok
     ];
   },
 };
@@ -60,7 +58,7 @@ export default {
 .image-container {
   position: relative;
   width: 100%;
-  height: 100%; /* A háttérkép teljes képernyőt kitölti */
+  height: 100%;
 }
 
 .background-image {
