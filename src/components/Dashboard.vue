@@ -6,38 +6,36 @@
 
     <div class="business-grid">
       <div v-for="(business, index) in businesses" :key="index" class="business-card">
-        {{ business.name }}
+        <h3>{{ business.vallalkozas_neve }}</h3>
+        <p>
+          {{ business.iranyitoszam }} {{ business.varos }} {{ business.utca }} {{ business.hazszam }}
+          <span v-if="business.ajto">{{ business.ajto }}</span>
+        </p>
+        <p>Kategória: {{ business.category }}</p>
       </div>
+
       <div class="business-card add-business-card" @click="showForm = true">
         <span>+</span>
       </div>
     </div>
 
-    <!-- Új vállalkozás űrlap -->
     <div v-if="showForm" class="form-overlay">
       <div class="form-container">
         <form @submit.prevent="addBusiness">
           <h2>Új Vállalkozás Hozzáadása</h2>
-          <div class="form-group">
-            <label for="name">Vállalkozás neve:</label>
-            <input type="text" id="name" v-model="newBusiness.name" required />
-          </div>
-          <div class="form-group">
-            <label for="category">Kategória:</label>
-            <select id="category" v-model="newBusiness.category" required>
-              <option value="" disabled selected>Válassz kategóriát</option>
+          <div class="form-group" v-for="(value, key) in newBusiness" :key="key">
+            <label :for="key">{{ fieldLabels[key] }}:</label>
+            <input v-if="key !== 'category'" type="text" :id="key" v-model="newBusiness[key]" :required="key !== 'ajto'" />
+            <select v-else id="category" v-model="newBusiness.category" required>
+              <option value="" disabled selected>Válassz típust</option>
               <option value="Fodraszat">Fodrászat</option>
               <option value="Autoszerviz">Autószerviz</option>
               <option value="Fogaszat">Fogászat</option>
               <option value="Masszazs">Masszázs</option>
               <option value="Kozmetika">Kozmetikai szalon</option>
               <option value="Kutyakozmetika">Kutyakozmetika</option>
-              <option value="">Személyi edző</option>
+              <option value="SzemelyiEdzo">Személyi edző</option>
             </select>
-          </div>
-          <div class="form-group">
-            <label for="description">Leírás:</label>
-            <textarea id="description" v-model="newBusiness.description"></textarea>
           </div>
           <div class="form-buttons">
             <button type="submit" class="submit-button">Hozzáadás</button>
@@ -50,30 +48,69 @@
 </template>
 
 <script>
+import axios from "axios";
+
 export default {
   name: "Dashboard",
   data() {
     return {
       showForm: false,
       newBusiness: {
-        name: "",
+        vallalkozas_neve: "",
+        iranyitoszam: "",
+        varos: "",
+        utca: "",
+        hazszam: "",
+        ajto: "",
         category: "",
-        description: "",
       },
-      businesses: []
+      fieldLabels: {
+        vallalkozas_neve: "Vállalkozás neve",
+        iranyitoszam: "Irányítószám",
+        varos: "Város",
+        utca: "Utca",
+        hazszam: "Házszám",
+        ajto: "Ajtó (opcionális)",
+        category: "Vállalkozás típusa",
+      },
+      businesses: [],
     };
   },
   methods: {
-    addBusiness() {
-      if (this.newBusiness.name && this.newBusiness.category) {
-        this.businesses.push({ ...this.newBusiness });
-        this.newBusiness = { name: "", category: "", description: "" };
-        this.showForm = false;
-      } else {
-        alert("Kérlek, töltsd ki az összes mezőt!");
+    async addBusiness() {
+      try {
+        const response = await axios.post("http://localhost:5000/api/businesses/add", this.newBusiness);
+        this.businesses.push(response.data);
+        this.resetForm();
+      } catch (error) {
+        console.error("Hiba történt az adatok mentésekor:", error);
+        alert("Hiba történt az adatok mentésekor!");
       }
-    }
-  }
+    },
+    async fetchBusinesses() {
+      try {
+        const response = await axios.get("http://localhost:5000/api/businesses");
+        this.businesses = response.data;
+      } catch (error) {
+        console.error("Hiba történt a vállalkozások lekérésekor:", error);
+      }
+    },
+    resetForm() {
+      this.newBusiness = {
+        vallalkozas_neve: "",
+        iranyitoszam: "",
+        varos: "",
+        utca: "",
+        hazszam: "",
+        ajto: "",
+        category: "",
+      };
+      this.showForm = false;
+    },
+  },
+  mounted() {
+    this.fetchBusinesses();
+  },
 };
 </script>
 
@@ -90,7 +127,7 @@ export default {
 
 .business-card {
   background-color: white;
-  border: 1px solid #C3B1E1;
+  border: 1px solid #c3b1e1;
   border-radius: 8px;
   padding: 20px;
   text-align: center;
@@ -109,7 +146,7 @@ export default {
   align-items: center;
   font-size: 32px;
   font-weight: bold;
-  color: #5A3472;
+  color: #5a3472;
   background-color: white;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
@@ -204,7 +241,7 @@ button {
 }
 
 .submit-button {
-  background: #6327A2;
+  background: #6327a2;
   color: white;
 }
 

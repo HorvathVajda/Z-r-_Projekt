@@ -1,8 +1,9 @@
 const express = require("express");
 const authRoutes = require("../routes/authRoutes");
+const businessRoutes = require("../routes/businessRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
-const db = require("./db"); // Adatbázis kapcsolat importálása
+const db = require("./db"); // db.js a config mappában
 
 dotenv.config();
 
@@ -15,47 +16,24 @@ app.use((err, req, res, next) => {
 });
 
 // CORS beállítások
-app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:5173", // A frontend URL-je, ha nincs beállítva, alapértelmezett érték
-  credentials: true // Engedélyezi a sütik használatát
-}));
+app.use(
+  cors({
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", // A frontend URL-je
+    credentials: true // Engedélyezi a sütik használatát
+  })
+);
 
 // JSON adatok kezelése
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 
 // API útvonalak
-app.use("/api/auth", authRoutes); // Autentikációs útvonalak
+app.use("/api/auth", authRoutes);         // Autentikációs útvonalak
+app.use("/api/businesses", businessRoutes);
 
 // Teszt endpoint
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
-});
-
-// Példa: Foglalások listázása
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const [results] = await db.query("SELECT * FROM foglalasok");
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
-});
-
-// Példa: Foglalás hozzáadása
-app.post("/api/bookings", async (req, res) => {
-  const { user_id, service_id, appointment_time } = req.body;
-  try {
-    await db.query(
-      "INSERT INTO foglalasok (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
-      [user_id, service_id, appointment_time]
-    );
-    res.status(201).send("Foglalás sikeresen hozzáadva");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
 });
 
 // Szerver indítása

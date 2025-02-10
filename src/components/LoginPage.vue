@@ -55,16 +55,19 @@ async function handleLogin() {
       jelszo: password.value,
     });
 
-    const { token, expirationTime, tipus } = response.data;
+    const { token, expirationTime, tipus, id } = response.data;
 
     const authData = {
       token,
       email: email.value,
       expirationTime,
       tipus,
+      id // Tároljuk el az id-t is
     };
 
-    // Auth adatok tárolása Vuex-ben vagy LocalStorage-ban
+    console.log("authData to be stored:", authData);  // Ellenőrzés
+
+    // Auth adatok tárolása localStorage-ban
     localStorage.setItem('authData', JSON.stringify(authData));
 
     // Átirányítás a megfelelő oldalra

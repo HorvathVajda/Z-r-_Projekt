@@ -60,7 +60,8 @@ exports.login = async (req, res) => {
       token,
       expirationTime,
       tipus: user.tipus,
-    });
+      id: user.id,
+    });;
   } catch (error) {
     console.error('Szerverhiba:', error);
     res.status(500).json({ message: "Szerverhiba történt. Kérjük próbálja újra később." });
