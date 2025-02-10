@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'; 
+import { createRouter, createWebHistory } from 'vue-router';
 import HomePage from './components/HomePage.vue';
 import KapcsolatPage from './components/KapcsolatPage.vue';
 import RolunkPage from './components/RolunkPage.vue';
@@ -10,8 +10,7 @@ import editProfile from './components/editProfile.vue';
 import vallalkozoHome from './components/vallalkozoHome.vue';
 import registerChoose from './components/registerChoose.vue';
 import vallalkozoRegister from './components/vallalkozoRegister.vue';
-
-//import Dashboard from './components/Dashboard.vue'; // Dashboard most külön fájlban
+import Dashboard from './components/Dashboard.vue'; // Importálás itt
 import Settings from './components/Beallitasok.vue';
 import Notifications from './components/Ertesitesek.vue';
 
@@ -30,12 +29,13 @@ const routes = [
     path: '/vallalkozoHome',
     component: vallalkozoHome,
     children: [
-      //{ path: '', name: 'Dashboard', component: Dashboard }, // Dashboard most külön fájlban
+      { path: '', name: 'Dashboard', component: Dashboard },
       { path: 'beallitasok', name: 'Beallitasok', component: Settings },
       { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
-      { path: 'Profil', name: 'Profil', component: Profil }
+      { path: 'profil', name: 'Profil', component: Profil }
     ]
   }
+
 ];
 
 const router = createRouter({

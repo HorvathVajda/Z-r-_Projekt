@@ -80,7 +80,7 @@ export default {
   },
   methods: {
     handleRegistration() {
-      this.formSubmitted = true;
+      this.formSubmitted = true; // A regisztrációs próbálkozás jelzése
       if (!this.isFormValid || !this.termsAccepted) {
         alert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
         return;
@@ -91,23 +91,23 @@ export default {
         email: this.email,
         password: this.password,
         phone: this.phone,
-        tipus: 'felhasznalo',
+        tipus: 'vallalkozo', // Ezt is küldjük, hogy tudja, hogy vállalkozói regisztráció
       };
 
-      axios.post('http://localhost:5000/api/auth/register-vallalkozo', userData)
-  .then((response) => {
-    console.log('Regisztráció sikeres:', response.data);
-    alert(response.data.message);
-    this.$router.push('/login');
-  })
-  .catch((error) => {
-    console.error('Regisztráció hiba:', error.response?.data || error.message);
-    alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
-  });
 
+      axios.post('http://localhost:5000/api/auth/register-vallalkozo', userData)
+        .then((response) => {
+          console.log('Regisztráció sikeres:', response.data);
+          alert(response.data.message);
+          this.$router.push('/login');
+        })
+        .catch((error) => {
+          console.error('Regisztráció hiba:', error.response?.data || error.message);
+          alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
+        });
     },
   },
-};
+}
 </script>
 
 <style scoped>

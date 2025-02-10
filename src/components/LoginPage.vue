@@ -2,8 +2,8 @@
   <div class="container-fluid d-flex p-0 m-0 min-vh-100">
     <div class="left-col d-flex justify-content-center align-items-center">
       <div class="login-form">
-        <h2>{{ $store.isLoggedIn ? "Kijelentkezés" : "Bejelentkezés" }}</h2>
-        <form @submit.prevent="handleLogin" v-if="!$store.isLoggedIn">
+        <h2>Bejelentkezés</h2>
+        <form @submit.prevent="handleLogin">
           <div class="form-group">
             <label for="email">E-mail</label>
             <input
@@ -25,6 +25,7 @@
             />
           </div>
           <button type="submit" class="login-button">Bejelentkezés</button>
+          <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           <router-link class="nav-link" to="/registerChoose">Regisztráció</router-link>
         </form>
       </div>
@@ -38,16 +39,18 @@
 </template>
 
 <script setup>
-import { useRouter } from 'vue-router';
 import { ref } from 'vue';
+import { useRouter } from 'vue-router';
+import axios from 'axios';
 
 const router = useRouter();
 const email = ref('');
 const password = ref('');
+const errorMessage = ref('');
 
 async function handleLogin() {
   try {
-    const response = await login({
+    const response = await axios.post('http://localhost:5000/api/auth/login', {
       email: email.value,
       jelszo: password.value,
     });
@@ -61,15 +64,17 @@ async function handleLogin() {
       tipus,
     };
 
-    this.$store.updateAuthData(authData);
+    // Auth adatok tárolása Vuex-ben vagy LocalStorage-ban
+    localStorage.setItem('authData', JSON.stringify(authData));
 
-    if (tipus == "vallalkozo") {
+    // Átirányítás a megfelelő oldalra
+    if (tipus === "vallalkozo") {
       router.push("/vallalkozoHome");
     } else {
       router.push("/");
     }
   } catch (error) {
-    alert("Hiba történt a bejelentkezés során");
+    errorMessage.value = error.response?.data?.message || "Hiba történt a bejelentkezés során.";
   }
 }
 </script>
