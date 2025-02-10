@@ -52,11 +52,26 @@ export default {
     };
   },
   methods: {
-    submitForm() {
-      console.log("Beküldött adatok:", this.formData);
-      alert("Üzeneted sikeresen elküldtük!");
-      // Az űrlap adatainak elküldése backend felé (opcionális)
-      this.formData = { name: "", email: "", message: "" }; // Alapállapot
+    async submitForm() {
+      try {
+        const response = await fetch("http://localhost:5000/api/contact", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(this.formData),
+        });
+
+        if (!response.ok) {
+          throw new Error("Hiba történt az üzenet küldésekor!");
+        }
+
+        alert("Üzeneted sikeresen elküldtük!");
+        this.formData = { name: "", email: "", message: "" }; // Alapállapot
+      } catch (error) {
+        console.error(error);
+        alert("Nem sikerült elküldeni az üzenetet!");
+      }
     },
   },
 };
@@ -145,5 +160,4 @@ main {
     padding: 15px;
   }
 }
-
 </style>

@@ -58,6 +58,24 @@ app.post("/api/bookings", async (req, res) => {
   }
 });
 
+// Új végpont: Kapcsolatfelvételi űrlap kezelése
+app.post("/api/contact", async (req, res) => {
+  const { name, email, message } = req.body;
+  if (!name || !email || !message) {
+    return res.status(400).json({ error: "Minden mező kitöltése kötelező!" });
+  }
+  try {
+    await db.query(
+      "INSERT INTO kapcsolat (name, email, message) VALUES (?, ?, ?)",
+      [name, email, message]
+    );
+    res.status(201).json({ message: "Üzenet sikeresen elküldve!" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Adatbázis hiba történt." });
+  }
+});
+
 // Szerver indítása
 const PORT = process.env.PORT || 5000;
 const HOST = process.env.HOST || "0.0.0.0"; // Hálózati eléréshez
