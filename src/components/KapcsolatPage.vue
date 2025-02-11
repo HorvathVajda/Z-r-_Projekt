@@ -62,15 +62,19 @@ export default {
           body: JSON.stringify(this.formData),
         });
 
+        // Ha a válasz nem sikeres, dobunk egy hibát
         if (!response.ok) {
-          throw new Error("Hiba történt az üzenet küldésekor!");
+          const errorData = await response.json();
+          console.error("API válasz:", errorData); // Kiírja a válasz adatokat
+          throw new Error(errorData.error || "Hiba történt az üzenet küldésekor!");
         }
 
+        // Sikeres válasz esetén üzenet küldése és form ürítése
         alert("Üzeneted sikeresen elküldtük!");
         this.formData = { name: "", email: "", message: "" }; // Alapállapot
       } catch (error) {
-        console.error(error);
-        alert("Nem sikerült elküldeni az üzenetet!");
+        console.error("Hiba:", error.message); // Hibaüzenet kiírása a konzolra
+        alert("Nem sikerült elküldeni az üzenetet: " + error.message);
       }
     },
   },

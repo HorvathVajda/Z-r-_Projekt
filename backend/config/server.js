@@ -4,16 +4,11 @@ const businessRoutes = require("../routes/businessRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const db = require("./db"); // db.js a config mappában
+const nodemailer = require("nodemailer");
 
 dotenv.config();
 
 const app = express();
-
-// Hibakezelő middleware
-app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Valami hiba történt!");
-});
 
 // CORS beállítások
 app.use(
@@ -35,6 +30,7 @@ app.use("/api/businesses", businessRoutes);
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
 });
+
 
 
 // Szerver indítása
