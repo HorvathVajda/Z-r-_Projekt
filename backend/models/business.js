@@ -12,7 +12,7 @@ function verifyToken(req, res, next) {
   }
   // Az Authorization header általában "Bearer <token>" formátumú
   const token = authHeader.split(" ")[1];
-  jwt.verify(token, process.env.JWT_SECRET || "your_secret_key", (err, decoded) => {
+  jwt.verify(token, process.env.JWT_SECRET || "titkoskulcs", (err, decoded) => {
     if (err) {
       return res.status(401).json({ error: "Invalid token" });
     }

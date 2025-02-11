@@ -124,8 +124,8 @@ export default {
         };
 
         const response = await axios.put(
-        `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`, 
-        updatedBusiness, 
+        `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`,
+        updatedBusiness,
         {
           headers: {
             Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
@@ -141,19 +141,28 @@ export default {
     },
     async addBusiness() {
       try {
+        const authData = JSON.parse(localStorage.getItem('authData'));
+        const token = authData ? authData.token : null;
+
+        if (!token) {
+          console.error('Token is missing');
+          return;
+        }
+
         const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}` // Token hozzáadása
+            Authorization: `Bearer ${token}`
           }
         });
+
         this.businesses.push(response.data);
         this.showForm = false;
       } catch (error) {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error);
       }
     },
-  },
-};
+      },
+    };
 </script>
 
 
