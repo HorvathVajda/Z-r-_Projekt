@@ -5,7 +5,13 @@
     </header>
 
     <div class="business-grid">
-      <div v-for="(business, index) in businesses" :key="index" class="business-card" @click="selectBusiness(business)">
+      <div
+        v-for="(business, index) in businesses"
+        :key="index"
+        class="business-card"
+        :class="{ selected: selectedBusiness && selectedBusiness.id === business.id, expanded: isExpanded }"
+        @click="selectBusiness(business)"
+      >
         <h3>{{ business.vallalkozas_neve }}</h3>
         <p>
           {{ business.iranyitoszam }} {{ business.varos }} {{ business.utca }} {{ business.hazszam }}
@@ -16,6 +22,14 @@
 
       <div class="business-card add-business-card" @click="showForm = true">
         <span>+</span>
+      </div>
+    </div>
+
+    <div v-if="isExpanded" class="overlay" @click="closeExpandedView">
+      <div class="expanded-business">
+        <h2>{{ selectedBusiness.vallalkozas_neve }}</h2>
+        <p>{{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }}, {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}</p>
+        <p>Kategória: {{ selectedBusiness.kategoria }}</p>
       </div>
     </div>
 
@@ -45,23 +59,6 @@
       </div>
     </div>
 
-    <div v-if="selectedBusiness" class="business-details">
-      <h2>Szerkesztés</h2>
-      <label>Név:</label>
-      <input v-model="selectedBusiness.vallalkozas_neve" />
-      <label>Kategória:</label>
-      <input v-model="selectedBusiness.kategoria" />
-      <label>Város:</label>
-      <input v-model="selectedBusiness.varos" />
-      <label>Utca:</label>
-      <input v-model="selectedBusiness.utca" />
-      <label>Házszám:</label>
-      <input v-model="selectedBusiness.hazszam" />
-      <label>Ajtó:</label>
-      <input v-model="selectedBusiness.ajto" />
-      <button @click="updateBusiness">Mentés</button>
-      <button @click="selectedBusiness = null">Bezárás</button>
-    </div>
   </div>
 </template>
 
@@ -107,7 +104,12 @@ export default {
       }
     },
     selectBusiness(business) {
-      this.selectedBusiness = { ...business };
+      this.selectedBusiness = business;
+      this.isExpanded = true;
+    },
+    closeExpandedView() {
+      this.isExpanded = false;
+      this.selectedBusiness = null;
     },
     async updateBusiness() {
       try {
@@ -185,11 +187,43 @@ export default {
   text-align: center;
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
+  cursor: pointer;
 }
 
 .business-card:hover {
   transform: translateY(-5px);
   box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+}
+
+.business-card.selected {
+  border: 2px solid #5a3472;
+  box-shadow: 0 6px 15px rgba(90, 52, 114, 0.5);
+  background-color: #f3f1ff;
+}
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+.expanded-business {
+  background: white;
+  padding: 20px;
+  border-radius: 10px;
+  width: 50%;
+  text-align: center;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+}
+
+.expanded-business h2 {
+  font-size: 24px;
+  color: #5a3472;
 }
 
 .add-business-card {
