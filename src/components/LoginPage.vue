@@ -55,22 +55,21 @@ async function handleLogin() {
       jelszo: password.value,
     });
 
+    // Válaszban legyen: token, expirationTime, tipus, id
     const { token, expirationTime, tipus, id } = response.data;
 
     const authData = {
       token,
-      email: email.value,
+      email: email.value,       // a beírt email
       expirationTime,
       tipus,
-      id // Tároljuk el az id-t is
+      id  // itt szerepel az id
     };
 
-    console.log("authData to be stored:", authData);  // Ellenőrzés
-
-    // Auth adatok tárolása localStorage-ban
+    // A localStorage-ban elmentjük az authData-t
     localStorage.setItem('authData', JSON.stringify(authData));
 
-    // Átirányítás a megfelelő oldalra
+    // Utána navigálunk a megfelelő oldalra
     if (tipus === "vallalkozo") {
       router.push("/vallalkozoHome");
     } else {

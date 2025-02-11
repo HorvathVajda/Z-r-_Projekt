@@ -48,7 +48,7 @@ exports.login = async (req, res) => {
     // JWT token generálása
     const token = jwt.sign(
       { id: user.id, email: user.email, tipus: user.tipus },
-      secretKey,
+      process.env.JWT_SECRET || "titkoskulcs",
       { expiresIn: "1h" }
     );
 

@@ -5,13 +5,13 @@
     </header>
 
     <div class="business-grid">
-      <div v-for="(business, index) in businesses" :key="index" class="business-card">
+      <div v-for="(business, index) in businesses" :key="index" class="business-card" @click="selectBusiness(business)">
         <h3>{{ business.vallalkozas_neve }}</h3>
         <p>
           {{ business.iranyitoszam }} {{ business.varos }} {{ business.utca }} {{ business.hazszam }}
           <span v-if="business.ajto">{{ business.ajto }}</span>
         </p>
-        <p>Kategória: {{ business.category }}</p>
+        <p>Kategória: {{ business.kategoria }}</p>
       </div>
 
       <div class="business-card add-business-card" @click="showForm = true">
@@ -44,16 +44,35 @@
         </form>
       </div>
     </div>
+
+    <div v-if="selectedBusiness" class="business-details">
+      <h2>Szerkesztés</h2>
+      <label>Név:</label>
+      <input v-model="selectedBusiness.vallalkozas_neve" />
+      <label>Kategória:</label>
+      <input v-model="selectedBusiness.kategoria" />
+      <label>Város:</label>
+      <input v-model="selectedBusiness.varos" />
+      <label>Utca:</label>
+      <input v-model="selectedBusiness.utca" />
+      <label>Házszám:</label>
+      <input v-model="selectedBusiness.hazszam" />
+      <label>Ajtó:</label>
+      <input v-model="selectedBusiness.ajto" />
+      <button @click="updateBusiness">Mentés</button>
+      <button @click="selectedBusiness = null">Bezárás</button>
+    </div>
   </div>
 </template>
 
 <script>
-import axios from "axios";
+import axios from 'axios';
 
 export default {
-  name: "Dashboard",
   data() {
     return {
+      businesses: [],
+      selectedBusiness: null,
       showForm: false,
       newBusiness: {
         vallalkozas_neve: "",
@@ -73,46 +92,70 @@ export default {
         ajto: "Ajtó (opcionális)",
         category: "Vállalkozás típusa",
       },
-      businesses: [],
     };
-  },
-  methods: {
-    async addBusiness() {
-      try {
-        const response = await axios.post("http://localhost:5000/api/businesses/add", this.newBusiness);
-        this.businesses.push(response.data);
-        this.resetForm();
-      } catch (error) {
-        console.error("Hiba történt az adatok mentésekor:", error);
-        alert("Hiba történt az adatok mentésekor!");
-      }
-    },
-    async fetchBusinesses() {
-      try {
-        const response = await axios.get("http://localhost:5000/api/businesses");
-        this.businesses = response.data;
-      } catch (error) {
-        console.error("Hiba történt a vállalkozások lekérésekor:", error);
-      }
-    },
-    resetForm() {
-      this.newBusiness = {
-        vallalkozas_neve: "",
-        iranyitoszam: "",
-        varos: "",
-        utca: "",
-        hazszam: "",
-        ajto: "",
-        category: "",
-      };
-      this.showForm = false;
-    },
   },
   mounted() {
     this.fetchBusinesses();
   },
+  methods: {
+    async fetchBusinesses() {
+      try {
+        const response = await axios.get('http://localhost:5000/api/businesses');
+        this.businesses = response.data;
+      } catch (error) {
+        console.error('Hiba a vállalkozások betöltésekor:', error);
+      }
+    },
+    selectBusiness(business) {
+      this.selectedBusiness = { ...business };
+    },
+    async updateBusiness() {
+      try {
+        const updatedBusiness = {
+          vallalkozas_neve: this.selectedBusiness.vallalkozas_neve,
+          iranyitoszam: this.selectedBusiness.iranyitoszam,
+          varos: this.selectedBusiness.varos,
+          utca: this.selectedBusiness.utca,
+          hazszam: this.selectedBusiness.hazszam,
+          ajto: this.selectedBusiness.ajto,
+          category: this.selectedBusiness.category,
+          // helyszin újra generálása a frissített adatokból
+          helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
+        };
+
+        const response = await axios.put(
+        `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`, 
+        updatedBusiness, 
+        {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+          }
+        }
+      );
+        console.log('Frissítés sikeres:', response);
+        this.fetchBusinesses(); // Frissítsd a vállalkozások listáját
+        this.selectedBusiness = null; // Zárd be a szerkesztési formot
+      } catch (error) {
+        console.error('Hiba a vállalkozás frissítésekor:', error.response ? error.response.data : error.message);
+      }
+    },
+    async addBusiness() {
+      try {
+        const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Token hozzáadása
+          }
+        });
+        this.businesses.push(response.data);
+        this.showForm = false;
+      } catch (error) {
+        console.error('Hiba az új vállalkozás hozzáadásakor:', error);
+      }
+    },
+  },
 };
 </script>
+
 
 <style scoped>
 .dashboard-content {

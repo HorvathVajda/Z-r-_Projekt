@@ -36,31 +36,6 @@ app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
 });
 
-// Példa: Foglalások listázása
-app.get("/api/bookings", async (req, res) => {
-  try {
-    const [results] = await db.query("SELECT * FROM foglalasok");
-    res.json(results);
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
-});
-
-// Példa: Foglalás hozzáadása
-app.post("/api/bookings", async (req, res) => {
-  const { user_id, service_id, appointment_time } = req.body;
-  try {
-    await db.query(
-      "INSERT INTO foglalasok (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
-      [user_id, service_id, appointment_time]
-    );
-    res.status(201).send("Foglalás sikeresen hozzáadva");
-  } catch (err) {
-    console.error(err);
-    res.status(500).send("Adatbázis hiba");
-  }
-});
 
 // Szerver indítása
 const PORT = process.env.PORT || 5000;
