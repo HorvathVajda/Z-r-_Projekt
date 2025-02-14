@@ -34,6 +34,10 @@
         ></textarea>
 
         <button type="submit">Küldés</button>
+
+        <!-- Hibaüzenetek megjelenítése -->
+        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+        <p v-if="successMessage" class="success">{{ successMessage }}</p>
       </form>
     </main>
   </div>
@@ -49,10 +53,15 @@ export default {
         email: "",
         message: "",
       },
+      errorMessage: "",
+      successMessage: "",
     };
   },
   methods: {
     async submitForm() {
+      this.errorMessage = "";
+      this.successMessage = "";
+
       try {
         const response = await fetch("http://localhost:5000/api/contact", {
           method: "POST",
@@ -62,19 +71,19 @@ export default {
           body: JSON.stringify(this.formData),
         });
 
-        // Ha a válasz nem sikeres, dobunk egy hibát
+        const responseData = await response.json();
+
         if (!response.ok) {
-          const errorData = await response.json();
-          console.error("API válasz:", errorData); // Kiírja a válasz adatokat
-          throw new Error(errorData.error || "Hiba történt az üzenet küldésekor!");
+          throw new Error(responseData.error || "Hiba történt az üzenet küldésekor!");
         }
 
-        // Sikeres válasz esetén üzenet küldése és form ürítése
-        alert("Üzeneted sikeresen elküldtük!");
-        this.formData = { name: "", email: "", message: "" }; // Alapállapot
+        // Sikeres küldés esetén
+        this.successMessage = "Üzeneted sikeresen elküldtük!";
+        this.formData = { name: "", email: "", message: "" }; // Alapállapotba állítás
+
       } catch (error) {
-        console.error("Hiba:", error.message); // Hibaüzenet kiírása a konzolra
-        alert("Nem sikerült elküldeni az üzenetet: " + error.message);
+        this.errorMessage = error.message;
+        console.error("Hiba:", error.message);
       }
     },
   },
@@ -98,7 +107,7 @@ export default {
 header {
   text-align: center;
   padding: 20px;
-  color:black;
+  color: black;
 }
 
 main {
@@ -152,6 +161,20 @@ main {
 
 .contact-form button:hover {
   background: goldenrod;
+}
+
+/* Hibaüzenet */
+.error {
+  color: red;
+  font-weight: bold;
+  margin-top: 10px;
+}
+
+/* Sikeres üzenet */
+.success {
+  color: green;
+  font-weight: bold;
+  margin-top: 10px;
 }
 
 /* Reszponzív módosítások (mobil nézet) */
