@@ -138,7 +138,7 @@ html, body {
 }
 
 .navbar-brand.logo:hover {
-  color: #F4C542; /* Hover szín */
+  color: #9d9ff4; /* Hover szín */
   background: transparent;
 }
 
@@ -162,7 +162,7 @@ html, body {
 }
 
 .navbar-toggler:hover {
-  background: #6327A2;
+  background: #6F4868;
   color: white;
 }
 
@@ -202,12 +202,12 @@ html, body {
 }
 
 .nav-link:hover {
-  color: #F4C542;
+  color: #9d9ff4;
   background: transparent;
 }
 
 .nav-link.active {
-  background-color: gold;
+  background-color: 00CED1;
   color: black;
   border-radius: 5px;
   padding: 5px 10px;
@@ -220,7 +220,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #F4C542;
+  background-color: #9d9ff4;
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }

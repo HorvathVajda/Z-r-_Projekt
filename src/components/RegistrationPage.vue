@@ -65,15 +65,14 @@
               Kérjük, érvényes telefonszámot adjon meg!
             </p>
           </div>
-          <div class="form-group">
+          <div class="form-group checkbox-group">
             <input type="checkbox" id="terms" v-model="termsAccepted" />
             <label for="terms">
-              Elfogadom az <a href="/Adatvedelem" target="_blank">ÁSZF-et</a>
+              <span>Elfogadom az</span>
+              <a href="/Adatvedelem" target="_blank">ÁSZF-et</a>
             </label>
-            <p v-if="!termsAccepted && formSubmitted" class="error-message">
-              Az ÁSZF-et el kell fogadni a regisztrációhoz!
-            </p>
           </div>
+
           <button type="submit" class="register-button" :disabled="!isFormValid || !termsAccepted">
             Regisztráció
           </button>
@@ -225,6 +224,41 @@ h2 {
   box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
 }
 
+.checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 7px;
+}
+
+.checkbox-group input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  cursor: pointer;
+  margin: 0;
+  padding: 0;
+  vertical-align: middle;
+}
+
+.checkbox-group label {
+  display: flex;
+  align-items: center;
+  font-weight: bold;
+  color: #6327A2;
+  gap: 4px; /* Kisebb térköz a szövegrészek között */
+}
+
+.checkbox-group a {
+  color: #6327A2;
+  text-decoration: none;
+}
+
+.checkbox-group a:hover {
+  text-decoration: underline;
+  background: transparent;
+}
+
+
 .register-button {
   background-color: #5a3472;
   color: white;
@@ -239,12 +273,10 @@ h2 {
 }
 
 .register-button:hover {
-  background-color: #e67e00;
   transform: translateY(-2px);
 }
 
 .register-button:active {
-  background-color: #c87c00;
   transform: translateY(0);
 }
 
