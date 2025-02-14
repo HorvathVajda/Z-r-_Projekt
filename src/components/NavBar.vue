@@ -138,7 +138,7 @@ html, body {
 }
 
 .navbar-brand.logo:hover {
-  color: #6F4868; /* Hover szín */
+  color: #9d9ff4; /* Hover szín */
   background: transparent;
 }
 
@@ -202,7 +202,7 @@ html, body {
 }
 
 .nav-link:hover {
-  color: #6F4868;
+  color: #9d9ff4;
   background: transparent;
 }
 
@@ -220,7 +220,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #6F4868;
+  background-color: #9d9ff4;
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }
