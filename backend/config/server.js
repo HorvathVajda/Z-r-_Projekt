@@ -2,11 +2,11 @@ const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const businessRoutes = require("../routes/businessRoutes");
 const cors = require("cors");
-dotenv = require("dotenv");
+const dotenv = require("dotenv"); // Javított import
 const db = require("./db"); // db.js a config mappában
 const nodemailer = require("nodemailer");
 
-dotenv.config();
+dotenv.config(); // Konfigurációs fájl betöltése
 
 const app = express();
 
@@ -26,11 +26,10 @@ app.use(
 
 // JSON adatok kezelése
 app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
 
 // API útvonalak
 app.use("/api/auth", authRoutes);         // Autentikációs útvonalak
-app.use("/api/businesses", businessRoutes);
+app.use("/api/businesses", businessRoutes); // Vállalkozások útvonalai
 
 // Teszt endpoint
 app.get("/", (req, res) => {

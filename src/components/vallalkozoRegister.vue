@@ -136,7 +136,7 @@ export default {
         tipus: 'felhasznalo',
       };
 
-      axios.post('http://localhost:5000/api/auth/register', userData)
+      axios.post('http://localhost:5000/api/auth/register-vallalkozo', userData)
         .then((response) => {
           console.log('Regisztráció sikeres:', response.data);
           alert(response.data.message);

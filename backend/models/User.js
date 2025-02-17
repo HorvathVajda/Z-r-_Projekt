@@ -1,18 +1,32 @@
-const db = require('../db');
-const bcrypt = require('bcrypt');
+// user.js - A profil frissítése backend
+const db = require('../db'); // Adatbázis kapcsolat
+const bcrypt = require('bcrypt'); // Ha szükséges jelszóhasheléshez
 
+// A bio frissítése a vállalkozó számára
+const updateBio = (req, res) => {
+  const { email, bio } = req.body;
 
-exports.createUser = async (name, email, password) => {
-  const hashedPassword = await bcrypt.hash(password, 10);
-  const [result] = await db.query(
-    'INSERT INTO users (name, email, password) VALUES (?, ?, ?)',
-    [name, email, hashedPassword]
-  );
-  return result.insertId;
+  // Ellenőrizzük, hogy mindkét paraméter megvan
+  if (!email || !bio) {
+    return res.status(400).send({ message: 'Email és bio mezők szükségesek' });
+  }
+
+  // Bio frissítése SQL lekérdezés
+  const query = 'UPDATE businesses SET bio = ? WHERE email = ?';
+  db.query(query, [bio, email], (err, results) => {
+    if (err) {
+      console.error('Hiba történt a frissítés során:', err);
+      return res.status(500).send({ message: 'Hiba történt a frissítés során' });
+    }
+
+    if (results.affectedRows > 0) {
+      // Sikeres frissítés
+      res.status(200).send({ message: 'Bio sikeresen frissítve' });
+    } else {
+      // Ha nincs találat, azaz nem létezik az email
+      res.status(404).send({ message: 'Vállalkozó nem található' });
+    }
+  });
 };
 
-
-exports.findUserByEmail = async (email) => {
-  const [rows] = await db.query('SELECT * FROM users WHERE email = ?', [email]);
-  return rows[0];
-};
+module.exports = { updateBio };
