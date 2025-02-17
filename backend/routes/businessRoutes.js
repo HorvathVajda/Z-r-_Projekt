@@ -66,6 +66,25 @@ router.post('/update-bio', async (req, res) => {
   });
 });
 
+router.post('/update-user', async (req, res) => {
+  const { email, nev, telefonszam } = req.body;
+
+  const query = 'UPDATE vallalkozo SET nev = ?, telefonszam = ? WHERE email = ?';
+  db.query(query, [nev, telefonszam, email], (err, results) => {
+    if (err) {
+      console.error('Hiba történt a frissítés során:', err);
+      return res.status(500).json({ message: 'Hiba történt a frissítés során' });
+    }
+
+    if (results.affectedRows > 0) {
+      res.status(200).json({ message: 'Adatok sikeresen frissítve' });
+    } else {
+      res.status(404).json({ message: 'Vállalkozó nem található' });
+    }
+  });
+});
+
+
 // Vállalkozói profil lekérése email alapján
 router.get("/vallalkozo-profile", async (req, res) => {
   const { email } = req.query;
@@ -95,5 +114,23 @@ router.get("/vallalkozo-profile", async (req, res) => {
     res.status(500).json({ error: "Adatbázis hiba történt!" });
   }
 });
+
+router.get('/foglalasok/:userId', async (req, res) => {
+  const { userId } = req.params;
+
+  const query = `
+    SELECT foglalas_id, szolgaltatas_neve, idopontok, statusz
+    FROM foglalasok
+    WHERE felhasznalo_id = ? OR vallalkozo_foglalo_id = ?`;
+
+  db.query(query, [userId, userId], (err, results) => {
+    if (err) {
+      console.error('Hiba történt a foglalások lekérdezésekor:', err);
+      return res.status(500).json({ message: 'Hiba történt a foglalások lekérdezésekor' });
+    }
+    res.status(200).json(results);
+  });
+});
+
 
 module.exports = router; // A router exportálása

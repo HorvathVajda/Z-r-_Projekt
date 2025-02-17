@@ -20,9 +20,6 @@
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
             <li class="nav-item">
-              <a v-if="isLoggedIn" class="nav-link" href="/Profil" @click="toggleMenu">Profil</a>
-            </li>
-            <li class="nav-item">
               <a
                 v-if="!isLoggedIn"
                 class="nav-link login-link"

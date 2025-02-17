@@ -7,13 +7,10 @@
       </h2>
       <ul>
         <li>
-          <router-link to="/vallalkozoHome/beallitasok">Beállítások</router-link>
-        </li>
-        <li>
           <router-link to="/vallalkozoHome/profil">Profil</router-link>
         </li>
         <li>
-          <router-link to="/vallalkozoHome/ertesitesek">Értesítések</router-link>
+          <router-link to="/vallalkozoHome/ertesitesek">Foglalj</router-link>
         </li>
       </ul>
     </aside>
@@ -87,7 +84,7 @@ export default {
 .sidebar ul li a {
   color: white;
   text-decoration: none;
-  font-size: 16px;
+  font-size: 18px;
   transition: color 0.3s;
 
 }

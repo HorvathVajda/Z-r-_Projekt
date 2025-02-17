@@ -10,9 +10,10 @@ import editProfile from './components/editProfile.vue';
 import vallalkozoHome from './components/vallalkozoHome.vue';
 import registerChoose from './components/registerChoose.vue';
 import vallalkozoRegister from './components/vallalkozoRegister.vue';
-import Dashboard from './components/Dashboard.vue'; // Importálás itt
+import Dashboard from './components/Dashboard.vue';
 import Settings from './components/Beallitasok.vue';
 import Notifications from './components/Ertesitesek.vue';
+import Foglalas from './components/Foglalas.vue';
 
 const routes = [
   { path: '/', name: 'Home', component: HomePage },
@@ -32,7 +33,8 @@ const routes = [
       { path: '', name: 'Dashboard', component: Dashboard },
       { path: 'beallitasok', name: 'Beallitasok', component: Settings },
       { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
-      { path: 'profil', name: 'Profil', component: Profil }
+      { path: 'profil', name: 'Profil', component: Profil },
+      { path: 'foglalas', name: 'Foglalas', component: Foglalas }
     ]
   }
 
