@@ -18,6 +18,12 @@
           <span v-if="business.ajto">{{ business.ajto }}</span>
         </p>
         <p>Kategória: {{ business.kategoria }}</p>
+        
+        <!-- Szerkesztés és Törlés gombok -->
+        <div class="business-card-actions">
+          <button @click="editBusiness(business)">Szerkesztés</button>
+          <button @click="deleteBusiness(business.id)">Törlés</button>
+        </div>
       </div>
 
       <div class="business-card add-business-card" @click="showForm = true">
@@ -126,14 +132,14 @@ export default {
         };
 
         const response = await axios.put(
-        `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`,
-        updatedBusiness,
-        {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+          `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`,
+          updatedBusiness,
+          {
+            headers: {
+              Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+            }
           }
-        }
-      );
+        );
         console.log('Frissítés sikeres:', response);
         this.fetchBusinesses(); // Frissítsd a vállalkozások listáját
         this.selectedBusiness = null; // Zárd be a szerkesztési formot
@@ -151,6 +157,9 @@ export default {
           return;
         }
 
+        // A helyszín összeállítása
+        this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
+
         const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness, {
           headers: {
             Authorization: `Bearer ${token}`
@@ -163,10 +172,29 @@ export default {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error);
       }
     },
-      },
-    };
-</script>
 
+    // Új funkcionalitás a vállalkozás szerkesztéséhez
+    editBusiness(business) {
+      this.selectedBusiness = { ...business };
+      this.showForm = true;
+    },
+
+    // Törlés funkcionalitás hozzáadása
+    async deleteBusiness(businessId) {
+      try {
+        await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`, {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+          }
+        });
+        this.fetchBusinesses(); // Frissítjük a vállalkozások listáját
+      } catch (error) {
+        console.error('Hiba a vállalkozás törlésénél:', error);
+      }
+    },
+  },
+};
+</script>
 
 <style scoped>
 .dashboard-content {
@@ -200,30 +228,24 @@ export default {
   box-shadow: 0 6px 15px rgba(90, 52, 114, 0.5);
   background-color: #f3f1ff;
 }
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  z-index: 1000;
-}
-.expanded-business {
-  background: white;
-  padding: 20px;
-  border-radius: 10px;
-  width: 50%;
-  text-align: center;
-  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+
+.business-card-actions {
+  margin-top: 10px;
 }
 
-.expanded-business h2 {
-  font-size: 24px;
-  color: #5a3472;
+.business-card-actions button {
+  margin: 5px;
+  padding: 8px 15px;
+  background-color: #6327a2;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.business-card-actions button:hover {
+  background-color: #5a3472;
 }
 
 .add-business-card {
@@ -253,96 +275,85 @@ export default {
   display: flex;
   justify-content: center;
   align-items: center;
-  z-index: 1000;
 }
 
 .form-container {
-  background: linear-gradient(to bottom right, #ffffff, #f3f1ff);
-  padding: 2rem 3rem;
-  border-radius: 15px;
-  border: 2px solid #5a3472;
-  box-shadow: 0 6px 15px rgba(0, 0, 0, 0.3);
-  width: 100%;
-  max-width: 450px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 1.5rem;
-}
-
-.form-container h2 {
-  text-align: center;
-  font-size: 22px;
-  color: #5a3472;
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  width: 400px;
 }
 
 .form-group {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
+  margin-bottom: 15px;
 }
 
 .form-group label {
+  display: block;
   font-size: 14px;
-  color: #5a3472;
-  text-align: left;
+  margin-bottom: 5px;
 }
 
 .form-group input,
-.form-group textarea,
 .form-group select {
   width: 100%;
-  padding: 0.7rem;
-  border: 1px solid #c3b1e1;
-  border-radius: 8px;
-  font-size: 14px;
-  outline: none;
-  transition: box-shadow 0.3s, border-color 0.3s;
-}
-
-.form-group input:focus,
-.form-group textarea:focus,
-.form-group select:focus {
-  box-shadow: 0 0 8px rgba(138, 81, 189, 0.5);
-  border-color: #5a3472;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
 }
 
 .form-buttons {
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  padding: 20px;
 }
 
-button {
-  flex: 1;
-  padding: 0.7rem 1.5rem;
+.submit-button,
+.cancel-button {
+  padding: 10px 20px;
   border: none;
-  border-radius: 8px;
-  font-size: 14px;
+  border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  margin: 0 0.5rem;
+  font-size: 16px;
 }
 
 .submit-button {
-  background: #6327a2;
+  background-color: #6327a2;
   color: white;
 }
 
-.submit-button:hover {
-  transform: scale(1.05);
+.cancel-button {
+  background-color: #ddd;
 }
 
-.cancel-button {
-  background: white;
-  border-color: #e74c3c;
-  color: black;
+.submit-button:hover {
+  background-color: #5a3472;
 }
 
 .cancel-button:hover {
-  background: white;
-  transform: scale(1.05);
+  background-color: #bbb;
+}
+
+.overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(0, 0, 0, 0.5);
+}
+
+.expanded-business {
+  background-color: white;
+  padding: 30px;
+  border-radius: 8px;
+  text-align: center;
+}
+
+.expanded-business h2 {
+  margin-bottom: 15px;
+}
+
+.expanded-business p {
+  margin: 10px 0;
 }
 </style>
