@@ -15,7 +15,6 @@
       </div>
       <div class="buttons">
         <button class="follow-btn">Foglalás</button>
-        <button class="message-btn" @click="logout">Kijelentkezés</button>
       </div>
     </div>
 
@@ -28,7 +27,7 @@
             <li><strong>Teljes név:</strong> {{ userName }}</li>
             <li><strong>Email:</strong> {{ user.email }}</li>
             <li><strong>Telefon:</strong> {{ user.phone }}</li>
-
+            <button class="edit-btn">Szerkesztés</button>
           </ul>
         </div>
 
@@ -172,9 +171,8 @@ export default {
   border: none;
   cursor: pointer;
 }
-.follow-btn, .message-btn{
+.follow-btn, .edit-btn{
   font-size: 18px;
-  padding: 0.35rem 0.8rem;
   font-size: 20px;
   font-weight: bold;
   padding: 0.55rem 1rem;
@@ -183,9 +181,14 @@ export default {
   border-radius: 100px;
   margin: 10px;
   transition: transform 0.3s;
-
 }
-.follow-btn:hover, .message-btn:hover{
+
+.edit-btn {
+  position: absolute;
+  right: 5%;
+  top: 30%;
+}
+.follow-btn:hover, .edit-btn:hover{
   transform: translateY(-3px);
 }
 
@@ -193,10 +196,7 @@ export default {
   background: #6bb6ea;
   color: black;
 }
-.message-btn {
-  background: #6327A2;
-  color: white;
-}
+
 .user-info, .stats, .foglalasok, .idopontok {
   flex: 1;
   background: #fff;
@@ -204,6 +204,9 @@ export default {
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   min-width: 45%;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
 }
 
 .bio-container {
