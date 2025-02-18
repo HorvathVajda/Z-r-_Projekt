@@ -135,13 +135,25 @@ export default {
   },
   methods: {
     async fetchBusinesses() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/businesses');
-        this.businesses = response.data;
-      } catch (error) {
-        console.error('Hiba a vállalkozások betöltésekor:', error);
-      }
-    },
+  try {
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const token = authData ? authData.token : null;
+
+    if (!token) {
+      console.error('Token nem található');
+      return;
+    }
+
+    const response = await axios.get('http://localhost:5000/api/businesses', {
+      headers: { Authorization: `Bearer ${token}` }
+    });
+
+    this.businesses = response.data;
+  } catch (error) {
+    console.error('Hiba a vállalkozások betöltésekor:', error);
+  }
+},
+
     selectBusiness(business) {
       this.selectedBusiness = business;
       this.isExpanded = true;

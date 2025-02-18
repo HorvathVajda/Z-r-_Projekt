@@ -21,6 +21,28 @@ function verifyToken(req, res, next) {
   });
 }
 
+router.get('/', async (req, res) => {
+  try {
+    const authData = req.headers.authorization; // Token alapján vállalkozó ID megszerzése
+    if (!authData) return res.status(401).json({ error: 'Nincs jogosultság' });
+
+    const token = authData.split(' ')[1]; // "Bearer <token>" → a token kivétele
+    const decoded = jwt.verify(token, 'sajatTitkosKulcs'); // JWT dekódolása
+    const vallalkozo_id = decoded.id; // A tokenből kivesszük a bejelentkezett vállalkozó ID-ját
+
+    const [results] = await db.execute(
+      'SELECT * FROM vallalkozasok WHERE vallalkozo_id = ?',
+      [vallalkozo_id]
+    );
+
+    res.json(results);
+  } catch (error) {
+    console.error('Hiba a vállalkozások lekérdezésénél:', error);
+    res.status(500).json({ error: 'Szerverhiba' });
+  }
+});
+
+
 // Új vállalkozás hozzáadása
 router.post("/add", verifyToken, async (req, res) => {
   const { vallalkozas_neve, iranyitoszam, varos, utca, hazszam, ajto, category } = req.body;
