@@ -66,6 +66,7 @@ router.post('/update-bio', async (req, res) => {
   });
 });
 
+// Vállalkozói adatok frissítése
 router.post('/update-user', async (req, res) => {
   const { email, nev, telefonszam } = req.body;
 
@@ -83,7 +84,6 @@ router.post('/update-user', async (req, res) => {
     }
   });
 });
-
 
 // Vállalkozói profil lekérése email alapján
 router.get("/vallalkozo-profile", async (req, res) => {
@@ -115,6 +115,7 @@ router.get("/vallalkozo-profile", async (req, res) => {
   }
 });
 
+// Foglalások lekérése egy felhasználóhoz
 router.get('/foglalasok/:userId', async (req, res) => {
   const { userId } = req.params;
 
@@ -133,8 +134,7 @@ router.get('/foglalasok/:userId', async (req, res) => {
   }
 });
 
-
-
+// Vállalkozások és szolgáltatásaik lekérése
 router.get('/vallalkozasok', async (req, res) => {
   const query = `
       SELECT v.*, s.szolgaltatas_id, s.szolgaltatas_neve, s.idotartam, s.ar
@@ -177,7 +177,7 @@ router.get('/vallalkozasok', async (req, res) => {
   }
 });
 
-
+// Foglalás létrehozása
 router.post('/foglalas', async (req, res) => {
   const { felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont } = req.body;
 
@@ -198,6 +198,5 @@ router.post('/foglalas', async (req, res) => {
     res.status(500).json({ error: "Hiba történt a foglalás mentésekor." });
   }
 });
-
 
 module.exports = router; // A router exportálása

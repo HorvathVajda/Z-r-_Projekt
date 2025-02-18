@@ -20,12 +20,13 @@
         <p>Kategória: {{ business.kategoria }}</p>
         
         <div class="business-card-actions">
-          <button @click="editBusiness(business)">Szerkesztés</button>
-          <button @click="deleteBusiness(business.id)">Törlés</button>
+          <!-- .stop megakadályozza, hogy a kattintás a teljes kártyát is kiválassza -->
+          <button @click.stop="openEditForm(business)">Szerkesztés</button>
+          <button @click.stop="deleteBusiness(business.id)">Törlés</button>
         </div>
       </div>
 
-      <div class="business-card add-business-card" @click="showForm = true">
+      <div class="business-card add-business-card" @click="openNewForm">
         <span>+</span>
       </div>
     </div>
@@ -33,32 +34,53 @@
     <div v-if="isExpanded" class="overlay" @click="closeExpandedView">
       <div class="expanded-business">
         <h2>{{ selectedBusiness.vallalkozas_neve }}</h2>
-        <p>{{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }}, {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}</p>
+        <p>
+          {{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }}, 
+          {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}
+        </p>
         <p>Kategória: {{ selectedBusiness.kategoria }}</p>
       </div>
     </div>
 
+    <!-- Az űrlap – ugyanaz a form mindkét esetben, a computed property activeBusiness-val dolgozunk -->
     <div v-if="showForm" class="form-overlay">
       <div class="form-container">
-        <form @submit.prevent="addBusiness">
-          <h2>Új Vállalkozás Hozzáadása</h2>
-          <div class="form-group" v-for="(value, key) in newBusiness" :key="key">
+        <form @submit.prevent="isEdit ? updateBusiness() : addBusiness()">
+          <h2>{{ isEdit ? 'Vállalkozás Szerkesztése' : 'Új Vállalkozás Hozzáadása' }}</h2>
+          <div class="form-group" v-for="(value, key) in activeBusiness" :key="key">
             <label :for="key">{{ fieldLabels[key] }}:</label>
-            <input v-if="key !== 'category'" type="text" :id="key" v-model="newBusiness[key]" :required="key !== 'ajto'" />
-            <select v-else id="category" v-model="newBusiness.category" required>
-              <option value="" disabled selected>Válassz típust</option>
-              <option value="Fodraszat">Fodrászat</option>
-              <option value="Autoszerviz">Autószerviz</option>
-              <option value="Fogaszat">Fogászat</option>
-              <option value="Masszazs">Masszázs</option>
-              <option value="Kozmetika">Kozmetikai szalon</option>
-              <option value="Kutyakozmetika">Kutyakozmetika</option>
-              <option value="SzemelyiEdzo">Személyi edző</option>
-            </select>
+            <template v-if="key !== 'category'">
+              <input
+                type="text"
+                :id="key"
+                v-model="activeBusiness[key]"
+                :required="key !== 'ajto'"
+              />
+            </template>
+            <template v-else>
+              <select
+                :id="key"
+                v-model="activeBusiness.category"
+                required
+              >
+                <option value="" disabled selected>Válassz típust</option>
+                <option value="Fodraszat">Fodrászat</option>
+                <option value="Autoszerviz">Autószerviz</option>
+                <option value="Fogaszat">Fogászat</option>
+                <option value="Masszazs">Masszázs</option>
+                <option value="Kozmetika">Kozmetikai szalon</option>
+                <option value="Kutyakozmetika">Kutyakozmetika</option>
+                <option value="SzemelyiEdzo">Személyi edző</option>
+              </select>
+            </template>
           </div>
           <div class="form-buttons">
-            <button type="submit" class="submit-button">Hozzáadás</button>
-            <button type="button" @click="showForm = false" class="cancel-button">Mégse</button>
+            <button type="submit" class="submit-button">
+              {{ isEdit ? 'Szerkesztés' : 'Hozzáadás' }}
+            </button>
+            <button type="button" @click="closeForm" class="cancel-button">
+              Mégse
+            </button>
           </div>
         </form>
       </div>
@@ -69,13 +91,13 @@
 
 <script>
 import axios from 'axios';
-
 export default {
   data() {
     return {
       businesses: [],
       selectedBusiness: null,
       showForm: false,
+      isEdit: false, // Ha true, szerkesztési mód
       newBusiness: {
         vallalkozas_neve: "",
         iranyitoszam: "",
@@ -83,7 +105,7 @@ export default {
         utca: "",
         hazszam: "",
         ajto: "",
-        category: "",
+        category: ""
       },
       fieldLabels: {
         vallalkozas_neve: "Vállalkozás neve",
@@ -92,9 +114,24 @@ export default {
         utca: "Utca",
         hazszam: "Házszám",
         ajto: "Ajtó (opcionális)",
-        category: "Vállalkozás típusa",
-      },
+        category: "Vállalkozás típusa"
+      }
     };
+  },
+  computed: {
+    // activeBusiness visszaadja azt az objektumot, amelyből az űrlap mezői származnak:
+    activeBusiness: {
+      get() {
+        return this.isEdit ? this.selectedBusiness : this.newBusiness;
+      },
+      set(val) {
+        if (this.isEdit) {
+          this.selectedBusiness = val;
+        } else {
+          this.newBusiness = val;
+        }
+      }
+    }
   },
   mounted() {
     this.fetchBusinesses();
@@ -116,6 +153,31 @@ export default {
       this.isExpanded = false;
       this.selectedBusiness = null;
     },
+    openNewForm() {
+      this.showForm = true;
+      this.isEdit = false;
+      // Új vállalkozás mezők resetelése
+      this.newBusiness = {
+        vallalkozas_neve: "",
+        iranyitoszam: "",
+        varos: "",
+        utca: "",
+        hazszam: "",
+        ajto: "",
+        category: ""
+      };
+    },
+    openEditForm(business) {
+      // Klónozzuk a kiválasztott vállalkozás adatait, hogy azonnali módosítás ne történjen
+      this.selectedBusiness = { ...business };
+      this.showForm = true;
+      this.isEdit = true;
+    },
+    closeForm() {
+      this.showForm = false;
+      this.isEdit = false;
+      this.selectedBusiness = null;
+    },
     async updateBusiness() {
       try {
         const updatedBusiness = {
@@ -126,7 +188,6 @@ export default {
           hazszam: this.selectedBusiness.hazszam,
           ajto: this.selectedBusiness.ajto,
           category: this.selectedBusiness.category,
-          // helyszin újra generálása a frissített adatokból
           helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
         };
 
@@ -135,13 +196,13 @@ export default {
           updatedBusiness,
           {
             headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+              Authorization: `Bearer ${localStorage.getItem('token')}`
             }
           }
         );
         console.log('Frissítés sikeres:', response);
-        this.fetchBusinesses(); // Frissítsd a vállalkozások listáját
-        this.selectedBusiness = null; // Zárd be a szerkesztési formot
+        this.fetchBusinesses();
+        this.closeForm();
       } catch (error) {
         console.error('Hiba a vállalkozás frissítésekor:', error.response ? error.response.data : error.message);
       }
@@ -150,52 +211,44 @@ export default {
       try {
         const authData = JSON.parse(localStorage.getItem('authData'));
         const token = authData ? authData.token : null;
-
         if (!token) {
           console.error('Token is missing');
           return;
         }
-
-        // A helyszín összeállítása
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
-
-        const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness, {
-          headers: {
-            Authorization: `Bearer ${token}`
+        const response = await axios.post(
+          'http://localhost:5000/api/businesses/add',
+          this.newBusiness,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`
+            }
           }
-        });
-
+        );
         this.businesses.push(response.data);
-        this.showForm = false;
+        this.closeForm();
       } catch (error) {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error);
       }
     },
-
-    // Új funkcionalitás a vállalkozás szerkesztéséhez
-    editBusiness(business) {
-      this.selectedBusiness = { ...business };
-      this.showForm = true;
-    },
-
-    // Törlés funkcionalitás hozzáadása
     async deleteBusiness(businessId) {
       try {
         await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`, {
           headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}` // Token biztosítása
+            Authorization: `Bearer ${localStorage.getItem('token')}`
           }
         });
-        this.fetchBusinesses(); // Frissítjük a vállalkozások listáját
+        this.fetchBusinesses();
       } catch (error) {
         console.error('Hiba a vállalkozás törlésénél:', error);
       }
-    },
-  },
+    }
+  }
 };
 </script>
 
 <style scoped>
+/* Az eredeti CSS változatlan marad */
 .dashboard-content {
   padding: 20px;
 }
