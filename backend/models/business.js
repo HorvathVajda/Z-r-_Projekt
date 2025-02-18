@@ -1,28 +1,23 @@
-// routes/business.js
 const express = require("express");
 const router = express.Router();
 const jwt = require("jsonwebtoken");
 const db = require("../config/db");
 
-// Middleware: JWT token ellenőrzése
 function verifyToken(req, res, next) {
   const authHeader = req.headers.authorization;
   if (!authHeader) {
     return res.status(401).json({ error: "No token provided" });
   }
-  // Az Authorization header általában "Bearer <token>" formátumú
   const token = authHeader.split(" ")[1];
   jwt.verify(token, process.env.JWT_SECRET || "titkoskulcs", (err, decoded) => {
     if (err) {
       return res.status(401).json({ error: "Invalid token" });
     }
-    // A decoded objektum tartalmazza a felhasználó adatait (például id, email, stb.)
     req.user = decoded;
     next();
   });
 }
 
-// Új vállalkozás felvitelének végpontja
 router.post("/add", verifyToken, async (req, res) => {
   const {
     vallalkozas_neve,
@@ -30,11 +25,10 @@ router.post("/add", verifyToken, async (req, res) => {
     varos,
     utca,
     hazszam,
-    ajto,       // opcionális
-    category    // Vállalkozás típusa
+    ajto,
+    category
   } = req.body;
 
-  // Ellenőrizzük, hogy a kötelező mezők meg vannak-e adva
   if (
     !vallalkozas_neve ||
     !iranyitoszam ||

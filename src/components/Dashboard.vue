@@ -18,9 +18,8 @@
           <span v-if="business.ajto">{{ business.ajto }}</span>
         </p>
         <p>Kategória: {{ business.kategoria }}</p>
-        
+
         <div class="business-card-actions">
-          <!-- .stop megakadályozza, hogy a kattintás a teljes kártyát is kiválassza -->
           <button @click.stop="openEditForm(business)">Szerkesztés</button>
           <button @click.stop="deleteBusiness(business.id)">Törlés</button>
         </div>
@@ -35,14 +34,13 @@
       <div class="expanded-business">
         <h2>{{ selectedBusiness.vallalkozas_neve }}</h2>
         <p>
-          {{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }}, 
+          {{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }},
           {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}
         </p>
         <p>Kategória: {{ selectedBusiness.kategoria }}</p>
       </div>
     </div>
 
-    <!-- Az űrlap – ugyanaz a form mindkét esetben, a computed property activeBusiness-val dolgozunk -->
     <div v-if="showForm" class="form-overlay">
       <div class="form-container">
         <form @submit.prevent="isEdit ? updateBusiness() : addBusiness()">
@@ -97,7 +95,7 @@ export default {
       businesses: [],
       selectedBusiness: null,
       showForm: false,
-      isEdit: false, // Ha true, szerkesztési mód
+      isEdit: false,
       newBusiness: {
         vallalkozas_neve: "",
         iranyitoszam: "",
@@ -119,7 +117,6 @@ export default {
     };
   },
   computed: {
-    // activeBusiness visszaadja azt az objektumot, amelyből az űrlap mezői származnak:
     activeBusiness: {
       get() {
         return this.isEdit ? this.selectedBusiness : this.newBusiness;
@@ -156,7 +153,6 @@ export default {
     openNewForm() {
       this.showForm = true;
       this.isEdit = false;
-      // Új vállalkozás mezők resetelése
       this.newBusiness = {
         vallalkozas_neve: "",
         iranyitoszam: "",
@@ -168,7 +164,6 @@ export default {
       };
     },
     openEditForm(business) {
-      // Klónozzuk a kiválasztott vállalkozás adatait, hogy azonnali módosítás ne történjen
       this.selectedBusiness = { ...business };
       this.showForm = true;
       this.isEdit = true;

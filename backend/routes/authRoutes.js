@@ -5,13 +5,10 @@ const { registerUser, login, registerBusiness } = require("../controllers/authCo
 dotenv.config();
 const router = express.Router();
 
-// Felhasználói regisztráció
 router.post("/register", registerUser);
 
-// Vállalkozói regisztráció (cég neve nélkül)
 router.post("/register-vallalkozo", registerBusiness);
 
-// Bejelentkezés
 router.post("/login", login);
 
 module.exports = router;

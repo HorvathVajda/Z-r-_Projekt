@@ -1,6 +1,6 @@
-const bcrypt = require('bcryptjs'); // Jelszó hasheléshez
-const jwt = require('jsonwebtoken'); // JWT token generáláshoz
-require('dotenv').config(); // Környezeti változók betöltéséhez
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
+require('dotenv').config();
 
 // Jelszó hashelés
 const hashPassword = async (password) => {

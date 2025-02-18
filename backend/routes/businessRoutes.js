@@ -45,14 +45,14 @@ router.post("/add", verifyToken, async (req, res) => {
 
 // Vállalkozás bio frissítése
 router.post('/update-bio', async (req, res) => {
-  const { email, bio } = req.body;
+  const { vallalkozo_id, bio } = req.body;
 
-  if (!email || !bio) {
-    return res.status(400).json({ message: 'Email és bio mezők szükségesek' });
+  if (!vallalkozo_id || !bio) {
+    return res.status(400).json({ message: 'Vállalkozó ID és bio mezők szükségesek' });
   }
 
-  const query = 'UPDATE vallalkozo SET bio = ? WHERE email = ?';
-  db.query(query, [bio, email], (err, results) => {
+  const query = 'UPDATE vallalkozo SET bio = ? WHERE vallalkozo_id = ?';
+  db.query(query, [bio, vallalkozo_id], (err, results) => {
     if (err) {
       console.error('Hiba történt a frissítés során:', err);
       return res.status(500).json({ message: 'Hiba történt a frissítés során' });
@@ -66,36 +66,17 @@ router.post('/update-bio', async (req, res) => {
   });
 });
 
-// Vállalkozói adatok frissítése
-router.post('/update-user', async (req, res) => {
-  const { email, nev, telefonszam } = req.body;
-
-  const query = 'UPDATE vallalkozo SET nev = ?, telefonszam = ? WHERE email = ?';
-  db.query(query, [nev, telefonszam, email], (err, results) => {
-    if (err) {
-      console.error('Hiba történt a frissítés során:', err);
-      return res.status(500).json({ message: 'Hiba történt a frissítés során' });
-    }
-
-    if (results.affectedRows > 0) {
-      res.status(200).json({ message: 'Adatok sikeresen frissítve' });
-    } else {
-      res.status(404).json({ message: 'Vállalkozó nem található' });
-    }
-  });
-});
-
-// Vállalkozói profil lekérése email alapján
+// Vállalkozói profil lekérése ID alapján
 router.get("/vallalkozo-profile", async (req, res) => {
-  const { email } = req.query;
-  if (!email) {
-    return res.status(400).json({ error: "Email megadása szükséges!" });
+  const { vallalkozo_id } = req.query;
+  if (!vallalkozo_id) {
+    return res.status(400).json({ error: "Vállalkozó ID megadása szükséges!" });
   }
 
   try {
     const [results] = await db.query(
-      "SELECT * FROM vallalkozo WHERE email = ?",
-      [email]
+      "SELECT * FROM vallalkozo WHERE vallalkozo_id = ?",
+      [vallalkozo_id]
     );
 
     if (results.length === 0) {
@@ -115,14 +96,16 @@ router.get("/vallalkozo-profile", async (req, res) => {
   }
 });
 
-// Foglalások lekérése egy felhasználóhoz
+// Foglalások lekérdezése
 router.get('/foglalasok/:userId', async (req, res) => {
   const { userId } = req.params;
 
   const query = `
     SELECT foglalas_id, szolgaltatas_neve, idopontok, statusz
     FROM foglalasok
-    WHERE felhasznalo_id = ? OR vallalkozo_foglalo_id = ?
+    WHERE felhasznalo_id = ? OR vallalkozas_id IN (
+      SELECT id FROM vallalkozas WHERE vallalkozo_id = ?
+    )
   `;
 
   try {
@@ -134,14 +117,13 @@ router.get('/foglalasok/:userId', async (req, res) => {
   }
 });
 
-// Vállalkozások és szolgáltatásaik lekérése
+// Vállalkozások és szolgáltatások lekérdezése
 router.get('/vallalkozasok', async (req, res) => {
   const query = `
-      SELECT v.*, s.szolgaltatas_id, s.szolgaltatas_neve, s.idotartam, s.ar
+      SELECT v.*, s.szolgaltatas_neve, s.idotartam, s.ar
       FROM vallalkozas v
       LEFT JOIN szolgaltatas s ON v.id = s.vallalkozas_id
   `;
-
   try {
     const [results] = await db.query(query);
 
@@ -154,15 +136,13 @@ router.get('/vallalkozasok', async (req, res) => {
           vallalkozas_neve: row.vallalkozas_neve,
           helyszin: row.helyszin,
           nyitva_tartas: row.nyitva_tartas,
-          szabad_ido: row.szabad_ido,
-          idopontok: row.idopontok,
           category: row.category,
+          vallalkozo_id: row.vallalkozo_id,
           szolgaltatasok: []
         };
       }
-      if (row.szolgaltatas_id) {
+      if (row.szolgaltatas_neve) {
         vallalkozasok[row.id].szolgaltatasok.push({
-          szolgaltatas_id: row.szolgaltatas_id,
           szolgaltatas_neve: row.szolgaltatas_neve,
           idotartam: row.idotartam,
           ar: row.ar
@@ -179,24 +159,64 @@ router.get('/vallalkozasok', async (req, res) => {
 
 // Foglalás létrehozása
 router.post('/foglalas', async (req, res) => {
-  const { felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont } = req.body;
+  const { felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont, szabad_ido, nev, statusz } = req.body;
 
-  if (!felhasznalo_id || !vallalkozas_id || !szolgaltatas_neve || !idopont) {
+  if (!felhasznalo_id || !vallalkozas_id || !szolgaltatas_neve || !idopont || !szabad_ido || !nev || !statusz) {
     return res.status(400).json({ error: "Minden mezőt ki kell tölteni!" });
   }
 
-  const query = `
-    INSERT INTO foglalasok (felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont, statusz)
-    VALUES (?, ?, ?, ?, 'pending')
-  `;
+  // Ellenőrizd, hogy az időpont szabad-e
+  const checkAvailabilityQuery = 'SELECT * FROM foglalasok WHERE vallalkozas_id = ? AND szabad_ido = ? AND statusz = "foglalt"';
+  db.query(checkAvailabilityQuery, [vallalkozas_id, szabad_ido], (err, results) => {
+    if (err) {
+      console.error('Hiba történt az időpont ellenőrzésekor:', err);
+      return res.status(500).json({ error: 'Szerver hiba történt.' });
+    }
+    if (results.length > 0) {
+      return res.status(400).json({ error: 'A kiválasztott időpont már foglalt!' });
+    }
 
+    const query = `
+      INSERT INTO foglalasok (szabad_ido, idopontok, nev, felhasznalo_id, szolgaltatas_neve, statusz, vallalkozas_id)
+      VALUES (?, ?, ?, ?, ?, ?, ?)
+    `;
+    db.query(query, [szabad_ido, idopont, nev, felhasznalo_id, szolgaltatas_neve, statusz, vallalkozas_id], (err, result) => {
+      if (err) {
+        console.error("Hiba történt a foglalás mentésekor:", err);
+        return res.status(500).json({ error: "Szerver hiba történt!" });
+      }
+
+      res.status(201).json({ message: "Foglalás sikeresen létrehozva!" });
+    });
+  });
+});
+
+// Elérhető időpontok lekérése
+router.get('/ido/:vallalkozas_id/:szolgaltatas_id', async (req, res) => {
+  const { vallalkozas_id, szolgaltatas_id } = req.params;
+
+  if (!vallalkozas_id || !szolgaltatas_id) {
+    return res.status(400).json({ error: "Kérlek, add meg a vállalkozás és a szolgáltatás ID-ját!" });
+  }
+
+  // Itt lekérheted az időpontokat a megfelelő táblákból (például a foglalások táblából)
   try {
-    await db.query(query, [felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont]);
-    res.json({ message: "Foglalás sikeresen létrehozva!" });
+    const query = `
+      SELECT * FROM idopontok
+      WHERE vallalkozas_id = ? AND szolgaltatas_id = ? AND szabad_ido > NOW()
+    `;
+    const [results] = await db.query(query, [vallalkozas_id, szolgaltatas_id]);
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "Nincs elérhető időpont." });
+    }
+
+    res.json(results);
   } catch (err) {
-    console.error("Hiba történt a foglalás mentésekor:", err);
-    res.status(500).json({ error: "Hiba történt a foglalás mentésekor." });
+    console.error("Hiba történt az időpontok lekérésekor:", err);
+    res.status(500).json({ error: "Szerver hiba!" });
   }
 });
+
 
 module.exports = router; // A router exportálása

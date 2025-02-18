@@ -1,6 +1,5 @@
 const Business = require('../models/businessModel');
 
-// Vállalkozások lekérése
 exports.getBusinesses = async (req, res) => {
   try {
     const businesses = await Business.find();
@@ -10,7 +9,6 @@ exports.getBusinesses = async (req, res) => {
   }
 };
 
-// Vállalkozás hozzáadása
 exports.addBusiness = async (req, res) => {
   try {
     const newBusiness = new Business(req.body);
@@ -21,7 +19,6 @@ exports.addBusiness = async (req, res) => {
   }
 };
 
-// Vállalkozás frissítése
 exports.updateBusiness = async (req, res) => {
   try {
     const business = await Business.findByIdAndUpdate(req.params.id, req.body, { new: true });
@@ -34,7 +31,6 @@ exports.updateBusiness = async (req, res) => {
   }
 };
 
-// Vállalkozás törlése
 exports.deleteBusiness = async (req, res) => {
   try {
     const business = await Business.findByIdAndDelete(req.params.id);

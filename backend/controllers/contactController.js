@@ -2,7 +2,6 @@ const nodemailer = require("nodemailer");
 const mysql = require("mysql2/promise");
 require("dotenv").config();
 
-// MySQL kapcsolat
 const db = mysql.createPool({
   host: process.env.MYSQL_HOST,
   user: process.env.MYSQL_USER,
@@ -10,19 +9,16 @@ const db = mysql.createPool({
   database: process.env.MYSQL_DATABASE,
 });
 
-// E-mail küldési függvény
 async function getTransporter(userEmail) {
   try {
-    // Ellenőrizzük, hogy az e-mail cím létezik-e az adatbázisban
     const [rows] = await db.execute("SELECT email FROM felhasznalo WHERE email = ?", [userEmail]);
 
     let smtpUser = process.env.ADMIN_EMAIL;
     let smtpPass = process.env.ADMIN_EMAIL_PASSWORD;
 
-    // Ha az e-mail cím létezik az adatbázisban, azt használjuk
     if (rows.length > 0) {
       smtpUser = userEmail;
-      smtpPass = process.env.SMTP_PASS; // ⚠️ Ide egy felhasználóspecifikus jelszó kellene, ha van
+      smtpPass = process.env.SMTP_PASS;
     }
 
     return nodemailer.createTransport({
@@ -38,7 +34,6 @@ async function getTransporter(userEmail) {
   }
 }
 
-// Kapcsolatfelvételi üzenet küldése
 exports.sendContactMessage = async (req, res) => {
   const { name, email, message } = req.body;
 
@@ -47,7 +42,6 @@ exports.sendContactMessage = async (req, res) => {
   }
 
   try {
-    // SMTP szerver beállítása
     const transporter = await getTransporter(email);
 
     const mailOptions = {
