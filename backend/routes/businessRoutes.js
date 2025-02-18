@@ -121,57 +121,83 @@ router.get('/foglalasok/:userId', async (req, res) => {
   const query = `
     SELECT foglalas_id, szolgaltatas_neve, idopontok, statusz
     FROM foglalasok
-    WHERE felhasznalo_id = ? OR vallalkozo_foglalo_id = ?`;
+    WHERE felhasznalo_id = ? OR vallalkozo_foglalo_id = ?
+  `;
 
-  db.query(query, [userId, userId], (err, results) => {
-    if (err) {
-      console.error('Hiba történt a foglalások lekérdezésekor:', err);
-      return res.status(500).json({ message: 'Hiba történt a foglalások lekérdezésekor' });
-    }
+  try {
+    const [results] = await db.query(query, [userId, userId]);
     res.status(200).json(results);
-  });
+  } catch (err) {
+    console.error("Hiba történt a foglalások lekérdezésekor:", err);
+    res.status(500).json({ message: "Hiba történt a foglalások lekérdezésekor" });
+  }
 });
 
 
-// Vállalkozások listája szolgáltatásokkal együtt
-router.get('/vallalkozasok', (req, res) => {
+
+router.get('/vallalkozasok', async (req, res) => {
   const query = `
       SELECT v.*, s.szolgaltatas_id, s.szolgaltatas_neve, s.idotartam, s.ar
-      FROM vallalkozasok v
-      LEFT JOIN szolgaltatasok s ON v.id = s.vallalkozas_id
+      FROM vallalkozas v
+      LEFT JOIN szolgaltatas s ON v.id = s.vallalkozas_id
   `;
-  db.query(query, (err, results) => {
-      if (err) {
-          return res.status(500).json({ error: 'Hiba történt az adatok lekérésekor.' });
+
+  try {
+    const [results] = await db.query(query);
+
+    // Csoportosítás vállalkozás szerint
+    const vallalkozasok = {};
+    results.forEach(row => {
+      if (!vallalkozasok[row.id]) {
+        vallalkozasok[row.id] = {
+          id: row.id,
+          vallalkozas_neve: row.vallalkozas_neve,
+          helyszin: row.helyszin,
+          nyitva_tartas: row.nyitva_tartas,
+          szabad_ido: row.szabad_ido,
+          idopontok: row.idopontok,
+          category: row.category,
+          szolgaltatasok: []
+        };
       }
+      if (row.szolgaltatas_id) {
+        vallalkozasok[row.id].szolgaltatasok.push({
+          szolgaltatas_id: row.szolgaltatas_id,
+          szolgaltatas_neve: row.szolgaltatas_neve,
+          idotartam: row.idotartam,
+          ar: row.ar
+        });
+      }
+    });
 
-      // Csoportosítás vállalkozás szerint
-      const vallalkozasok = {};
-      results.forEach(row => {
-          if (!vallalkozasok[row.id]) {
-              vallalkozasok[row.id] = {
-                  id: row.id,
-                  vallalkozas_neve: row.vallalkozas_neve,
-                  helyszin: row.helyszin,
-                  nyitva_tartas: row.nyitva_tartas,
-                  szabad_ido: row.szabad_ido,
-                  idopontok: row.idopontok,
-                  category: row.category,
-                  szolgaltatasok: []
-              };
-          }
-          if (row.szolgaltatas_id) {
-              vallalkozasok[row.id].szolgaltatasok.push({
-                  szolgaltatas_id: row.szolgaltatas_id,
-                  szolgaltatas_neve: row.szolgaltatas_neve,
-                  idotartam: row.idotartam,
-                  ar: row.ar
-              });
-          }
-      });
-
-      res.json(Object.values(vallalkozasok));
-  });
+    res.json(Object.values(vallalkozasok));
+  } catch (err) {
+    console.error("Hiba történt az adatok lekérésekor:", err);
+    res.status(500).json({ error: "Hiba történt az adatok lekérésekor." });
+  }
 });
+
+
+router.post('/foglalas', async (req, res) => {
+  const { felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont } = req.body;
+
+  if (!felhasznalo_id || !vallalkozas_id || !szolgaltatas_neve || !idopont) {
+    return res.status(400).json({ error: "Minden mezőt ki kell tölteni!" });
+  }
+
+  const query = `
+    INSERT INTO foglalasok (felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont, statusz)
+    VALUES (?, ?, ?, ?, 'pending')
+  `;
+
+  try {
+    await db.query(query, [felhasznalo_id, vallalkozas_id, szolgaltatas_neve, idopont]);
+    res.json({ message: "Foglalás sikeresen létrehozva!" });
+  } catch (err) {
+    console.error("Hiba történt a foglalás mentésekor:", err);
+    res.status(500).json({ error: "Hiba történt a foglalás mentésekor." });
+  }
+});
+
 
 module.exports = router; // A router exportálása

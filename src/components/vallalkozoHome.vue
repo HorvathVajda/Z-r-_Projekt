@@ -10,7 +10,7 @@
           <router-link to="/vallalkozoHome/profil">Profil</router-link>
         </li>
         <li>
-          <router-link to="/vallalkozoHome/ertesitesek">Foglalj</router-link>
+          <router-link to="/Foglalas">Foglalj</router-link>
         </li>
       </ul>
     </aside>

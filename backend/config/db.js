@@ -7,7 +7,7 @@ dotenv.config(); // Betölti a .env fájlt
 const db = mysql.createPool({
   host: process.env.DB_HOST || 'localhost',
   user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
+  password: process.env.DB_PASS || 'mysql',
   database: process.env.DB_NAME || 'bookmytime',
   port: process.env.DB_PORT || 3306,
   waitForConnections: true, // Kapcsolat várakozás engedélyezése

@@ -25,6 +25,7 @@ const routes = [
   { path: '/editprofile', name: 'editProfile', component: editProfile },
   { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
+  { path: '/foglalas', name: 'Foglalas', component: Foglalas },
 
   {
     path: '/vallalkozoHome',
@@ -34,7 +35,6 @@ const routes = [
       { path: 'beallitasok', name: 'Beallitasok', component: Settings },
       { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
       { path: 'profil', name: 'Profil', component: Profil },
-      { path: 'foglalas', name: 'Foglalas', component: Foglalas }
     ]
   }
 
