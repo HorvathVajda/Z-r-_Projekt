@@ -2,7 +2,16 @@
   <header>
     <nav class="navbar navbar-expand-lg" :class="navbarClass">
       <div class="container-fluid">
-        <a class="navbar-brand logo" href="/">BookMyTime</a>
+        <a 
+          v-if="!isLoggedIn"
+          class="navbar-brand logo" 
+          href="/">BookMyTime
+        </a>
+        <a 
+          v-if="isLoggedIn"
+          class="navbar-brand logo" 
+          href="/Foglalas">BookMyTime
+        </a>
 
         <!-- Hamburger menü gomb -->
         <button

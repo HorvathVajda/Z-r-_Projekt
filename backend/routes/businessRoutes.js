@@ -133,4 +133,45 @@ router.get('/foglalasok/:userId', async (req, res) => {
 });
 
 
+// Vállalkozások listája szolgáltatásokkal együtt
+router.get('/vallalkozasok', (req, res) => {
+  const query = `
+      SELECT v.*, s.szolgaltatas_id, s.szolgaltatas_neve, s.idotartam, s.ar
+      FROM vallalkozasok v
+      LEFT JOIN szolgaltatasok s ON v.id = s.vallalkozas_id
+  `;
+  db.query(query, (err, results) => {
+      if (err) {
+          return res.status(500).json({ error: 'Hiba történt az adatok lekérésekor.' });
+      }
+
+      // Csoportosítás vállalkozás szerint
+      const vallalkozasok = {};
+      results.forEach(row => {
+          if (!vallalkozasok[row.id]) {
+              vallalkozasok[row.id] = {
+                  id: row.id,
+                  vallalkozas_neve: row.vallalkozas_neve,
+                  helyszin: row.helyszin,
+                  nyitva_tartas: row.nyitva_tartas,
+                  szabad_ido: row.szabad_ido,
+                  idopontok: row.idopontok,
+                  category: row.category,
+                  szolgaltatasok: []
+              };
+          }
+          if (row.szolgaltatas_id) {
+              vallalkozasok[row.id].szolgaltatasok.push({
+                  szolgaltatas_id: row.szolgaltatas_id,
+                  szolgaltatas_neve: row.szolgaltatas_neve,
+                  idotartam: row.idotartam,
+                  ar: row.ar
+              });
+          }
+      });
+
+      res.json(Object.values(vallalkozasok));
+  });
+});
+
 module.exports = router; // A router exportálása

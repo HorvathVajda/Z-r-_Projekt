@@ -19,7 +19,6 @@
         </p>
         <p>Kategória: {{ business.kategoria }}</p>
         
-        <!-- Szerkesztés és Törlés gombok -->
         <div class="business-card-actions">
           <button @click="editBusiness(business)">Szerkesztés</button>
           <button @click="deleteBusiness(business.id)">Törlés</button>
