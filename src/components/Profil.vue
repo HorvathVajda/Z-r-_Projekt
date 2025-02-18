@@ -45,13 +45,13 @@
         <!-- Foglalások -->
         <div class="foglalasok">
           <h3>Foglalások</h3>
-          <div v-if="bookings.length">
+          <div>
             <div v-for="(booking, index) in bookings" :key="index" class="foglalas-item">
               <p><strong>Időpont:</strong> {{ booking.date }} - {{ booking.time }}</p>
               <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
             </div>
           </div>
-          <p v-else>Nincs még foglalás.</p>
+          <p>Nincs még foglalás.</p>
         </div>
       </div>
 

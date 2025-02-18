@@ -6,7 +6,7 @@
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla alias, ad quae nisi recusandae officiis sapiente fuga, similique incidunt fugiat ducimus dolores iure nesciunt quam facilis. Quam tempora temporibus possimus!</p>
         <div class="gombok">
           <button type="submit" class="home-button">Foglaljon most</button>
-          <button type="submit" class="home-button-register">Regisztráció</button>
+          <a type="submit" class="home-button-register" href="/registerChoose">Regisztráció</a>
         </div>
       </div>
   </div>
@@ -69,6 +69,7 @@ export default {
   gap: 20px;
 }
 
+
 .home-button, .home-button-register {
   font-size: 20px;
   font-weight: bold;
@@ -86,6 +87,7 @@ export default {
 .home-button-register {
   background: transparent;
   color: #6bb6ea;
+  text-decoration: none;
 }
 .user-button{
   background-color: #6327A2;
