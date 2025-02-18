@@ -2,11 +2,11 @@ const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const businessRoutes = require("../routes/businessRoutes");
 const cors = require("cors");
-const dotenv = require("dotenv"); // Javított import
-const db = require("./db"); // db.js a config mappában
+const dotenv = require("dotenv"); 
+const db = require("./db"); 
 const nodemailer = require("nodemailer");
 
-dotenv.config(); // Konfigurációs fájl betöltése
+dotenv.config(); 
 
 const app = express();
 
@@ -19,7 +19,7 @@ app.use((err, req, res, next) => {
 // CORS beállítások
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:5173", // A frontend URL-je
+    origin: process.env.FRONTEND_URL || "http://localhost:5173", 
     credentials: true // Engedélyezi a sütik használatát
   })
 );
@@ -84,7 +84,7 @@ app.post("/api/contact", async (req, res) => {
     let transporter = nodemailer.createTransport({
       service: "gmail",
       auth: {
-        user: process.env.EMAIL_USER, // Pl.: "your-email@gmail.com"
+        user: process.env.EMAIL_USER, 
         pass: process.env.EMAIL_PASS  // Alkalmazásjelszó szükséges
       }
     });
