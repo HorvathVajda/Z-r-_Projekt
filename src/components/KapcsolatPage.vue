@@ -1,49 +1,58 @@
 <template>
   <div class="contact-container">
-    <header>
-      <h1>Kapcsolatfelvétel</h1>
-      <p>Lépj kapcsolatba velünk az alábbi űrlap segítségével!</p>
-    </header>
-    <main>
-      <form @submit.prevent="submitForm" class="contact-form">
-        <label for="name">Név</label>
-        <input
-          type="text"
-          id="name"
-          v-model="formData.name"
-          placeholder="Add meg a neved"
-          required
-        />
+    <!-- Bal oldali háttérkép -->
+    <div class="left-side"></div>
 
-        <label for="email">Email</label>
-        <input
-          type="email"
-          id="email"
-          v-model="formData.email"
-          placeholder="Add meg az email címed"
-          required
-        />
+    <!-- Jobb oldali űrlap -->
+    <div class="right-side">
+      <header>
+        <h1>Kapcsolatfelvétel</h1>
+        <p>Lépj kapcsolatba velünk az alábbi űrlap segítségével!</p>
+      </header>
 
-        <label for="message">Üzenet</label>
-        <textarea
-          id="message"
-          v-model="formData.message"
-          rows="5"
-          placeholder="Írd meg az üzeneted..."
-          required
-        ></textarea>
+      <main>
+        <form @submit.prevent="submitForm" class="contact-form">
+          <label for="name">Név</label>
+          <input
+            type="text"
+            id="name"
+            v-model="formData.name"
+            placeholder="Add meg a neved"
+            required
+          />
 
-        <button type="submit">Küldés</button>
+          <label for="email">Email</label>
+          <input
+            type="email"
+            id="email"
+            v-model="formData.email"
+            placeholder="Add meg az email címed"
+            required
+          />
 
-        <!-- Hibaüzenetek megjelenítése -->
-        <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
-        <p v-if="successMessage" class="success">{{ successMessage }}</p>
-      </form>
-    </main>
+          <label for="message">Üzenet</label>
+          <textarea
+            id="message"
+            v-model="formData.message"
+            rows="5"
+            placeholder="Írd meg az üzeneted..."
+            required
+          ></textarea>
+
+          <button type="submit" @click="sendEmail">Küldés</button>
+
+          <!-- Hibaüzenetek megjelenítése -->
+          <p v-if="errorMessage" class="error">{{ errorMessage }}</p>
+          <p v-if="successMessage" class="success">{{ successMessage }}</p>
+        </form>
+      </main>
+    </div>
   </div>
 </template>
 
 <script>
+import emailjs from 'emailjs-com';
+
 export default {
   name: "KapcsolatPage",
   data() {
@@ -58,75 +67,75 @@ export default {
     };
   },
   methods: {
-    async submitForm() {
-      this.errorMessage = "";
-      this.successMessage = "";
-
-      try {
-        const response = await fetch("http://localhost:5000/api/contact", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify(this.formData),
-        });
-
-        const responseData = await response.json();
-
-        if (!response.ok) {
-          throw new Error(responseData.error || "Hiba történt az üzenet küldésekor!");
-        }
-
-        // Sikeres küldés esetén
-        this.successMessage = "Üzeneted sikeresen elküldtük!";
-        this.formData = { name: "", email: "", message: "" }; // Alapállapotba állítás
-
-      } catch (error) {
-        this.errorMessage = error.message;
-        console.error("Hiba:", error.message);
-      }
+    submitForm() {
+      this.sendEmail();
     },
+    sendEmail() {
+      const templateParams = {
+        from_name: this.formData.name,  // felhasználó neve
+        user_email: this.formData.email, // felhasználó email címe
+        message: this.formData.message,  // üzenet
+      };
+
+      emailjs.send('service_et6yxeo', 'template_d7tlhxi', templateParams, 'An_2K3rlynQaF-gOD')
+        .then((response) => {
+          this.successMessage = "Your message has been sent successfully!";
+          this.errorMessage = "";
+          console.log('Success!', response.status, response.text);
+        }, (err) => {
+          this.errorMessage = "Failed to send message.";
+          this.successMessage = "";
+          console.error('Failed...', err);
+        });
+    }
   },
 };
 </script>
 
 <style scoped>
-/* Általános stílusok */
 .contact-container {
   font-family: Arial, sans-serif;
   margin: 0;
   padding: 0;
   box-sizing: border-box;
-  color: black;
-  min-height: 100vh;
   display: flex;
-  flex-direction: column;
+  min-height: 100vh;
+}
+
+.contact-container .left-side {
+  flex: 1;
+  background-image: url(/as.jpg);
+  background-size: cover;
+  background-position: center center;
+  background-repeat: no-repeat;
+}
+
+.contact-container .right-side {
+  flex: 1;
+  display: flex;
+  flex-direction: column; /* Vertikális elrendezés */
+  justify-content: center;
   align-items: center;
+  padding: 20px;
+  box-sizing: border-box;
 }
 
 header {
   text-align: center;
-  padding: 20px;
   color: black;
+  margin-bottom: 20px; /* Space between header and form */
 }
 
-main {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  padding: 20px;
-  width: 100%;
-}
-
-/* Fix szélességű form */
 .contact-form {
+  margin-top: 20px; /* Ensures space between header and form */
   border: 3px solid black;
   background: #fff;
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 600px; /* Fix szélesség */
-  max-width: 100%; /* Ne lépje túl a képernyőt mobilon */
+  width: 600px;
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 /* Form elemek */
@@ -141,10 +150,7 @@ main {
   width: 100%;
   padding: 10px;
   margin-bottom: 15px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 14px;
-  border: 2px solid black; /* Fekete szegély */
+  border: 2px solid black;
   border-radius: 0.5em;
 }
 
@@ -177,8 +183,12 @@ main {
   margin-top: 10px;
 }
 
-/* Reszponzív módosítások (mobil nézet) */
+/* Reszponzív módosítások */
 @media (max-width: 600px) {
+  .contact-container {
+    flex-direction: column;
+  }
+
   header h1 {
     font-size: 1.5em;
   }

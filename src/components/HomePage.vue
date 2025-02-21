@@ -5,8 +5,8 @@
         <h2>Foglaljon most időpontot</h2>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla alias, ad quae nisi recusandae officiis sapiente fuga, similique incidunt fugiat ducimus dolores iure nesciunt quam facilis. Quam tempora temporibus possimus!</p>
         <div class="gombok">
-          <button type="submit" class="home-button">Foglaljon most</button>
-          <a type="submit" class="home-button-register" href="/registerChoose">Regisztráció</a>
+          <a @click="goToBooking" class="home-button">Foglaljon most</a>
+          <a v-if="!isLoggedIn" @click="goToRegister" class="home-button-register">Regisztráció</a>
         </div>
       </div>
   </div>
@@ -16,10 +16,10 @@
       <img src="/hatter.jpg" alt="Kép" class="background-image" />
       <div class="info-box">
         <h2>Ügyfeleknek</h2>
-        <p>Foglalj időpontot online keresd, meg a legjobb helyeket a környéken, és kezeld a foglalásaidat egy helyen</p>
-        <input v-if="!isLoggedIn" type="button" class="user-button" value="Regisztráció">
+        <p>Foglalj időpontot online, keresd meg a legjobb helyeket a környéken, és kezeld a foglalásaidat egy helyen</p>
+        <input v-if="!isLoggedIn" @click="goToRegister" type="button" class="user-button" value="Regisztráció">
         <p>Ha van már fiókja:</p>
-        <input v-if="!isLoggedIn" type="button" class="user-button" value="Bejelentkezés">
+        <input v-if="!isLoggedIn" @click="goToLogin" type="button" class="user-button" value="Bejelentkezés">
       </div>
     </div>
   </div>
@@ -33,29 +33,56 @@
     <div class="business-help-box">
       <p>Eljött az idő, hogy vállalkozásai időpontjait egy helyről könnyedén és egyszerűen kezelje!</p>
       <p>Kezdje el pár egyszerű lépésben:</p>
-      <input v-if="!isLoggedIn" type="button" class="business-button" value="Regisztráció">
+      <input v-if="!isLoggedIn" @click="goToRegister" type="button" class="business-button" value="Regisztráció">
       <p>Ha van már fiókja:</p>
-      <input v-if="!isLoggedIn" type="button" class="business-button" value="Bejelentkezés">
+      <input v-if="!isLoggedIn" @click="goToLogin" type="button" class="business-button" value="Bejelentkezés">
     </div>
   </div>
-
 
   <LabelLec />
 </template>
 
 <script>
-import { computed} from "vue";
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import axios from 'axios';
 import { store } from "../store";
 
-const isLoggedIn = computed(() => store.isLoggedIn);
-
 export default {
-  data() {
-    return {
+  setup() {
+    const isLoggedIn = computed(() => store.isLoggedIn);
+    const businesses = ref([]);
+    const router = useRouter();
+
+    const fetchBusinesses = async () => {
+      try {
+        const response = await axios.get("http://localhost:3000/api/businesses");
+        businesses.value = response.data;
+      } catch (error) {
+        console.error("Hiba a vállalkozások lekérésekor:", error);
+      }
     };
-  },
-  methods: {
+
+    const goToLogin = () => {
+      router.push("/login");
+    };
+
+    const goToRegister = () => {
+      router.push("/registerChoose");
+    };
+
+    const goToBooking = () => {
+      if(!isLoggedIn){
+        router.push(`/foglalas`);
+      }
+      else{
+        router.push("/login");
+      }
+    };
+
+    onMounted(fetchBusinesses);
+
+    return { isLoggedIn, goToLogin, goToRegister, goToBooking, businesses };
   },
 };
 </script>
@@ -77,6 +104,7 @@ export default {
   border: none;
   cursor: pointer;
   border-radius: 25px;
+  text-decoration: none;
 }
 
 .home-button {
