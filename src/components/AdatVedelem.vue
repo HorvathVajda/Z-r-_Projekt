@@ -61,7 +61,7 @@ h1 {
   font-weight: bold;
   text-align: center;
   margin-bottom: 20px;
-  color: #b8860b;
+  color: #6B00D0;
 }
 
 #hatalyos {
@@ -74,7 +74,7 @@ h1 {
 h2 {
   font-size: 1.5em;
   margin-top: 20px;
-  color: #b8860b;
+  color: #6B00D0;
   border-bottom: 2px solid #b8860b;
   padding-bottom: 5px;
 }

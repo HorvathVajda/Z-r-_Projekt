@@ -17,7 +17,7 @@
 
     <!-- Fő tartalom -->
     <main class="main-content">
-      <!-- Router view csak egyszer -->
+      <!-- Router view csak egyszer #6B00D0-->
       <router-view></router-view>
     </main>
   </div>
@@ -41,7 +41,7 @@ export default {
 /* Oldalsáv (Dashboard) */
 .sidebar {
   width: 250px;
-  background-color: #6327A2; /* Sötét lila */
+  background-color: #6B00D0; /* Sötét lila */
   color: white;
   padding: 20px;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
