@@ -75,7 +75,7 @@ h2 {
   font-size: 1.5em;
   margin-top: 20px;
   color: #6B00D0;
-  border-bottom: 2px solid #6B00D0;
+  border-bottom: 2px solid #b8860b;
   padding-bottom: 5px;
 }
 

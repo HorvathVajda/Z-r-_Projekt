@@ -10,7 +10,7 @@
         </div>
       </div>
   </div>
-
+  <router-view></router-view>
   <div class="user-container">
     <div class="image-container">
       <img src="/hatter.jpg" alt="Kép" class="background-image" />
