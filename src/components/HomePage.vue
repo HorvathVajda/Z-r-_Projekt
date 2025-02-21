@@ -1,6 +1,6 @@
 <template>
   <div class="harmadik-container">
-      <img src="/hatter3.jpg" alt="Vállalkozóknak" class="harmadik-image" />
+      <img src="/s2.png" alt="Vállalkozóknak" class="harmadik-image" />
       <div class="harmadik-info-box">
         <h2>Foglaljon most időpontot</h2>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla alias, ad quae nisi recusandae officiis sapiente fuga, similique incidunt fugiat ducimus dolores iure nesciunt quam facilis. Quam tempora temporibus possimus!</p>
@@ -108,17 +108,17 @@ export default {
 }
 
 .home-button {
-  background-color: #9d9ff4;
+  background-color: #6B00D0;
   color: white;
 }
 
 .home-button-register {
   background: transparent;
-  color: #6bb6ea;
+  color: black;
   text-decoration: none;
 }
 .user-button{
-  background-color: #6327A2;
+  background-color: #6B00D0;
   color: white;
   font-size: 20px;
   font-weight: bold;
@@ -202,7 +202,7 @@ export default {
   top: 50%;
   left: 20%;
   transform: translate(-50%, -50%);
-  color: #9d9ff4;
+  color: #6B00D0;
   text-align: left;
   max-width: 550px;
   margin-left: 60px;
@@ -215,7 +215,7 @@ export default {
 
 .harmadik-info-box p {
   font-size: 22px;
-  color: #6bb6ea;
+  color: black;
   text-align: center;
 }
 

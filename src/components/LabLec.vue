@@ -4,7 +4,6 @@
       <a class="nav-link" href="/kapcsolat">Kapcsolatfelvétel</a>
       <a class="nav-link" href="/rolunk">Rólunk</a>
       <a class="nav-link" href="/adatvedelem">Adatvédelem</a>
-
     </div>
     <p>&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
   </footer>
@@ -19,37 +18,45 @@ export default {
 <style scoped>
 .footer {
   width: 100%;
-  height: 60px;
-  background-color: #F4F4F4 !important;
-  color: black;
+  background-color: #f4f4f4;
+  color: #333; /* Darker color for better contrast */
   padding: 20px 0;
   text-align: center;
   position: relative;
   bottom: 0;
-  margin-bottom: 25px;
+  box-shadow: 0 -2px 5px rgba(0, 0, 0, 0.1); /* Light shadow to separate from content */
 }
 
 .footer-container {
-  width: 100%;
-  margin: 0 auto;
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 20px;
+  gap: 30px;
   flex-wrap: wrap;
 }
 
 .nav-link {
-  color: black;
+  color: #6B00D0; /* Consistent brand color */
   text-decoration: none;
-  font-weight: bold;
-  transition: color 0.3s ease;
+  font-weight: 600;
+  transition: color 0.3s ease, transform 0.2s ease;
   padding: 5px 10px;
-  margin: 0 10px;
 }
 
 .nav-link:hover {
-  color: black;
-  background: transparent;
+  transform: translateY(-2px); /* Subtle lifting effect */
+}
+
+p {
+  margin-top: 15px;
+  font-size: 14px;
+  color: #777; /* Lighter gray for the copyright text */
+}
+
+@media (max-width: 768px) {
+  .footer-container {
+    flex-direction: column;
+    gap: 15px;
+  }
 }
 </style>

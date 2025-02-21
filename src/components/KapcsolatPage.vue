@@ -122,7 +122,7 @@ export default {
 
 header {
   text-align: center;
-  color: #6327A2;
+  color: #6B00D0;
   margin-bottom: 20px;
 }
 
@@ -155,12 +155,12 @@ header {
 
 .contact-form input:focus,
 .contact-form textarea:focus {
-  border-color: #6327A2;
+  border-color: #6B00D0;
   outline: none;
 }
 
 .contact-form button {
-  background: #6327A2;
+  background: #6B00D0;
   color: white;
   padding: 12px 30px;
   border: none;
@@ -178,7 +178,7 @@ header {
 }
 
 .contact-form button:hover {
-  color: #6327A2;
+  color: #6B00D0;
   background: transparent;
 }
 

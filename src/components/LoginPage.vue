@@ -124,7 +124,7 @@ body, html {
 
 h2 {
   font-size: 2rem;
-  color: #6327A2;
+  color: #6B00D0;
   margin-bottom: 1.5rem;
 }
 
@@ -134,7 +134,7 @@ h2 {
 
 .form-group label {
   font-weight: bold;
-  color: #6327A2;
+  color: #6B00D0;
 }
 
 .form-group input {
@@ -150,12 +150,12 @@ h2 {
 }
 
 .form-group input:focus {
-  border-color: #ff8c00;
+  border-color: #6B00D0;
   box-shadow: 0 0 8px rgba(255, 140, 0, 0.3);
 }
 
 .login-button {
-  background-color: #5a3472;
+  background-color: #6B00D0;
   color: white;
   font-size: 1.1rem;
   font-weight: bold;
@@ -176,7 +176,7 @@ h2 {
 }
 
 .nav-link {
-  color: #6327A2;
+  color: #6B00D0;
   text-decoration: none;
   font-size: 0.9rem;
   margin-top: 10px;
