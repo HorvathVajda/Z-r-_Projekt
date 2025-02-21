@@ -79,7 +79,7 @@ export default {
 
       emailjs.send('service_et6yxeo', 'template_d7tlhxi', templateParams, 'An_2K3rlynQaF-gOD')
         .then((response) => {
-          this.successMessage = "Your message has been sent successfully!";
+          this.successMessage = "Az Email sikeresen elküldve!";
           this.errorMessage = "";
           console.log('Success!', response.status, response.text);
         }, (err) => {
@@ -104,7 +104,7 @@ export default {
 
 .contact-container .left-side {
   flex: 1;
-  background-image: url(/as.jpg);
+  background-image: url('/ff.jpg');
   background-size: cover;
   background-position: center center;
   background-repeat: no-repeat;
@@ -122,17 +122,14 @@ export default {
 
 header {
   text-align: center;
-  color: black;
-  margin-bottom: 20px; /* Space between header and form */
+  color: #6327A2;
+  margin-bottom: 20px;
 }
 
 .contact-form {
-  margin-top: 20px; /* Ensures space between header and form */
-  border: 3px solid black;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  margin-top: 20px;
+  border: 3px solid transparent;
+  padding: 30px;
   width: 600px;
   max-width: 100%;
   box-sizing: border-box;
@@ -143,30 +140,46 @@ header {
   display: block;
   margin: 10px 0 5px;
   font-weight: bold;
+  color: #333;
 }
 
 .contact-form input,
 .contact-form textarea {
   width: 100%;
-  padding: 10px;
-  margin-bottom: 15px;
-  border: 2px solid black;
+  padding: 12px;
+  margin-bottom: 20px;
+  border: 2px solid #ccc;
   border-radius: 0.5em;
+  transition: border-color 0.3s;
+}
+
+.contact-form input:focus,
+.contact-form textarea:focus {
+  border-color: #6327A2;
+  outline: none;
 }
 
 .contact-form button {
-  background: gold;
-  color: black;
-  padding: 10px 20px;
+  background: #6327A2;
+  color: white;
+  padding: 12px 30px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
   font-size: 16px;
   transition: background 0.3s ease;
+  margin-top: 20px; /* Optional: Adds some space above the button */
+  align-items: center; /* Centers all children elements (including button) */
+  display: flex;
+  flex-direction: column;
+  box-sizing: border-box;
+
+
 }
 
 .contact-form button:hover {
-  background: goldenrod;
+  color: #6327A2;
+  background: transparent;
 }
 
 /* Hibaüzenet */
@@ -194,7 +207,7 @@ header {
   }
 
   .contact-form {
-    padding: 15px;
+    padding: 20px;
   }
 }
 </style>
