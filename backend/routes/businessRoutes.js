@@ -65,9 +65,9 @@ router.post("/add", verifyToken, async (req, res) => {
   }
 });
 
-// Vállalkozás bio frissítése
 router.post('/update-bio', async (req, res) => {
   const { vallalkozo_id, bio } = req.body;
+  console.log("Request Body:", req.body);  // Add this line for debugging
 
   if (!vallalkozo_id || !bio) {
     return res.status(400).json({ message: 'Vállalkozó ID és bio mezők szükségesek' });
@@ -90,16 +90,25 @@ router.post('/update-bio', async (req, res) => {
 
 // Vállalkozói profil lekérése ID alapján
 router.get("/vallalkozo-profile", async (req, res) => {
-  const { vallalkozo_id } = req.query;
-  if (!vallalkozo_id) {
-    return res.status(400).json({ error: "Vállalkozó ID megadása szükséges!" });
+  const { vallalkozo_id, email } = req.query;
+
+  if (!vallalkozo_id && !email) {
+    return res.status(400).json({ error: "Vállalkozó ID vagy e-mail megadása szükséges!" });
   }
 
   try {
-    const [results] = await db.query(
-      "SELECT * FROM vallalkozo WHERE vallalkozo_id = ?",
-      [vallalkozo_id]
-    );
+    let query = "SELECT * FROM vallalkozo WHERE ";
+    let queryParams = [];
+
+    if (vallalkozo_id) {
+      query += "vallalkozo_id = ?";
+      queryParams.push(vallalkozo_id);
+    } else if (email) {
+      query += "email = ?";
+      queryParams.push(email);
+    }
+
+    const [results] = await db.query(query, queryParams);
 
     if (results.length === 0) {
       return res.status(404).json({ error: "A vállalkozó nem található!" });
@@ -117,6 +126,7 @@ router.get("/vallalkozo-profile", async (req, res) => {
     res.status(500).json({ error: "Adatbázis hiba történt!" });
   }
 });
+
 
 // Foglalások lekérdezése
 router.get('/foglalasok/:userId', async (req, res) => {
@@ -240,5 +250,31 @@ router.get('/ido/:vallalkozas_id/:szolgaltatas_id', async (req, res) => {
   }
 });
 
+router.post('/update-user', async (req, res) => {
+  const { email, nev, telefonszam } = req.body;
+
+  if (!email || !nev || !telefonszam) {
+      return res.status(400).json({ message: 'Minden mező kitöltése kötelező!' });
+  }
+
+  try {
+      const sql = 'UPDATE vallalkozo SET nev = ?, telefonszam = ? WHERE email = ?';
+      const values = [nev, telefonszam, email];
+
+      db.query(sql, values, (err, result) => {
+          if (err) {
+              console.error('Hiba a frissítés során:', err);
+              return res.status(500).json({ message: 'Hiba történt a frissítés során.' });
+          }
+          if (result.affectedRows === 0) {
+              return res.status(404).json({ message: 'Felhasználó nem található.' });
+          }
+          res.json({ message: 'Sikeres frissítés!' });
+      });
+  } catch (error) {
+      console.error('Szerverhiba:', error);
+      res.status(500).json({ message: 'Szerverhiba történt.' });
+  }
+});
 
 module.exports = router; // A router exportálása

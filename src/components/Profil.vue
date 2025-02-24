@@ -102,10 +102,10 @@ export default {
   },
   mounted() {
     const authData = JSON.parse(localStorage.getItem('authData'));
-    if (authData && authData.email) {
-      // Az email alapján lekérjük a vállalkozó adatokat
-      this.getBusinessProfile(authData.email);
-    }
+  if (authData && authData.email) {
+    this.user.vallalkozo_id = authData.id;  // Ne felejtsd el hozzárendelni
+    this.getBusinessProfile(authData.id);
+  }
   },
   methods: {
     toggleEditBio() {
@@ -113,19 +113,24 @@ export default {
       this.editedBio = this.userBio;
     },
     saveBio() {
-      this.isEditingBio = false;
-      if (this.editedBio.trim() !== '') {
-        // Frissítjük a bio-t az adatbázisban
-        axios.post('/api/businesses/update-bio', { email: this.user.email, bio: this.editedBio })
-          .then(response => {
-            // handle success
-          })
-          .catch(error => {
-            console.error('Hiba történt a mentés során:', error);
-          });
-      }
-      this.userBio = this.editedBio;
-    },
+  this.isEditingBio = false;
+  if (this.editedBio.trim() !== '') {
+    console.log("Sending bio update:", this.user.vallalkozo_id, this.editedBio);  // Add this line for debugging
+    axios.post('/api/businesses/update-bio', {
+      email: this.user.email,
+      vallalkozo_id: this.user.vallalkozo_id,
+      bio: this.editedBio
+    })
+      .then(response => {
+        // handle success
+      })
+      .catch(error => {
+        console.error('Hiba történt a mentés során:', error);
+      });
+  }
+  this.userBio = this.editedBio;
+},
+
     cancelEdit() {
       this.isEditingBio = false;
     },
@@ -172,8 +177,8 @@ export default {
       localStorage.removeItem('authData');
       this.$router.push('/login');
     },
-    getBusinessProfile(email) {
-      axios.get(`/api/businesses/vallalkozo-profile?email=${email}`)
+    getBusinessProfile(vallalkozo_id) {
+      axios.get(`/api/businesses/vallalkozo-profile?vallalkozo_id=${vallalkozo_id}`)
         .then(response => {
           if (response.data) {
             this.userName = response.data.name;
