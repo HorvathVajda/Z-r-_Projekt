@@ -77,7 +77,7 @@ body, html {
 .content h1 {
   font-size: 48px;
   font-weight: bold;
-  color: #6327A2;
+  color: #6B00D0;
   margin-bottom: 20px;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
 }
@@ -89,7 +89,7 @@ body, html {
   font-size: 22px;
   font-weight: bold;
   color: #fff;
-  background: #6327A2;
+  background: #6B00D0;
   border: none;
   border-radius: 10px;
   cursor: pointer;

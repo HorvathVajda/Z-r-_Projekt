@@ -1,18 +1,16 @@
 const nodemailer = require('nodemailer');
-require('dotenv').config(); // Környezeti változók betöltése
+require('dotenv').config();
 
 async function sendMail(name, email, message) {
     try {
-        // Gmail SMTP beállítása
         const transporter = nodemailer.createTransport({
             service: "gmail",
             auth: {
-                user: process.env.EMAIL_USER, // Gmail fiók
-                pass: process.env.EMAIL_PASS // Alkalmazásjelszó
+                user: process.env.EMAIL_USER,
+                pass: process.env.EMAIL_PASS
             }
         });
 
-        // E-mail tartalma
         const mailOptions = {
             from: `"BookMyTime Kapcsolat" <${process.env.EMAIL_USER}>`,
             to: "bookmytime884@gmail.com",
@@ -25,7 +23,6 @@ async function sendMail(name, email, message) {
             `
         };
 
-        // E-mail küldése
         const info = await transporter.sendMail(mailOptions);
         console.log("Üzenet elküldve: " + info.messageId);
         return true;
@@ -35,7 +32,5 @@ async function sendMail(name, email, message) {
     }
 }
 
-// Tesztelés (ha szükséges)
-// sendMail("Teszt Felhasználó", "teszt@example.com", "Ez egy teszt üzenet!");
 
 module.exports = sendMail;

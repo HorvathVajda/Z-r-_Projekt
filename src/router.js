@@ -14,9 +14,9 @@ import Dashboard from './components/Dashboard.vue';
 import Settings from './components/Beallitasok.vue';
 import Notifications from './components/Ertesitesek.vue';
 import Foglalas from './components/Foglalas.vue';
+import businessCard from './components/businessCards.vue';
 
 const routes = [
-  { path: '/', name: 'Home', component: HomePage },
   { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
   { path: '/rolunk', name: 'Rolunk', component: RolunkPage },
   { path: '/login', name: 'login', component: LoginPage },
@@ -28,6 +28,14 @@ const routes = [
   { path: '/foglalas', name: 'Foglalas', component: Foglalas },
 
   {
+    path: '/',
+    component: HomePage,
+    children: [
+      { path: '', name: 'Businesscards', component: businessCard },
+    ]
+  },
+
+  {
     path: '/vallalkozoHome',
     component: vallalkozoHome,
     children: [
@@ -37,7 +45,6 @@ const routes = [
       { path: 'profil', name: 'Profil', component: Profil },
     ]
   }
-
 ];
 
 const router = createRouter({

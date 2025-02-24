@@ -1,0 +1,71 @@
+[
+  {
+    "id": 1,
+    "vallalkozas_neve": "Kovács Fodrászat",
+    "helyszin": "Budapest, Kossuth Lajos utca 10.",
+    "nyitva_tartas": "Hétfőtől Péntekig: 09:00 - 18:00",
+    "category": "Szépségipar",
+    "vallalkozo_id": 1,
+    "szolgaltatasok": [
+      {
+        "szolgaltatas_neve": "Körömfestés",
+        "idotartam": 45,
+        "ar": "4000.00"
+      },
+      {
+        "szolgaltatas_neve": "Hajvágás",
+        "idotartam": 30,
+        "ar": "3000.00"
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "vallalkozas_neve": "Szabó Autószerviz",
+    "helyszin": "Budapest, Petőfi Sándor utca 5.",
+    "nyitva_tartas": "Hétfőtől Szombatig: 08:00 - 20:00",
+    "category": "Autószerviz",
+    "vallalkozo_id": 2,
+    "szolgaltatasok": [
+      {
+        "szolgaltatas_neve": "Motorkerékpár javítás",
+        "idotartam": 120,
+        "ar": "25000.00"
+      },
+      {
+        "szolgaltatas_neve": "Autóolaj csere",
+        "idotartam": 60,
+        "ar": "15000.00"
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "vallalkozas_neve": "Nagy Festészet",
+    "helyszin": "Budapest, Andrássy út 30.",
+    "nyitva_tartas": "Hétfőtől Péntekig: 10:00 - 17:00",
+    "category": "Festészet",
+    "vallalkozo_id": 3,
+    "szolgaltatasok": [
+      {
+        "szolgaltatas_neve": "Külső festés",
+        "idotartam": 240,
+        "ar": "45000.00"
+      },
+      {
+        "szolgaltatas_neve": "Belső festés",
+        "idotartam": 180,
+        "ar": "35000.00"
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "vallalkozas_neve": "Béla edzőterem ",
+    "helyszin": "6133  Jászszsentlászló Dózsa György utca  1",
+    "nyitva_tartas": null,
+    "category": "SzemelyiEdzo",
+    "vallalkozo_id": 4,
+    "szolgaltatasok": []
+  }
+]

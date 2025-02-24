@@ -114,15 +114,13 @@ export default {
     this.fetchVallalkozasok();
   },
 };
-
-
 </script>
 
 <style scoped>
 .foglalas-container {
-  max-width: 800px;
+  max-width: 1400px;
   margin: 0 auto;
-  padding: 20px;
+  margin-top: 80px;
 }
 
 .vallalkozas-card {
@@ -142,19 +140,22 @@ export default {
 }
 
 button {
-  background-color: #4CAF50;
+  background-color: #6327A2;
   color: white;
   border: none;
-  padding: 10px 20px;
+  padding: 8px 16px;
   text-align: center;
   font-size: 16px;
-  border-radius: 5px;
+  border-radius: 20px;
   cursor: pointer;
-  transition: background-color 0.3s ease;
+  transition: background-color 0.5s, transform 0.4s;
+  margin: 3px;
+  margin-left: 10px;
 }
 
 button:hover {
-  background-color: #45a049;
+  background-color: #9d9ff4;
+  transform: translateX(5%);
 }
 
 select {

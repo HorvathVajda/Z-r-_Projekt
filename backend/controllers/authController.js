@@ -7,13 +7,11 @@ const saltRounds = 10;
 exports.login = async (req, res) => {
   const { email, jelszo } = req.body;
 
-  // Ha nincs email vagy jelszó megadva
   if (!email || !jelszo) {
     return res.status(400).json({ message: "Minden mezőt ki kell tölteni!" });
   }
 
   try {
-    // Megkeressük a felhasználót az adatbázisban
     const [users] = await db.query(
       `
       SELECT 'felhasznalo' AS tipus, felhasznalo_id AS id, nev, email, jelszo
@@ -26,35 +24,30 @@ exports.login = async (req, res) => {
       [email, email]
     );
 
-    // Ha nem található a felhasználó
     if (users.length === 0) {
       return res.status(404).json({ message: "A felhasználó nem található." });
     }
 
     const user = users[0];
 
-    // Ha nincs jelszó tárolva a felhasználónál
     if (!user.jelszo) {
       return res.status(400).json({ message: "A felhasználóhoz nincs jelszó társítva." });
     }
 
-    // Jelszó ellenőrzése
     const isMatch = await bcrypt.compare(jelszo, user.jelszo);
 
     if (!isMatch) {
       return res.status(401).json({ message: "Helytelen jelszó." });
     }
 
-    // JWT token generálása
     const token = jwt.sign(
       { id: user.id, email: user.email, tipus: user.tipus },
       process.env.JWT_SECRET || "titkoskulcs",
       { expiresIn: "1h" }
     );
 
-    const expirationTime = Date.now() + 3600 * 1000; // 1 óra múlva lejár
+    const expirationTime = Date.now() + 3600 * 1000;
 
-    // Sikeres válasz
     res.json({
       message: `Sikeres bejelentkezés ${user.tipus === 'felhasznalo' ? 'felhasználóként' : 'vállalkozóként'}.`,
       token,

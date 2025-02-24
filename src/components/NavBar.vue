@@ -2,14 +2,14 @@
   <header>
     <nav class="navbar navbar-expand-lg" :class="navbarClass">
       <div class="container-fluid">
-        <a 
+        <a
           v-if="!isLoggedIn"
-          class="navbar-brand logo" 
+          class="navbar-brand logo"
           href="/">BookMyTime
         </a>
-        <a 
+        <a
           v-if="isLoggedIn"
-          class="navbar-brand logo" 
+          class="navbar-brand logo"
           href="/Foglalas">BookMyTime
         </a>
 
@@ -100,62 +100,64 @@ html, body {
   height: 100%;
   width: 100%;
 }
-
 .navbar {
-  background: rgba(255, 255, 255, 0.7); /* Félig átlátszó fehér háttér */
-  backdrop-filter: blur(10px); /* Elmosás effekt */
-  position: fixed;
+  background: #fff; /* Simán fehér háttér */
+  position: sticky; /* Sticky navbar, marad a képernyő tetején görgetéskor */
+  top: 0; /* A navbar mindig a képernyő tetején lesz */
   left: 0;
   right: 0;
-  width: 99%; /* Kisebb szélesség */
+  width: 100%;
   z-index: 1000;
-  padding: 0 20px; /* Csökkentett padding */
+  padding: 0 20px;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-family: 'Franklin Gothic Medium';
   height: 70px; /* Fix magasság */
-  transition: top 0.3s ease-in-out, background 0.3s ease-in-out;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Enyhe árnyék */
-  border-radius: 25px; /* Lekerekített sarkak */
-  margin-top: 5px;
-  left: 50%; /* A navbar bal széle a képernyő közepére kerül */
-  transform: translateX(-50%); /* A navbar középre igazítása */
-}
-
-
-.navbar.normal-navbar {
-  top: 0; /* Alapértelmezett top */
-}
-
-.navbar.scrolled-navbar {
-  top: 20px; /* Görgetéskor megnövelt top */
-}
-
-.navbar-brand.logo {
-  font-size: 40px; /* Betűméret */
-  font-weight: bold; /* Félkövér szöveg */
-  text-decoration: none; /* Aláhúzás eltávolítása */
-  color: #6327A2; /* Szöveg színe */
-  margin: 0; /* Margin eltávolítása */
-  padding: 0; /* Padding eltávolítása */
-  line-height: 60px; /* Az elem középre igazítása a navbar magasságával */
-  transition: color 0.3s; /* Színváltozás animáció */
-}
-
-.navbar-brand.logo:hover {
-  color: #9d9ff4; /* Hover szín */
-  background: transparent;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Alsó árnyék */
+  border-radius: 0; /* Nincs lekerekített sarkak */
 }
 
 .navbar-nav {
   display: flex;
-  flex-direction: row; /* Sorba rendezi az elemeket */
-  align-items: center; /* Középre igazítja őket függőlegesen */
-  gap: 20px; /* Elemenkénti távolság */
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
   margin: 0;
   padding: 0;
-  list-style: none; /* Lista stílus eltávolítása */
+  list-style: none;
+}
+
+/* További stílusok maradnak ugyanazok, ahogyan korábban */
+
+.navbar.normal-navbar {
+  top: 0;
+}
+
+.navbar-brand.logo {
+  font-size: 40px;
+  font-weight: bold;
+  text-decoration: none;
+  color: #6B00D0;
+  margin: 0;
+  padding: 0;
+  line-height: 60px;
+  transition: color 0.3s;
+  background: transparent;
+}
+
+.navbar-brand.logo:hover {
+  color: #6B00D0;
+}
+
+.navbar-nav {
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  gap: 20px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
 }
 
 .navbar-toggler {
@@ -168,7 +170,7 @@ html, body {
 }
 
 .navbar-toggler:hover {
-  background: #6F4868;
+  background: #6B00D0;
   color: white;
 }
 
@@ -187,33 +189,24 @@ html, body {
   width: 24px;
   height: 2px;
   background-color: black;
-  transition: transform 0.3s;
-}
-
-.navbar-toggler-icon::before {
-  top: -8px;
-}
-
-.navbar-toggler-icon::after {
-  top: 8px;
 }
 
 .nav-link {
-  color: #6327A2;
+  color: #6B00D0;
   text-decoration: none;
   font-size: 23px;
-  padding: 0 15px; /* Csökkentett padding */
+  padding: 0 15px;
   position: relative;
-  transition: color 0.3s, background-color 0.3s;
+  transition: color 0.3s;
 }
 
 .nav-link:hover {
-  color: #9d9ff4;
+  color: #6B00D0;
   background: transparent;
 }
 
 .nav-link.active {
-  background-color: 00CED1;
+  background-color: #00CED1;
   color: black;
   border-radius: 5px;
   padding: 5px 10px;
@@ -226,7 +219,7 @@ html, body {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #9d9ff4;
+  background-color: #6B00D0;
   transform: scaleX(0);
   transition: transform 0.3s ease-in-out;
 }
@@ -240,6 +233,26 @@ html, body {
   .navbar-nav {
     flex-direction: column;
     align-items: center;
+    width: 100%;
+    padding: 10px 0;
+  }
+
+  .navbar-toggler {
+    display: block;
+  }
+
+  .navbar-toggler-icon::before,
+  .navbar-toggler-icon::after {
+    width: 24px;
+  }
+
+  .collapse.navbar-collapse {
+    display: none;
+    width: 100%;
+  }
+
+  .collapse.navbar-collapse.show {
+    display: block;
   }
 }
 </style>

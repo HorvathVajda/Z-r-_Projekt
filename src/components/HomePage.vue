@@ -1,25 +1,25 @@
 <template>
   <div class="harmadik-container">
-      <img src="/hatter3.jpg" alt="Vállalkozóknak" class="harmadik-image" />
+      <img src="/s2.png" alt="Vállalkozóknak" class="harmadik-image" />
       <div class="harmadik-info-box">
         <h2>Foglaljon most időpontot</h2>
         <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla alias, ad quae nisi recusandae officiis sapiente fuga, similique incidunt fugiat ducimus dolores iure nesciunt quam facilis. Quam tempora temporibus possimus!</p>
         <div class="gombok">
-          <button type="submit" class="home-button">Foglaljon most</button>
-          <a type="submit" class="home-button-register" href="/registerChoose">Regisztráció</a>
+          <a @click="goToBooking" class="home-button">Foglaljon most</a>
+          <a v-if="!isLoggedIn" @click="goToRegister" class="home-button-register">Regisztráció</a>
         </div>
       </div>
   </div>
-
+  <router-view></router-view>
   <div class="user-container">
     <div class="image-container">
       <img src="/hatter.jpg" alt="Kép" class="background-image" />
       <div class="info-box">
         <h2>Ügyfeleknek</h2>
-        <p>Foglalj időpontot online keresd, meg a legjobb helyeket a környéken, és kezeld a foglalásaidat egy helyen</p>
-        <input v-if="!isLoggedIn" type="button" class="user-button" value="Regisztráció">
+        <p>Foglalj időpontot online, keresd meg a legjobb helyeket a környéken, és kezeld a foglalásaidat egy helyen</p>
+        <input v-if="!isLoggedIn" @click="goToRegister" type="button" class="user-button" value="Regisztráció">
         <p>Ha van már fiókja:</p>
-        <input v-if="!isLoggedIn" type="button" class="user-button" value="Bejelentkezés">
+        <input v-if="!isLoggedIn" @click="goToLogin" type="button" class="user-button" value="Bejelentkezés">
       </div>
     </div>
   </div>
@@ -33,29 +33,45 @@
     <div class="business-help-box">
       <p>Eljött az idő, hogy vállalkozásai időpontjait egy helyről könnyedén és egyszerűen kezelje!</p>
       <p>Kezdje el pár egyszerű lépésben:</p>
-      <input v-if="!isLoggedIn" type="button" class="business-button" value="Regisztráció">
+      <input v-if="!isLoggedIn" @click="goToRegister" type="button" class="business-button" value="Regisztráció">
       <p>Ha van már fiókja:</p>
-      <input v-if="!isLoggedIn" type="button" class="business-button" value="Bejelentkezés">
+      <input v-if="!isLoggedIn" @click="goToLogin" type="button" class="business-button" value="Bejelentkezés">
     </div>
   </div>
 
-
-  <LabelLec />
 </template>
 
 <script>
-import { computed} from "vue";
+import { computed, ref, onMounted } from "vue";
+import { useRouter } from "vue-router";
 import axios from 'axios';
 import { store } from "../store";
 
-const isLoggedIn = computed(() => store.isLoggedIn);
-
 export default {
-  data() {
-    return {
+  setup() {
+    const isLoggedIn = computed(() => store.isLoggedIn);
+    const businesses = ref([]);
+    const router = useRouter();
+
+    const goToLogin = () => {
+      router.push("/login");
     };
-  },
-  methods: {
+
+    const goToRegister = () => {
+      router.push("/registerChoose");
+    };
+
+    const goToBooking = () => {
+      if(!isLoggedIn){
+        router.push(`/foglalas`);
+      }
+      else{
+        router.push("/login");
+      }
+    };
+
+
+    return { isLoggedIn, goToLogin, goToRegister, goToBooking, businesses };
   },
 };
 </script>
@@ -77,20 +93,21 @@ export default {
   border: none;
   cursor: pointer;
   border-radius: 25px;
+  text-decoration: none;
 }
 
 .home-button {
-  background-color: #9d9ff4;
+  background-color: #6B00D0;
   color: white;
 }
 
 .home-button-register {
   background: transparent;
-  color: #6bb6ea;
+  color: black;
   text-decoration: none;
 }
 .user-button{
-  background-color: #6327A2;
+  background-color: #6B00D0;
   color: white;
   font-size: 20px;
   font-weight: bold;
@@ -174,7 +191,7 @@ export default {
   top: 50%;
   left: 20%;
   transform: translate(-50%, -50%);
-  color: #9d9ff4;
+  color: #6B00D0;
   text-align: left;
   max-width: 550px;
   margin-left: 60px;
@@ -187,7 +204,7 @@ export default {
 
 .harmadik-info-box p {
   font-size: 22px;
-  color: #6bb6ea;
+  color: black;
   text-align: center;
 }
 
