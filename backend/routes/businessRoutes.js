@@ -149,43 +149,32 @@ router.get('/foglalasok/:userId', async (req, res) => {
   }
 });
 
-// Vállalkozások és szolgáltatások lekérdezése
-router.get('/vallalkozasok', async (req, res) => {
-  const query = `
-      SELECT v.*, s.szolgaltatas_neve, s.idotartam, s.ar
-      FROM vallalkozas v
-      LEFT JOIN szolgaltatas s ON v.id = s.vallalkozas_id
-  `;
+router.get('/vallalkozasok', (req, res) => {
+  const category = req.query.category || ''; // Get category from query parameter
+  let query = 'SELECT * FROM vallalkozas'; // Default query (all businesses)
+
+  if (category) {
+    query += ` WHERE category = ?`; // Filter by category if provided
+  }
+
+  db.query(query, [category], (err, result) => {
+    if (err) {
+      res.status(500).json({ message: 'Error fetching businesses', error: err });
+    } else {
+      console.log('Fetched businesses:', result); // Győződj meg róla, hogy a válasz helyes
+      res.json(result); // Return businesses as JSON
+    }
+  });
+});
+
+router.get('/business-categories', async (req, res) => {
   try {
-    const [results] = await db.query(query);
-
-    // Csoportosítás vállalkozás szerint
-    const vallalkozasok = {};
-    results.forEach(row => {
-      if (!vallalkozasok[row.id]) {
-        vallalkozasok[row.id] = {
-          id: row.id,
-          vallalkozas_neve: row.vallalkozas_neve,
-          helyszin: row.helyszin,
-          nyitva_tartas: row.nyitva_tartas,
-          category: row.category,
-          vallalkozo_id: row.vallalkozo_id,
-          szolgaltatasok: []
-        };
-      }
-      if (row.szolgaltatas_neve) {
-        vallalkozasok[row.id].szolgaltatasok.push({
-          szolgaltatas_neve: row.szolgaltatas_neve,
-          idotartam: row.idotartam,
-          ar: row.ar
-        });
-      }
-    });
-
-    res.json(Object.values(vallalkozasok));
-  } catch (err) {
-    console.error("Hiba történt az adatok lekérésekor:", err);
-    res.status(500).json({ error: "Hiba történt az adatok lekérésekor." });
+    // Use async/await for querying the database
+    const [rows] = await db.query('SELECT DISTINCT category FROM vallalkozas');
+    res.json(rows); // Send the result as JSON
+  } catch (error) {
+    console.error('Error fetching categories: ', error);
+    res.status(500).json({ message: 'Error fetching categories', error: error.message });
   }
 });
 
@@ -277,4 +266,4 @@ router.post('/update-user', async (req, res) => {
   }
 });
 
-module.exports = router; // A router exportálása
+module.exports = router;

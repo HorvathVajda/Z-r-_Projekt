@@ -6,10 +6,10 @@
     <div class="category-selector">
       <label for="category-select">Kategória:</label>
       <select v-model="selectedCategory" @change="filterBusinesses">
-        <option value="">Minden kategória</option>
-        <option value="hairdresser">Hajszalon</option>
-        <option value="mechanic">Autószerelő</option>
-        <option value="fitness">Fitness terem</option>
+        <option value="">Minden kategória</option> <!-- Manuálisan hozzáadott "Minden kategória" -->
+        <option v-for="category in categories" :key="category" :value="category">
+          {{ category }}
+        </option>
       </select>
     </div>
 
@@ -20,42 +20,72 @@
         v-for="business in filteredBusinesses"
         :key="business.id"
       >
-        <img :src="business.image" alt="Business Image" class="business-image" />
-        <h3>{{ business.name }}</h3>
-        <p>{{ business.description }}</p>
+        <img src="/as.jpg" alt="Business Image" class="business-image" />
+        <h3>{{ business.vallalkozas_neve }}</h3>
+        <p>{{ business.helyszin }}</p>
+        <p>{{ business.nyitva_tartas }}</p>
         <button @click="selectBusiness(business)">Választás</button>
       </div>
     </div>
   </section>
 </template>
 
+
 <script setup>
-import { ref } from 'vue';
+import { ref, onMounted } from 'vue';
+import axios from 'axios';
 
-const businesses = ref([
-  { id: 1, name: 'Minta Hajszalon', description: 'Professzionális hajápolás', category: 'hairdresser', image: 'path_to_image_1.jpg' },
-  { id: 2, name: 'Autószerelő Műhely', description: 'Gyors és megbízható autószerviz', category: 'mechanic', image: 'path_to_image_2.jpg' },
-  { id: 3, name: 'Fitness Club', description: 'Legújabb fitnesz gépek és órák', category: 'fitness', image: 'path_to_image_3.jpg' },
-  { id: 4, name: 'Hajvágó Szalon', description: 'Stílusos hajvágások minden alkalomra', category: 'hairdresser', image: 'path_to_image_4.jpg' },
-]);
+const businesses = ref([]); // Minden vállalkozás tárolása
+const categories = ref([]); // Kategóriák tárolása
+const selectedCategory = ref(''); // A kiválasztott kategória
+const filteredBusinesses = ref([]); // A szűrt vállalkozások tárolása
 
-const selectedCategory = ref('');
-const filteredBusinesses = ref(businesses.value);
-
-const filterBusinesses = () => {
-  if (selectedCategory.value) {
-    filteredBusinesses.value = businesses.value.filter(
-      (business) => business.category === selectedCategory.value
-    );
-  } else {
-    filteredBusinesses.value = businesses.value;
+const fetchCategories = async () => {
+  try {
+    const response = await axios.get('/api/businesses/business-categories');
+    categories.value = [...new Set(response.data.map((item) => item.category))];
+    console.log('Kategóriák:', categories.value);
+  } catch (error) {
+    console.error('Hiba a kategóriák lekérésekor:', error);
   }
 };
 
-const selectBusiness = (business) => {
-  // Itt később navigálhatsz vagy egyéb műveletet végezhetsz, pl. a foglalás oldalra
-  alert(`Választottad a következőt: ${business.name}`);
+const fetchBusinesses = async () => {
+  try {
+    const response = await axios.get('/api/businesses/vallalkozasok');
+    businesses.value = response.data;
+    console.log('Vállalkozások:', businesses.value);
+    filterBusinesses();
+  } catch (error) {
+    console.error('Hiba a vállalkozások betöltésekor:', error);
+  }
 };
+
+// A szűrés a kiválasztott kategória alapján
+const filterBusinesses = () => {
+  console.log('Szűrés kategória szerint:', selectedCategory.value);
+
+  // Ha nincs kategória kiválasztva, minden vállalkozást megjelenítünk
+  if (selectedCategory.value && selectedCategory.value !== '') {
+    filteredBusinesses.value = businesses.value.filter(
+      (business) => business.category && business.category.toLowerCase() === selectedCategory.value.toLowerCase()
+    );
+
+  } else {
+    filteredBusinesses.value = businesses.value;
+  }
+
+  console.log('Szűrt vállalkozások:', Array.from(filteredBusinesses.value));
+
+};
+const selectBusiness = (business) => {
+  alert(`Választottad a következő vállalkozást: ${business.vallalkozas_neve}`);
+};
+
+onMounted(() => {
+  fetchCategories();
+  fetchBusinesses();
+});
 </script>
 
 <style scoped>
@@ -89,13 +119,14 @@ select {
   padding: 20px;
   border-radius: 10px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 200px;
+  width: 250px; /* A kártyák szélessége megnövelve */
   text-align: center;
-  transition: transform 0.3s;
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
 }
 
 .business-card:hover {
   transform: translateY(-10px);
+  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
 }
 
 .business-image {

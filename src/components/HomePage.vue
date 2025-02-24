@@ -39,7 +39,6 @@
     </div>
   </div>
 
-  <LabelLec />
 </template>
 
 <script>
@@ -53,15 +52,6 @@ export default {
     const isLoggedIn = computed(() => store.isLoggedIn);
     const businesses = ref([]);
     const router = useRouter();
-
-    const fetchBusinesses = async () => {
-      try {
-        const response = await axios.get("http://localhost:3000/api/businesses");
-        businesses.value = response.data;
-      } catch (error) {
-        console.error("Hiba a vállalkozások lekérésekor:", error);
-      }
-    };
 
     const goToLogin = () => {
       router.push("/login");
@@ -80,7 +70,6 @@ export default {
       }
     };
 
-    onMounted(fetchBusinesses);
 
     return { isLoggedIn, goToLogin, goToRegister, goToBooking, businesses };
   },
