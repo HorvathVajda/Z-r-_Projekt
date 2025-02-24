@@ -21,44 +21,33 @@ function verifyToken(req, res, next) {
   });
 }
 
+// A verifyToken middleware eltávolítása minden végpontról
 router.get('/allBusiness', async (req, res) => {
   try {
-    const authData = req.headers.authorization; // Token alapján vállalkozó ID megszerzése
-    if (!authData) return res.status(401).json({ error: 'Nincs jogosultság' });
-
-    const token = authData.split(' ')[1]; // "Bearer <token>" → a token kivétele
-    const decoded = jwt.verify(token, 'titkosKulcs'); // JWT dekódolása
-    const vallalkozo_id = decoded.id; // A tokenből kivesszük a bejelentkezett vállalkozó ID-ját
-
     const [results] = await db.execute(
-      'SELECT * FROM vallalkozas WHERE vallalkozo_id = ?',
-      [vallalkozo_id]
+      'SELECT * FROM vallalkozas'
     );
 
     res.json(results);
-
   } catch (error) {
     console.error('Hiba a vállalkozások lekérdezésénél:', error);
     res.status(500).json({ error: 'Szerverhiba' });
-
   }
 });
 
-
-// Új vállalkozás hozzáadása
-router.post("/add", verifyToken, async (req, res) => {
+// Új vállalkozás hozzáadása, már nincs token ellenőrzés
+router.post("/add", async (req, res) => {
   const { vallalkozas_neve, iranyitoszam, varos, utca, hazszam, ajto, category } = req.body;
 
   if (!vallalkozas_neve || !iranyitoszam || !varos || !utca || !hazszam || !category) {
     return res.status(400).json({ error: "Minden kötelező mezőt ki kell tölteni!" });
   }
 
-  const vallalkozo_id = req.user.id;
   const helyszin = `${iranyitoszam} ${varos} ${utca} ${hazszam}${ajto ? " " + ajto : ""}`;
 
   try {
-    const sql = `INSERT INTO vallalkozas (vallalkozas_neve, helyszin, category, vallalkozo_id) VALUES (?, ?, ?, ?)`;
-    await db.query(sql, [vallalkozas_neve, helyszin, category, vallalkozo_id]);
+    const sql = `INSERT INTO vallalkozas (vallalkozas_neve, helyszin, category) VALUES (?, ?, ?)`;
+    await db.query(sql, [vallalkozas_neve, helyszin, category]);
 
     res.status(201).json({ message: "Vállalkozás sikeresen hozzáadva!" });
   } catch (error) {

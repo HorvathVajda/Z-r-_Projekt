@@ -40,6 +40,7 @@ const categories = ref([]); // Kategóriák tárolása
 const selectedCategory = ref(''); // A kiválasztott kategória
 const filteredBusinesses = ref([]); // A szűrt vállalkozások tárolása
 
+// Kategóriák lekérése
 const fetchCategories = async () => {
   try {
     const response = await axios.get('/api/businesses/business-categories');
@@ -50,43 +51,49 @@ const fetchCategories = async () => {
   }
 };
 
+// Vállalkozások lekérése
 const fetchBusinesses = async () => {
   try {
     const response = await axios.get('/api/businesses/vallalkozasok');
     businesses.value = response.data;
     console.log('Vállalkozások:', businesses.value);
+
+    // A kategóriák ellenőrzése
+    console.log('Vállalkozások kategóriái:', businesses.value.map((business) => business.category));
+
+    // Kategóriák szerinti szűrés
     filterBusinesses();
   } catch (error) {
     console.error('Hiba a vállalkozások betöltésekor:', error);
   }
 };
 
-// A szűrés a kiválasztott kategória alapján
+// Kategóriák szerinti szűrés
 const filterBusinesses = () => {
   console.log('Szűrés kategória szerint:', selectedCategory.value);
 
-  // Ha nincs kategória kiválasztva, minden vállalkozást megjelenítünk
-  if (selectedCategory.value && selectedCategory.value !== '') {
-    filteredBusinesses.value = businesses.value.filter(
-      (business) => business.category && business.category.toLowerCase() === selectedCategory.value.toLowerCase()
-    );
+  // Szűrés a kiválasztott kategória alapján
+  filteredBusinesses.value = selectedCategory.value
+    ? businesses.value.filter((business) =>
+        business.category?.toLowerCase().trim() === selectedCategory.value.toLowerCase().trim()
+      )
+    : businesses.value;
 
-  } else {
-    filteredBusinesses.value = businesses.value;
-  }
-
-  console.log('Szűrt vállalkozások:', Array.from(filteredBusinesses.value));
-
+  console.log('Szűrt vállalkozások:', filteredBusinesses.value);
 };
+
+// Vállalkozás választása
 const selectBusiness = (business) => {
   alert(`Választottad a következő vállalkozást: ${business.vallalkozas_neve}`);
 };
 
+// Adatok lekérése és beállítása az oldal betöltésekor
 onMounted(() => {
   fetchCategories();
   fetchBusinesses();
 });
 </script>
+
 
 <style scoped>
 .business-section {

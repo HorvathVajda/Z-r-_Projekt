@@ -89,6 +89,7 @@
 
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -135,56 +136,15 @@ export default {
   },
   methods: {
     async fetchBusinesses() {
-  try {
-    const authData = JSON.parse(localStorage.getItem('authData'));
-    const token = authData ? authData.token : null;
+      try {
+        const response = await axios.get('/api/businesses/allBusiness');  // A token eltávolítva
 
-    if (!token) {
-      console.error('Token nem található');
-      return;
-    }
+        this.businesses = response.data;
+      } catch (error) {
+        console.error('Hiba a vállalkozások betöltésekor:', error);
+      }
+    },
 
-    const response = await axios.get('/api/businesses/allBusiness', {
-      headers: { Authorization: `Bearer ${token}` }
-    });
-
-    this.businesses = response.data;
-  } catch (error) {
-    console.error('Hiba a vállalkozások betöltésekor:', error);
-  }
-},
-
-    selectBusiness(business) {
-      this.selectedBusiness = business;
-      this.isExpanded = true;
-    },
-    closeExpandedView() {
-      this.isExpanded = false;
-      this.selectedBusiness = null;
-    },
-    openNewForm() {
-      this.showForm = true;
-      this.isEdit = false;
-      this.newBusiness = {
-        vallalkozas_neve: "",
-        iranyitoszam: "",
-        varos: "",
-        utca: "",
-        hazszam: "",
-        ajto: "",
-        category: ""
-      };
-    },
-    openEditForm(business) {
-      this.selectedBusiness = { ...business };
-      this.showForm = true;
-      this.isEdit = true;
-    },
-    closeForm() {
-      this.showForm = false;
-      this.isEdit = false;
-      this.selectedBusiness = null;
-    },
     async updateBusiness() {
       try {
         const updatedBusiness = {
@@ -200,12 +160,7 @@ export default {
 
         const response = await axios.put(
           `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`,
-          updatedBusiness,
-          {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem('token')}`
-            }
-          }
+          updatedBusiness
         );
         console.log('Frissítés sikeres:', response);
         this.fetchBusinesses();
@@ -214,23 +169,13 @@ export default {
         console.error('Hiba a vállalkozás frissítésekor:', error.response ? error.response.data : error.message);
       }
     },
+
     async addBusiness() {
       try {
-        const authData = JSON.parse(localStorage.getItem('authData'));
-        const token = authData ? authData.token : null;
-        if (!token) {
-          console.error('Token is missing');
-          return;
-        }
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
         const response = await axios.post(
           'http://localhost:5000/api/businesses/add',
-          this.newBusiness,
-          {
-            headers: {
-              Authorization: `Bearer ${token}`
-            }
-          }
+          this.newBusiness
         );
         this.businesses.push(response.data);
         this.closeForm();
@@ -238,17 +183,31 @@ export default {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error);
       }
     },
+
     async deleteBusiness(businessId) {
       try {
-        await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`, {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem('token')}`
-          }
-        });
+        await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`);
         this.fetchBusinesses();
       } catch (error) {
         console.error('Hiba a vállalkozás törlésénél:', error);
       }
+    },
+
+    openEditForm(business) {
+      this.selectedBusiness = { ...business };
+      this.showForm = true;
+      this.isEdit = true;
+    },
+
+    closeForm() {
+      this.showForm = false;
+      this.isEdit = false;
+      this.selectedBusiness = null;
+    },
+
+    openNewForm() {
+      this.showForm = true;
+      this.isEdit = false;
     }
   }
 };

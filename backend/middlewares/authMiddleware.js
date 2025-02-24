@@ -1,15 +1,14 @@
 const jwt = require('jsonwebtoken');
 
-
 const authenticateToken = (req, res, next) => {
-  const token = req.header('Authorization')?.split(' ')[1]; 
+  const token = req.header('Authorization')?.split(' ')[1]; // "Bearer token" formátumban
 
   if (!token) return res.status(401).json({ message: 'Nincs token' });
 
   jwt.verify(token, 'titkoskulcs', (err, user) => {
     if (err) return res.status(403).json({ message: 'Érvénytelen token' });
     req.user = user;
-    next();
+    next(); // Itt engedélyezed az adott kérés folytatását
   });
 };
 
