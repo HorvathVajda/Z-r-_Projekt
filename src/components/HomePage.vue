@@ -56,7 +56,7 @@ export default {
 
     const fetchBusinesses = async () => {
       try {
-        const response = await axios.get("http://localhost:3000/api/businesses");
+        const response = await axios.get("http://localhost:5000/api/businesses");
         businesses.value = response.data;
       } catch (error) {
         console.error("Hiba a vállalkozások lekérésekor:", error);
