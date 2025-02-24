@@ -1,0 +1,7 @@
+{
+  "message": "Sikeres bejelentkezés felhasználóként.",
+  "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NCwiZW1haWwiOiJrLmhhbm5hQGdtYWlsLmNvbSIsInRpcHVzIjoiZmVsaGFzem5hbG8iLCJpYXQiOjE3NDAzODA0OTMsImV4cCI6MTc0MDM4NDA5M30.DKwkLyKm2W8sFOXrptcsnOgnFrsGEEGqTMpP7tn7NKM",
+  "expirationTime": 1740384093477,
+  "tipus": "felhasznalo",
+  "id": 4
+}
