@@ -137,7 +137,15 @@ export default {
   methods: {
     async fetchBusinesses() {
       try {
-        const response = await axios.get('/api/businesses/allBusiness');  // A token eltávolítva
+        // Felhasználó email címének lekérése a localStorage-ból
+        const userEmail = JSON.parse(localStorage.getItem('authData')).email;
+
+        // Az email átadása a kérésben
+        const response = await axios.get('/api/businesses/vallalkozo_vallalkozasai', {
+          headers: {
+            'email': userEmail  // Az email átadása a kérés headerében
+          }
+        });
 
         this.businesses = response.data;
       } catch (error) {

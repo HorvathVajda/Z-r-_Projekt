@@ -22,10 +22,19 @@ function verifyToken(req, res, next) {
 }
 
 // A verifyToken middleware eltávolítása minden végpontról
-router.get('/allBusiness', async (req, res) => {
+// A verifyToken middleware eltávolítása minden végpontról
+router.get('/vallalkozo_vallalkozasai', async (req, res) => {
   try {
+    const userEmail = req.headers['email'];  // Az email headerből történő lekérés
+
+    // Ha nincs email, hibát adunk vissza
+    if (!userEmail) {
+      return res.status(400).json({ error: 'Nincs bejelentkezett felhasználó.' });
+    }
+
     const [results] = await db.execute(
-      'SELECT * FROM vallalkozas'
+      'SELECT * FROM vallalkozas WHERE email = ?',
+      [userEmail]
     );
 
     res.json(results);
@@ -34,6 +43,7 @@ router.get('/allBusiness', async (req, res) => {
     res.status(500).json({ error: 'Szerverhiba' });
   }
 });
+
 
 // Új vállalkozás hozzáadása, már nincs token ellenőrzés
 router.post("/add", async (req, res) => {
