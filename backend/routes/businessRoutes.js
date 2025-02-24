@@ -21,7 +21,7 @@ function verifyToken(req, res, next) {
   });
 }
 
-router.get('/', async (req, res) => {
+router.get('/allBusiness', async (req, res) => {
   try {
     const authData = req.headers.authorization; // Token alapján vállalkozó ID megszerzése
     if (!authData) return res.status(401).json({ error: 'Nincs jogosultság' });
@@ -31,7 +31,7 @@ router.get('/', async (req, res) => {
     const vallalkozo_id = decoded.id; // A tokenből kivesszük a bejelentkezett vállalkozó ID-ját
 
     const [results] = await db.execute(
-      'SELECT * FROM vallalkozasok WHERE vallalkozo_id = ?',
+      'SELECT * FROM vallalkozas WHERE vallalkozo_id = ?',
       [vallalkozo_id]
     );
 

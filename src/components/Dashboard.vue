@@ -144,7 +144,7 @@ export default {
       return;
     }
 
-    const response = await axios.get('http://localhost:5000/api/businesses', {
+    const response = await axios.get('/api/businesses/allBusiness', {
       headers: { Authorization: `Bearer ${token}` }
     });
 
