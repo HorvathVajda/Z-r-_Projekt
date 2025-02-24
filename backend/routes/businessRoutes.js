@@ -27,7 +27,7 @@ router.get('/allBusiness', async (req, res) => {
     if (!authData) return res.status(401).json({ error: 'Nincs jogosultság' });
 
     const token = authData.split(' ')[1]; // "Bearer <token>" → a token kivétele
-    const decoded = jwt.verify(token, 'sajatTitkosKulcs'); // JWT dekódolása
+    const decoded = jwt.verify(token, 'titkosKulcs'); // JWT dekódolása
     const vallalkozo_id = decoded.id; // A tokenből kivesszük a bejelentkezett vállalkozó ID-ját
 
     const [results] = await db.execute(
@@ -36,9 +36,11 @@ router.get('/allBusiness', async (req, res) => {
     );
 
     res.json(results);
+
   } catch (error) {
     console.error('Hiba a vállalkozások lekérdezésénél:', error);
     res.status(500).json({ error: 'Szerverhiba' });
+
   }
 });
 
@@ -67,7 +69,6 @@ router.post("/add", verifyToken, async (req, res) => {
 
 router.post('/update-bio', async (req, res) => {
   const { vallalkozo_id, bio } = req.body;
-  console.log("Request Body:", req.body);  // Add this line for debugging
 
   if (!vallalkozo_id || !bio) {
     return res.status(400).json({ message: 'Vállalkozó ID és bio mezők szükségesek' });
