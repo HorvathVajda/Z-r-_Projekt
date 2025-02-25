@@ -57,49 +57,110 @@ export default {
   methods: {
     async fetchSzolgaltatasok() {
       try {
-        const response = await axios.get("/api/foglalasok/szolgaltatasok");
+        // Token lekérése a localStorage-ból
+        const token = JSON.parse(localStorage.getItem('authData')).token;
+
+        // API hívás a megfelelő fejléc hozzáadásával
+        const response = await axios.get("/api/foglalasok/szolgaltatasok", {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
+        // A válasz tárolása a szolgáltatások tömbben
         this.szolgaltatasok = response.data;
       } catch (error) {
         console.error("Hiba a szolgáltatások lekérdezésekor:", error);
+        alert("Hiba történt a szolgáltatások lekérésekor!");
       }
     },
     async fetchSzabadIdopontok(szolgaltatasId) {
       this.selectedSzolgaltatasId = szolgaltatasId; // Store the selected service ID
       try {
-        const response = await axios.get(`/api/foglalasok/szabad-idopontok/${szolgaltatasId}`);
+        // Token lekérése a localStorage-ból
+        const token = JSON.parse(localStorage.getItem('authData')).token;
+
+        if (!token) {
+          throw new Error("Token nem található.");
+        }
+
+        // API hívás a megfelelő fejléc hozzáadásával
+        const response = await axios.get(`/api/foglalasok/szabad-idopontok/${szolgaltatasId}`, {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        });
+
         this.szabadIdopontok = response.data;
         this.modalVisible = true; // Open the modal
       } catch (error) {
         console.error("Hiba a szabad időpontok lekérésekor:", error);
+        alert("Hiba történt a szabad időpontok lekérésekor.");
       }
     },
-
     async bookAppointment() {
+      console.log({
+        szolgaltatas_id: this.selectedSzolgaltatasId,
+        ido_id: this.selectedIdo,
+        felhasznalo_id: this.getUserId(),
+        vallalkozas_id: this.getVallalkozasId() // Új függvény, ha vállalkozóról van szó
+      });
+
       if (this.selectedIdo && this.selectedSzolgaltatasId) {
         try {
           const response = await axios.post('/api/foglalasok/foglalas', {
             szolgaltatas_id: this.selectedSzolgaltatasId,
             ido_id: this.selectedIdo,
-            felhasznalo_id: this.getUserId(),
+            felhasznalo_id: this.getUserId() ? this.getUserId() : null,
+            vallalkozas_id: this.getVallalkozasId() ? this.getVallalkozasId() : null
           });
 
-          if (response.data.success || response.data.message) {
+          if (response.data.message) {
             alert("A foglalás sikeresen megtörtént!");
-            this.modalVisible = false; // Close the modal
-          } else {
-            alert('Ez az időpont már foglalt!');
+            this.modalVisible = false;
+            this.selectedIdo = null;
+          } else if (response.data.error) {
+            alert(response.data.error);
           }
         } catch (error) {
           console.error('Hiba a foglalás során:', error);
           alert('Hiba történt a foglalás során!');
         }
       } else {
-        alert('Kérjük válasszon szolgáltatást és időpontot!');
+        alert('Kérjük, válasszon szolgáltatást és időpontot!');
       }
     },
-    getUserId() {
-      return JSON.parse(localStorage.getItem('authData')).id;
+
+    getVallalkozasId() {
+      const authData = localStorage.getItem('authData');
+      if (authData) {
+        try {
+          const parsedData = JSON.parse(authData);
+          return parsedData.tipus === 'vallalkozo' ? parsedData.id : null;
+        } catch (error) {
+          console.error("Hiba az authData parse során:", error);
+          return null;
+        }
+      }
+      console.warn("authData nem található a localStorage-ban.");
+      return null;
     },
+
+    getUserId() {
+      const authData = localStorage.getItem('authData');
+      if (authData) {
+        try {
+          const parsedData = JSON.parse(authData);
+          return parsedData.id;
+        } catch (error) {
+          console.error("Hiba az authData parse során:", error);
+          return null;
+        }
+      }
+      console.warn("authData nem található a localStorage-ban.");
+      return null;
+    },
+
   },
 };
 </script>
