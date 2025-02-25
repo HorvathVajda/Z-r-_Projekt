@@ -1,6 +1,7 @@
 const express = require("express");
 const authRoutes = require("../routes/authRoutes");
 const businessRoutes = require("../routes/businessRoutes");
+const bookingRoutes = require("../routes/bookingRoutes");
 const cors = require("cors");
 const dotenv = require("dotenv");
 const db = require("./db");
@@ -26,6 +27,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/businesses", businessRoutes);
+app.use("/api/foglalas", bookingRoutes);
 
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");

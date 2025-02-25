@@ -1,176 +1,146 @@
 <template>
-  <div class="foglalas-container">
-    <h1>Foglalás</h1>
-    <div v-if="vallalkozasok.length === 0">Nincsenek elérhető vállalkozások.</div>
-
-    <div v-for="vallalkozas in vallalkozasok" :key="vallalkozas.id" class="vallalkozas-card">
-      <h2>{{ vallalkozas.vallalkozas_neve }}</h2>
-      <p><strong>Helyszín:</strong> {{ vallalkozas.helyszin }}</p>
-      <p><strong>Nyitvatartás:</strong> {{ vallalkozas.nyitva_tartas }}</p>
-
-      <h3>Szolgáltatások</h3>
-      <ul>
-        <li v-for="szolg in vallalkozas.szolgaltatasok" :key="szolg.szolgaltatas_id">
-          {{ szolg.szolgaltatas_neve }} - {{ szolg.idotartam }} perc - {{ szolg.ar }} Ft
-          <button @click="selectService(vallalkozas.id, szolg.szolgaltatas_id, szolg.szolgaltatas_neve)">Select Service</button>
-        </li>
-      </ul>
-
+  <div class="container">
+    <h2>Szolgáltatások</h2>
+    <div class="cards">
+      <div
+        v-for="szolgaltatas in szolgaltatasok"
+        :key="szolgaltatas.szolgaltatas_id"
+        class="card"
+      >
+        <h3>{{ szolgaltatas.szolgaltatas_neve }}</h3>
+        <p><strong>Vállalkozás:</strong> {{ szolgaltatas.vallalkozas_neve }}</p>
+        <p><strong>Időtartam:</strong> {{ szolgaltatas.idotartam }} perc</p>
+        <p><strong>Ár:</strong> {{ szolgaltatas.ar }} Ft</p>
+        <button @click="fetchSzabadIdopontok(szolgaltatas.szolgaltatas_id)">
+          Szabad időpontok
+        </button>
+      </div>
     </div>
 
-    <!-- Kiválasztott szolgáltatás és időpont panel -->
-    <div v-if="selectedService" class="foglalas-panel">
-      <h2>Foglalás részletei</h2>
-      <p><strong>Szolgáltatás:</strong> {{ selectedService.name }}</p>
-
-      <!-- Időpont kiválasztás -->
-      <label for="selectedTime">Válassz időpontot:</label>
-      <select v-model="selectedTime" id="selectedTime">
-        <option v-for="ido in availableTimes" :key="ido.ido_id" :value="ido.szabad_ido">
-          {{ ido.szabad_ido }}
-        </option>
-      </select>
-
-      <button @click="submitBooking">Foglalás megerősítése</button>
+    <!-- Modal for free time slots -->
+    <div v-if="modalVisible" class="modal">
+      <div class="modal-content">
+        <span class="close" @click="modalVisible = false">&times;</span>
+        <h3>Szabad időpontok</h3>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
+import axios from "axios";
+
 
 export default {
   data() {
     return {
-      vallalkozasok: [],   // Az elérhető vállalkozások
-      selectedService: null, // Kiválasztott szolgáltatás
-      selectedTime: null,   // Kiválasztott időpont
-      availableTimes: [],   // Elérhető időpontok a szolgáltatáshoz
+      szolgaltatasok: [],
+      modalVisible: false,
+      szabadIdopontok: [],
+      selectedDate: new Date().toISOString().substr(0, 10), // Kezdeti kiválasztott dátum
+      events: [], // A naptár eseményei (szabad időpontok
     };
   },
-  methods: {
-    async fetchVallalkozasok() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/businesses/vallalkozasok');
-        this.vallalkozasok = response.data;
-
-        // Ha szükséges, ellenőrizd, hogy a szolgáltatásokat is helyesen töltöd be
-        this.vallalkozasok.forEach(vallalkozas => {
-          vallalkozas.szolgaltatasok = vallalkozas.szolgaltatasok || [];  // Alapértelmezett üres tömb, ha nincs adat
-        });
-      } catch (error) {
-        console.error("Hiba történt a vállalkozások lekérésekor:", error);
-      }
-    },
-
-    selectService(vallalkozas_id, szolgaltatas_id, szolgaltatas_neve) {
-      if (szolgaltatas_id && szolgaltatas_id !== undefined && szolgaltatas_id !== null) {
-        this.selectedService = { id: szolgaltatas_id, name: szolgaltatas_neve };
-        this.fetchAvailableTimes(vallalkozas_id, szolgaltatas_id);
-      } else {
-        console.error("Szolgáltatás ID hiányzik!");
-      }
-    },
-
-    async fetchAvailableTimes(vallalkozas_id, szolgaltatas_id) {
-      if (!vallalkozas_id || !szolgaltatas_id) {
-        console.error("Hibás paraméterek a lekérdezéshez:", vallalkozas_id, szolgaltatas_id);
-        return;
-      }
-
-      try {
-        const response = await axios.get(`http://localhost:5000/api/businesses/ido/${vallalkozas_id}/${szolgaltatas_id}`);
-        this.availableTimes = response.data;
-      } catch (error) {
-        console.error("Hiba történt az elérhető időpontok lekérésekor:", error);
-      }
-    },
-
-    submitBooking() {
-      if (!this.selectedTime) {
-        alert("Kérlek, válassz időpontot!");
-        return;
-      }
-
-      const bookingData = {
-        szolgaltatas_id: this.selectedService.id,
-        idopont: this.selectedTime,
-        felhasznalo_id: 1, // Cseréld ki az aktuális felhasználó ID-jére
-        statusz: 'pending', // Alapértelmezett státusz
-      };
-
-      axios.post("http://localhost:5000/api/businesses/foglalas", bookingData)
-        .then(response => {
-          alert(response.data.message);
-          this.selectedService = null; // Töröljük a kiválasztott szolgáltatást
-          this.selectedTime = null;   // Töröljük a kiválasztott időpontot
-        })
-        .catch(error => {
-          console.error("Hiba történt a foglalás mentésekor:", error);
-        });
-    },
+  components: {
+    
   },
   mounted() {
-    this.fetchVallalkozasok();
+    this.fetchSzolgaltatasok();
+  },
+  methods: {
+    async fetchSzolgaltatasok() {
+      try {
+        const response = await axios.get("/api/foglalas/szolgaltatasok");
+        this.szolgaltatasok = response.data;
+      } catch (error) {
+        console.error("Hiba a szolgáltatások lekérdezésekor:", error);
+      }
+    },
+    async fetchSzabadIdopontok(szolgaltatasId) {
+      try {
+        // API hívás, hogy lekérjük a szabad időpontokat a választott szolgáltatáshoz
+        const response = await axios.get(`/api/foglalas/szabad-idopontok/${szolgaltatasId}`);
+        this.szabadIdopontok = response.data;
+
+        // A válaszban lévő időpontokat hozzuk létre eseményekként a naptárhoz
+        this.events = this.szabadIdopontok.map((ido) => ({
+          name: "Szabad időpont",
+          start: ido.szabad_ido, // Az időpontokat a megfelelő formátumban kell beállítani
+          end: ido.szabad_ido,
+        }));
+
+        // Modal megjelenítése
+        this.modalVisible = true;
+      } catch (error) {
+        console.error("Hiba a szabad időpontok lekérésekor:", error);
+      }
+    },
   },
 };
 </script>
 
 <style scoped>
-.foglalas-container {
-  max-width: 1400px;
-  margin: 0 auto;
-  margin-top: 80px;
-}
-
-.vallalkozas-card {
-  margin-bottom: 30px;
+.container {
   padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
+  max-width: 1200px;
+  margin: auto;
 }
 
-.foglalas-panel {
-  margin-top: 30px;
-  padding: 20px;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  background-color: #f9f9f9;
-}
-
-button {
-  background-color: #6327A2;
-  color: white;
-  border: none;
-  padding: 8px 16px;
+h2 {
   text-align: center;
-  font-size: 16px;
-  border-radius: 20px;
-  cursor: pointer;
-  transition: background-color 0.5s, transform 0.4s;
-  margin: 3px;
-  margin-left: 10px;
+  margin-bottom: 20px;
 }
 
-button:hover {
-  background-color: #9d9ff4;
-  transform: translateX(5%);
+.cards {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  justify-content: center;
 }
 
-select {
-  padding: 8px;
-  font-size: 16px;
-  margin-top: 10px;
-  width: 100%;
+.card {
+  background: #222;
+  color: #fff;
+  padding: 15px;
+  border-radius: 10px;
+  width: 280px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
+  text-align: center;
 }
 
-h2, h3 {
+.card h3 {
   margin-bottom: 10px;
 }
 
-label {
-  font-size: 16px;
-  margin-bottom: 5px;
+.card p {
+  margin: 5px 0;
+}
+
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  width: 80%;
+  max-width: 600px;
+}
+
+.close {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 30px;
+  cursor: pointer;
 }
 </style>

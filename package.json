@@ -10,7 +10,7 @@
     "lint": "eslint . --fix"
   },
   "dependencies": {
-    "@fortawesome/fontawesome-free": "^6.6.0",
+    "@fortawesome/fontawesome-free": "^6.7.2",
     "axios": "^1.7.8",
     "bcrypt": "^5.1.1",
     "bcryptjs": "^2.4.3",
@@ -25,16 +25,19 @@
     "mongoose": "^8.9.1",
     "mysql": "^2.18.1",
     "mysql2": "^3.11.4",
+    "vite-plugin-vuetify": "^2.1.0",
     "vue": "^3.5.12",
     "vue-router": "^4.4.5",
+    "vue3-calendar": "^0.1.2",
+    "vuetify": "^3.7.13",
     "vuex": "^4.0.2"
   },
   "devDependencies": {
     "@eslint/js": "^9.14.0",
-    "@vitejs/plugin-vue": "^5.1.4",
+    "@vitejs/plugin-vue": "^5.2.1",
     "eslint": "^9.14.0",
     "eslint-plugin-vue": "^9.30.0",
-    "vite": "^5.4.11",
+    "vite": "^6.2.0",
     "vite-plugin-vue-devtools": "^7.5.4"
   }
 }
