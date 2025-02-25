@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Feb 18. 12:35
+-- Létrehozás ideje: 2025. Feb 25. 12:30
 -- Kiszolgáló verziója: 10.4.32-MariaDB
 -- PHP verzió: 8.2.12
 
@@ -42,8 +42,7 @@ CREATE TABLE `felhasznalo` (
 INSERT INTO `felhasznalo` (`felhasznalo_id`, `nev`, `email`, `jelszo`, `telefonszam`) VALUES
 (1, 'Péter Kiss', 'peter.kiss@example.com', 'password123', '06123456788'),
 (2, 'Anna Varga', 'anna.varga@example.com', 'securepass', '06234567890'),
-(3, 'Zoltán Farkas', 'zoltan.farkas@example.com', 'strongpass', '06301234568'),
-(4, 'asd', 'asd@g.c', '$2b$10$wXlvwH/UtApaAOjJKvWxmegALKX58TsNUcunXlp8d7r/V/Rh3hGSi', '88971885');
+(3, 'Zoltán Farkas', 'zoltan.farkas@example.com', 'strongpass', '06301234568');
 
 -- --------------------------------------------------------
 
@@ -59,15 +58,6 @@ CREATE TABLE `foglalasok` (
   `statusz` enum('szabad','foglalt') DEFAULT 'szabad',
   `foglalas_datum` datetime DEFAULT current_timestamp()
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
-
---
--- A tábla adatainak kiíratása `foglalasok`
---
-
-INSERT INTO `foglalasok` (`foglalas_id`, `szolgaltatas_id`, `ido_id`, `felhasznalo_id`, `statusz`, `foglalas_datum`) VALUES
-(1, 1, 1, 1, 'foglalt', '2025-02-18 12:00:00'),
-(2, 2, 3, 2, 'foglalt', '2025-02-19 10:00:00'),
-(3, 3, 4, 3, 'foglalt', '2025-02-20 08:00:00');
 
 -- --------------------------------------------------------
 
@@ -87,13 +77,30 @@ CREATE TABLE `idopontok` (
 --
 
 INSERT INTO `idopontok` (`ido_id`, `szabad_ido`, `statusz`, `szolgaltatas_id`) VALUES
-(1, '2025-02-20 09:00:00', 'szabad', 1),
-(2, '2025-02-20 09:30:00', 'szabad', 1),
-(3, '2025-02-20 10:00:00', 'szabad', 2),
-(4, '2025-02-20 08:00:00', 'szabad', 3),
-(5, '2025-02-20 09:00:00', 'szabad', 4),
-(6, '2025-02-20 13:00:00', 'szabad', 5),
-(7, '2025-02-20 15:00:00', 'szabad', 6);
+(38, '2025-02-20 09:00:00', 'szabad', 1),
+(39, '2025-02-20 09:30:00', 'szabad', 1),
+(40, '2025-02-20 10:00:00', 'szabad', 2),
+(41, '2025-02-20 10:30:00', 'szabad', 2),
+(42, '2025-02-20 11:00:00', 'szabad', 3),
+(43, '2025-02-20 11:30:00', 'szabad', 3),
+(44, '2025-02-20 08:00:00', 'szabad', 4),
+(45, '2025-02-20 08:30:00', 'szabad', 4),
+(46, '2025-02-20 09:00:00', 'szabad', 5),
+(47, '2025-02-20 09:30:00', 'szabad', 5),
+(48, '2025-02-20 10:00:00', 'szabad', 6),
+(49, '2025-02-20 10:30:00', 'szabad', 6),
+(50, '2025-02-20 13:00:00', 'szabad', 7),
+(51, '2025-02-20 13:30:00', 'szabad', 7),
+(52, '2025-02-20 14:00:00', 'szabad', 8),
+(53, '2025-02-20 14:30:00', 'szabad', 8),
+(54, '2025-02-20 15:00:00', 'szabad', 9),
+(55, '2025-02-20 15:30:00', 'szabad', 9),
+(56, '2025-02-20 09:00:00', 'szabad', 10),
+(57, '2025-02-20 09:30:00', 'szabad', 10),
+(58, '2025-02-20 10:00:00', 'szabad', 11),
+(59, '2025-02-20 10:30:00', 'szabad', 11),
+(60, '2025-02-20 11:00:00', 'szabad', 12),
+(61, '2025-02-20 11:30:00', 'szabad', 12);
 
 -- --------------------------------------------------------
 
@@ -116,10 +123,16 @@ CREATE TABLE `szolgaltatas` (
 INSERT INTO `szolgaltatas` (`szolgaltatas_id`, `szolgaltatas_neve`, `idotartam`, `ar`, `vallalkozas_id`) VALUES
 (1, 'Hajvágás', 30, 3000.00, 1),
 (2, 'Körömfestés', 45, 4000.00, 1),
-(3, 'Autóolaj csere', 60, 15000.00, 2),
-(4, 'Motorkerékpár javítás', 120, 25000.00, 2),
-(5, 'Belső festés', 180, 35000.00, 3),
-(6, 'Külső festés', 240, 45000.00, 3);
+(3, 'Hajfestés', 60, 5000.00, 1),
+(4, 'Autóolaj csere', 60, 15000.00, 2),
+(5, 'Motorkerékpár javítás', 120, 25000.00, 2),
+(6, 'Gumiabroncs csere', 90, 12000.00, 2),
+(7, 'Belső festés', 180, 35000.00, 3),
+(8, 'Külső festés', 240, 45000.00, 3),
+(9, 'Dekoratív festés', 120, 25000.00, 3),
+(10, 'Hajvágás', 30, 3000.00, 5),
+(11, 'Körömfestés', 45, 4000.00, 5),
+(12, 'Hajformázás', 60, 3500.00, 5);
 
 -- --------------------------------------------------------
 
@@ -143,7 +156,8 @@ CREATE TABLE `vallalkozas` (
 INSERT INTO `vallalkozas` (`id`, `vallalkozas_neve`, `helyszin`, `nyitva_tartas`, `category`, `vallalkozo_id`) VALUES
 (1, 'Kovács Fodrászat', 'Budapest, Kossuth Lajos utca 10.', 'Hétfőtől Péntekig: 09:00 - 18:00', 'Szépségipar', 1),
 (2, 'Szabó Autószerviz', 'Budapest, Petőfi Sándor utca 5.', 'Hétfőtől Szombatig: 08:00 - 20:00', 'Autószerviz', 2),
-(3, 'Nagy Festészet', 'Budapest, Andrássy út 30.', 'Hétfőtől Péntekig: 10:00 - 17:00', 'Festészet', 3);
+(3, 'Nagy Festészet', 'Budapest, Andrássy út 30.', 'Hétfőtől Péntekig: 10:00 - 17:00', 'Festészet', 3),
+(5, 'pityuka fodraszata', '6033 Városföld Béke 2', 'Hétfőtől Péntekig: 09:00 - 18:00', 'Fodraszat', 4);
 
 -- --------------------------------------------------------
 
@@ -167,7 +181,8 @@ CREATE TABLE `vallalkozo` (
 INSERT INTO `vallalkozo` (`vallalkozo_id`, `nev`, `email`, `jelszo`, `telefonszam`, `bio`) VALUES
 (1, 'János Kovács', 'janos.kovacs@example.com', 'jelszo123', '06123456789', 'Szakértő fodrász, több éves tapasztalattal.'),
 (2, 'Erika Szabó', 'erika.szabo@example.com', 'titkosjelszo', '06201234567', 'Professzionális autószerelő, gyors és megbízható szolgáltatás.'),
-(3, 'Gábor Nagy', 'gabor.nagy@example.com', 'password456', '06301234567', 'Mindenféle festést vállalok, legyen szó belső vagy külső munkálatokról.');
+(3, 'Gábor Nagy', 'gabor.nagy@example.com', 'password456', '06301234567', 'Mindenféle festést vállalok, legyen szó belső vagy külső munkálatokról.'),
+(4, 'pista', 'p@g.c', '$2b$10$rpq9D3wlsr7O14qjK8I6pOCDrYL7HQRYgWu6ISqNo/o8mo.GJZ1Nm', '06044444', NULL);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -225,37 +240,37 @@ ALTER TABLE `vallalkozo`
 -- AUTO_INCREMENT a táblához `felhasznalo`
 --
 ALTER TABLE `felhasznalo`
-  MODIFY `felhasznalo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
+  MODIFY `felhasznalo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
 
 --
 -- AUTO_INCREMENT a táblához `foglalasok`
 --
 ALTER TABLE `foglalasok`
-  MODIFY `foglalas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `foglalas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=10;
 
 --
 -- AUTO_INCREMENT a táblához `idopontok`
 --
 ALTER TABLE `idopontok`
-  MODIFY `ido_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=8;
+  MODIFY `ido_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=62;
 
 --
 -- AUTO_INCREMENT a táblához `szolgaltatas`
 --
 ALTER TABLE `szolgaltatas`
-  MODIFY `szolgaltatas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=7;
+  MODIFY `szolgaltatas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=13;
 
 --
 -- AUTO_INCREMENT a táblához `vallalkozas`
 --
 ALTER TABLE `vallalkozas`
-  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
 
 --
 -- AUTO_INCREMENT a táblához `vallalkozo`
 --
 ALTER TABLE `vallalkozo`
-  MODIFY `vallalkozo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=4;
+  MODIFY `vallalkozo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=5;
 
 --
 -- Megkötések a kiírt táblákhoz

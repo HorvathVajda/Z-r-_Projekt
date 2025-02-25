@@ -28,11 +28,11 @@ app.get("/api/categories", async (req, res) => {
   try {
     // Lekérjük az egyedi kategóriákat a vallalkozas táblából
     const [results] = await db.query("SELECT DISTINCT categories FROM vallalkozas");
-    
+
     if (!results || results.length === 0) {
       return res.status(404).json({ message: 'Nincs elérhető kategória.' });
     }
-    
+
     res.json(results);
   } catch (err) {
     console.error(err);
@@ -56,7 +56,7 @@ app.use(express.json());
 
 app.use("/api/auth", authRoutes);
 app.use("/api/businesses", businessRoutes);
-app.use("/api/foglalas", bookingRoutes);
+app.use("/api/foglalasok", bookingRoutes);
 
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");

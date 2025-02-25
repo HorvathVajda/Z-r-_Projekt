@@ -22,6 +22,17 @@
       <div class="modal-content">
         <span class="close" @click="modalVisible = false">&times;</span>
         <h3>Szabad időpontok</h3>
+        <form>
+          <ul>
+            <li v-for="ido in szabadIdopontok" :key="ido.ido_id">
+              <label>
+                <input type="radio" :value="ido.ido_id" v-model="selectedIdo">
+                {{ ido.szabad_ido }} - {{ ido.statusz }}
+              </label>
+            </li>
+          </ul>
+        </form>
+        <button class="foglalas-btn" @click="bookAppointment">Foglalás</button>
       </div>
     </div>
   </div>
@@ -30,19 +41,15 @@
 <script>
 import axios from "axios";
 
-
 export default {
   data() {
     return {
       szolgaltatasok: [],
       modalVisible: false,
       szabadIdopontok: [],
-      selectedDate: new Date().toISOString().substr(0, 10), // Kezdeti kiválasztott dátum
-      events: [], // A naptár eseményei (szabad időpontok
+      selectedIdo: null,
+      selectedSzolgaltatasId: null, // Store the selected service ID
     };
-  },
-  components: {
-    
   },
   mounted() {
     this.fetchSzolgaltatasok();
@@ -50,30 +57,48 @@ export default {
   methods: {
     async fetchSzolgaltatasok() {
       try {
-        const response = await axios.get("/api/foglalas/szolgaltatasok");
+        const response = await axios.get("/api/foglalasok/szolgaltatasok");
         this.szolgaltatasok = response.data;
       } catch (error) {
         console.error("Hiba a szolgáltatások lekérdezésekor:", error);
       }
     },
     async fetchSzabadIdopontok(szolgaltatasId) {
+      this.selectedSzolgaltatasId = szolgaltatasId; // Store the selected service ID
       try {
-        // API hívás, hogy lekérjük a szabad időpontokat a választott szolgáltatáshoz
-        const response = await axios.get(`/api/foglalas/szabad-idopontok/${szolgaltatasId}`);
+        const response = await axios.get(`/api/foglalasok/szabad-idopontok/${szolgaltatasId}`);
         this.szabadIdopontok = response.data;
-
-        // A válaszban lévő időpontokat hozzuk létre eseményekként a naptárhoz
-        this.events = this.szabadIdopontok.map((ido) => ({
-          name: "Szabad időpont",
-          start: ido.szabad_ido, // Az időpontokat a megfelelő formátumban kell beállítani
-          end: ido.szabad_ido,
-        }));
-
-        // Modal megjelenítése
-        this.modalVisible = true;
+        this.modalVisible = true; // Open the modal
       } catch (error) {
         console.error("Hiba a szabad időpontok lekérésekor:", error);
       }
+    },
+
+    async bookAppointment() {
+      if (this.selectedIdo && this.selectedSzolgaltatasId) {
+        try {
+          const response = await axios.post('/api/foglalasok/foglalas', {
+            szolgaltatas_id: this.selectedSzolgaltatasId,
+            ido_id: this.selectedIdo,
+            felhasznalo_id: this.getUserId(),
+          });
+
+          if (response.data.success || response.data.message) {
+            alert("A foglalás sikeresen megtörtént!");
+            this.modalVisible = false; // Close the modal
+          } else {
+            alert('Ez az időpont már foglalt!');
+          }
+        } catch (error) {
+          console.error('Hiba a foglalás során:', error);
+          alert('Hiba történt a foglalás során!');
+        }
+      } else {
+        alert('Kérjük válasszon szolgáltatást és időpontot!');
+      }
+    },
+    getUserId() {
+      return JSON.parse(localStorage.getItem('authData')).id;
     },
   },
 };
@@ -103,7 +128,7 @@ h2 {
   color: #fff;
   padding: 15px;
   border-radius: 10px;
-  width: 280px;
+  width: 350px;
   box-shadow: 0 4px 6px rgba(0, 0, 0, 0.3);
   text-align: center;
 }
@@ -116,31 +141,74 @@ h2 {
   margin: 5px 0;
 }
 
+button {
+  padding: 10px;
+  background-color: #6b00d0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+}
+
+button:hover {
+  background-color: #7600e5;
+  transform: scale(1.05);
+}
+
+/* Modal Styles */
 .modal {
   position: fixed;
-  top: 0;
+  z-index: 1;
   left: 0;
-  right: 0;
-  bottom: 0;
-  background: rgba(0, 0, 0, 0.5);
+  top: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.4);
   display: flex;
   justify-content: center;
   align-items: center;
 }
 
 .modal-content {
-  background: #fff;
+  background-color: white;
   padding: 20px;
   border-radius: 10px;
-  width: 80%;
-  max-width: 600px;
+  width: 500px;
+  height: 400px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between; /* Ensures space between content and button */
+}
+
+.foglalas-btn {
+  padding: 10px;
+  background-color: #6b00d0;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: transform 0.3s ease, background-color 0.3s ease;
+  margin-top: auto; /* Pushes the button to the bottom */
+}
+
+.foglalas-btn:hover {
+  background-color: #7600e5;
+  transform: scale(1.05);
 }
 
 .close {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  font-size: 30px;
+  color: black;
+  font-size: 28px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+.close:hover,
+.close:focus {
+  color: red;
+  text-decoration: none;
   cursor: pointer;
 }
 </style>
