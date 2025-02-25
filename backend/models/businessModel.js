@@ -1,16 +1,48 @@
-const mongoose = require('mongoose');
+const db = require('../config/db'); // Ha a db kapcsolatot a config mappában tárolod
 
-const businessSchema = new mongoose.Schema({
-  vallalkozas_neve: { type: String, required: true },
-  iranyitoszam: { type: String, required: true },
-  varos: { type: String, required: true },
-  utca: { type: String, required: true },
-  hazszam: { type: String, required: true },
-  ajto: { type: String },
-  category: { type: String, required: true },
-  helyszin: { type: String }
-});
+// Vállalkozások lekérése
+const getAllBusinesses = async () => {
+  const [rows] = await db.query("SELECT * FROM vallalkozas");
+  return rows;
+};
 
-const Business = mongoose.model('Business', businessSchema);
+// Új vállalkozás hozzáadása
+const addNewBusiness = async (name, category, location) => {
+  const [result] = await db.query(
+    "INSERT INTO vallalkozas (name, category, location) VALUES (?, ?, ?)",
+    [name, category, location]
+  );
+  return { id: result.insertId, name, category, location };
+};
 
-module.exports = Business;
+// Vállalkozás frissítése
+const updateBusiness = async (id, updates) => {
+  const [result] = await db.query(
+    "UPDATE vallalkozas SET name = ?, category = ?, location = ? WHERE id = ?",
+    [updates.name, updates.category, updates.location, id]
+  );
+  return result.affectedRows ? { id, ...updates } : null;
+};
+
+// Vállalkozás törlése
+const deleteBusiness = async (id) => {
+  const [result] = await db.query(
+    "DELETE FROM vallalkozas WHERE id = ?",
+    [id]
+  );
+  return result.affectedRows ? { message: "Vállalkozás törölve." } : null;
+};
+
+// Kategóriák lekérése
+const getCategories = async () => {
+  const [rows] = await db.query("SELECT DISTINCT category FROM vallalkozas");
+  return rows;
+};
+
+module.exports = {
+  getAllBusinesses,
+  addNewBusiness,
+  updateBusiness,
+  deleteBusiness,
+  getCategories
+};

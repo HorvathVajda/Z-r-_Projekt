@@ -60,6 +60,7 @@
                 :id="key"
                 v-model="activeBusiness.category"
                 required
+                @change="handleCategoryChange"
               >
                 <option value="" disabled selected>Válassz típust</option>
                 <option value="Fodraszat">Fodrászat</option>
@@ -69,7 +70,14 @@
                 <option value="Kozmetika">Kozmetikai szalon</option>
                 <option value="Kutyakozmetika">Kutyakozmetika</option>
                 <option value="SzemelyiEdzo">Személyi edző</option>
+                <option value="other">Más...</option>
               </select>
+              <input
+                v-if="showCustomCategoryInput"
+                type="text"
+                v-model="customCategory"
+                placeholder="Írd be az új vállalkozás típust"
+              />
             </template>
           </div>
           <div class="form-buttons">
@@ -83,7 +91,6 @@
         </form>
       </div>
     </div>
-
   </div>
 </template>
 
@@ -106,6 +113,8 @@ export default {
         ajto: "",
         category: ""
       },
+      customCategory: "",
+      showCustomCategoryInput: false,
       fieldLabels: {
         vallalkozas_neve: "Vállalkozás neve",
         iranyitoszam: "Irányítószám",
@@ -137,22 +146,25 @@ export default {
   methods: {
     async fetchBusinesses() {
       try {
-        // Felhasználó email címének lekérése a localStorage-ból
         const userEmail = JSON.parse(localStorage.getItem('authData')).email;
-
-        // Az email átadása a kérésben
         const response = await axios.get('/api/businesses/vallalkozo_vallalkozasai', {
           headers: {
-            'email': userEmail  // Az email átadása a kérés headerében
+            'email': userEmail
           }
         });
-
         this.businesses = response.data;
       } catch (error) {
         console.error('Hiba a vállalkozások betöltésekor:', error);
       }
     },
-
+    handleCategoryChange() {
+      if (this.activeBusiness.category === "other") {
+        this.showCustomCategoryInput = true;
+        this.customCategory = "";
+      } else {
+        this.showCustomCategoryInput = false;
+      }
+    },
     async updateBusiness() {
       try {
         const updatedBusiness = {
@@ -165,11 +177,7 @@ export default {
           category: this.selectedBusiness.category,
           helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
         };
-
-        const response = await axios.put(
-          `http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`,
-          updatedBusiness
-        );
+        const response = await axios.put(`http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`, updatedBusiness);
         console.log('Frissítés sikeres:', response);
         this.fetchBusinesses();
         this.closeForm();
@@ -177,21 +185,19 @@ export default {
         console.error('Hiba a vállalkozás frissítésekor:', error.response ? error.response.data : error.message);
       }
     },
-
     async addBusiness() {
       try {
+        if (this.showCustomCategoryInput) {
+          this.newBusiness.category = this.customCategory;
+        }
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
-        const response = await axios.post(
-          'http://localhost:5000/api/businesses/add',
-          this.newBusiness
-        );
+        const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness);
         this.businesses.push(response.data);
         this.closeForm();
       } catch (error) {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error);
       }
     },
-
     async deleteBusiness(businessId) {
       try {
         await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`);
@@ -200,19 +206,16 @@ export default {
         console.error('Hiba a vállalkozás törlésénél:', error);
       }
     },
-
     openEditForm(business) {
       this.selectedBusiness = { ...business };
       this.showForm = true;
       this.isEdit = true;
     },
-
     closeForm() {
       this.showForm = false;
       this.isEdit = false;
       this.selectedBusiness = null;
     },
-
     openNewForm() {
       this.showForm = true;
       this.isEdit = false;
@@ -284,11 +287,16 @@ export default {
   background-color: white;
   cursor: pointer;
   transition: background-color 0.3s, transform 0.3s;
+  width: 100%;
+  height: 100%;
+  border-radius: 8px;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
 }
 
 .add-business-card:hover {
-  background-color: white;
+  background-color: #f3f1ff;
   transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
 }
 
 .form-overlay {
@@ -383,3 +391,4 @@ export default {
   margin: 10px 0;
 }
 </style>
+

@@ -11,6 +11,35 @@ dotenv.config();
 
 const app = express();
 
+// Új kategóriák hozzáadása
+app.post("/api/categories", async (req, res) => {
+  const { name } = req.body;
+  try {
+    await db.query("INSERT INTO categories (name) VALUES (?)", [name]);
+    res.status(201).json({ message: "Kategória hozzáadva" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Nem sikerült hozzáadni a kategóriát." });
+  }
+});
+
+// Kategóriák listázása a vallalkozas tábla categories oszlopából
+app.get("/api/categories", async (req, res) => {
+  try {
+    // Lekérjük az egyedi kategóriákat a vallalkozas táblából
+    const [results] = await db.query("SELECT DISTINCT categories FROM vallalkozas");
+    
+    if (!results || results.length === 0) {
+      return res.status(404).json({ message: 'Nincs elérhető kategória.' });
+    }
+    
+    res.json(results);
+  } catch (err) {
+    console.error(err);
+    res.status(500).send("Adatbázis hiba");
+  }
+});
+
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).send("Valami hiba történt!");

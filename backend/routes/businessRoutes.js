@@ -2,6 +2,7 @@ const express = require("express");
 const router = express.Router(); // Router létrehozása
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
+const businessController = require("../controllers/businessController");
 
 const secretKey = "titkoskulcs";
 
@@ -265,5 +266,15 @@ router.post('/update-user', async (req, res) => {
       res.status(500).json({ message: 'Szerverhiba történt.' });
   }
 });
+
+
+// Vállalkozások végpontjai
+router.get('/api/businesses', businessController.getBusinesses);
+router.post('/api/businesses', businessController.addBusiness);
+router.put('/api/businesses/:id', businessController.updateBusiness);
+router.delete('/api/businesses/:id', businessController.deleteBusiness);
+
+// Kategóriák lekérése
+router.get('/api/businesses/categories', businessController.getCategories);
 
 module.exports = router;
