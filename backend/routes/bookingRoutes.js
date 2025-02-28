@@ -1,10 +1,6 @@
 const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
-const authenticate = require('../middlewares/authMiddleware');
-
-// Middleware az autentikációhoz
-router.use(authenticate);  // Ez biztosítja, hogy a 'req.authData' mindig elérhető lesz
 
 // Szolgáltatások lekérése
 router.get("/szolgaltatasok", async (req, res) => {
@@ -18,6 +14,36 @@ router.get("/szolgaltatasok", async (req, res) => {
   } catch (error) {
     console.error("Hiba a szolgáltatások lekérésekor:", error);
     res.status(500).json({ error: "Szerver hiba" });
+  }
+});
+
+router.get('/vallalkozasok', (req, res) => {
+  const category = req.query.category || ''; // Get category from query parameter
+  let query = 'SELECT * FROM vallalkozas'; // Default query (all businesses)
+
+  if (category) {
+    query += ` WHERE category = ?`; // Filter by category if provided
+  }
+
+  db.query(query, [category], (err, result) => {
+    if (err) {
+      res.status(500).json({ message: 'Error fetching businesses', error: err });
+    } else {
+      console.log('Fetched businesses:', result); // Győződj meg róla, hogy a válasz helyes
+      res.json(result); // Return businesses as JSON
+    }
+  });
+});
+
+// Kategóriák lekérése
+router.get('/business-categories', async (req, res) => {
+  try {
+    // Use async/await for querying the database
+    const [rows] = await db.query('SELECT DISTINCT category FROM vallalkozas');
+    res.json(rows); // Send the result as JSON
+  } catch (error) {
+    console.error('Error fetching categories: ', error);
+    res.status(500).json({ message: 'Error fetching categories', error: error.message });
   }
 });
 
@@ -36,11 +62,10 @@ router.get("/szabad-idopontok/:szolgaltatasId", async (req, res) => {
   }
 });
 
-// Foglalás létrehozása
 router.post('/foglalas', (req, res) => {
   const { szolgaltatas_id, ido_id } = req.body;
-  const felhasznalo_id = req.body.felhasznalo_id || req.authData.id; // Felhasználói ID
-  const tipus = req.authData.tipus;  // Felhasználói típus ('vallalkozó' vagy 'felhasznalo')
+  const felhasznalo_id = req.body.felhasznalo_id; // Felhasználói ID
+  const tipus = req.body.tipus;  // Felhasználói típus ('vallalkozó' vagy 'felhasznalo')
   const foglalasDatum = new Date();
   const statusz = 'foglalt';
 
@@ -49,46 +74,90 @@ router.post('/foglalas', (req, res) => {
     return res.status(400).json({ error: 'Hiányzó kötelező mezők' });
   }
 
-  // 1. Szolgáltatás ellenőrzése
-  const checkSzolgaltatasQuery = `
-    SELECT * FROM szolgaltatas WHERE szolgaltatas_id = ? AND vallalkozas_id = ?`;
-  const vallalkozas_id = tipus === 'felhasznalo' ? felhasznalo_id : req.body.vallalkozas_id;  // Ha 'felhasznalo', akkor a felhasználó id-ját, ha 'vallalkozó', akkor a vállalkozás id-ját használjuk
-
-  db.query(checkSzolgaltatasQuery, [szolgaltatas_id, vallalkozas_id], (err, szolgaltatasResult) => {
-    if (err) {
-      console.error('Hiba a szolgáltatás ellenőrzésekor:', err);
-      return res.status(500).json({ error: 'Hiba a szolgáltatás ellenőrzésekor' });
-    }
-    if (szolgaltatasResult.length === 0) {
-      return res.status(400).json({ error: 'Szolgáltatás nem található vagy nem érvényes' });
-    }
-
-    // 2. Időpont ellenőrzése
-    const checkIdoQuery = `
-      SELECT * FROM idopontok WHERE ido_id = ? AND statusz = 'szabad'`;
-    db.query(checkIdoQuery, [ido_id], (idoErr, idoResult) => {
-      if (idoErr) {
-        console.error('Hiba az időpont ellenőrzésekor:', idoErr);
-        return res.status(500).json({ error: 'Hiba az időpont ellenőrzésekor' });
+  // A vallalkozas_id meghatározása a tipustól függően
+  let vallalkozas_id;
+  if (tipus === 'felhasznalo') {
+    // Felhasználóként foglalva, válassza ki a szolgáltatás vállalkozását
+    const checkSzolgaltatasQuery = `
+      SELECT vallalkozas_id FROM szolgaltatas WHERE szolgaltatas_id = ?`
+    db.query(checkSzolgaltatasQuery, [szolgaltatas_id], (err, result) => {
+      if (err) {
+        console.error('Hiba a szolgáltatás ellenőrzésekor:', err);
+        return res.status(500).json({ error: 'Szerver hiba a szolgáltatás ellenőrzésekor' });
       }
-      if (idoResult.length === 0) {
-        return res.status(400).json({ error: 'Az időpont nem található vagy már foglalt' });
+      if (result.length === 0) {
+        return res.status(400).json({ error: 'Szolgáltatás nem található' });
       }
+      vallalkozas_id = result[0].vallalkozas_id;
 
-      // 3. Foglalás mentése
-      const query = `
-        INSERT INTO foglalasok (szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalas_datum)
-        VALUES (?, ?, ?, ?, ?)`;
-      db.query(query, [szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalasDatum], (insertErr, insertResult) => {
-        if (insertErr) {
-          console.error('Hiba a foglalás során:', insertErr);
-          return res.status(500).json({ error: 'Hiba a foglalás során' });
+      // Időpont ellenőrzése
+      const checkIdoQuery = `
+        SELECT ido_id, statusz FROM idopontok WHERE ido_id = ? AND statusz = 'szabad' AND vallalkozas_id = ?`
+      db.query(checkIdoQuery, [ido_id, vallalkozas_id], (idoErr, idoResult) => {
+        if (idoErr) {
+          console.error('Hiba az időpont ellenőrzésekor:', idoErr);
+          return res.status(500).json({ error: 'Szerver hiba az időpont ellenőrzésekor' });
+        }
+        if (idoResult.length === 0) {
+          return res.status(400).json({ error: 'Az időpont már foglalt vagy nem található' });
         }
 
-        res.status(200).json({ message: 'Foglalás sikeresen létrejött!' });
+        // Foglalás mentése
+        const insertQuery = `
+          INSERT INTO foglalasok (szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalas_datum, vallalkozas_id)
+          VALUES (?, ?, ?, ?, ?, ?)`
+        db.query(insertQuery, [szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalasDatum, vallalkozas_id], (insertErr, insertResult) => {
+          if (insertErr) {
+            console.error('Hiba a foglalás során:', insertErr);
+            return res.status(500).json({ error: 'Hiba a foglalás során' });
+          }
+
+          res.status(200).json({ message: 'Foglalás sikeresen létrejött!' });
+        });
       });
     });
-  });
+  } else if (tipus === 'vallalkozó') {
+    // Vállalkozóként foglalva, csak saját szolgáltatásait és időpontjait érheti el
+    const checkSzolgaltatasQuery = `
+      SELECT szolgaltatas_id FROM szolgaltatas WHERE szolgaltatas_id = ? AND vallalkozas_id = ?`
+    db.query(checkSzolgaltatasQuery, [szolgaltatas_id, req.body.vallalkozas_id], (err, szolgaltatasResult) => {
+      if (err) {
+        console.error('Hiba a szolgáltatás ellenőrzésekor:', err);
+        return res.status(500).json({ error: 'Szerver hiba a szolgáltatás ellenőrzésekor' });
+      }
+      if (szolgaltatasResult.length === 0) {
+        return res.status(400).json({ error: 'Szolgáltatás nem található vagy nem érvényes' });
+      }
+
+      // Időpont ellenőrzése
+      const checkIdoQuery = `
+        SELECT ido_id, statusz FROM idopontok WHERE ido_id = ? AND statusz = 'szabad' AND vallalkozas_id = ?`
+      db.query(checkIdoQuery, [ido_id, req.body.vallalkozas_id], (idoErr, idoResult) => {
+        if (idoErr) {
+          console.error('Hiba az időpont ellenőrzésekor:', idoErr);
+          return res.status(500).json({ error: 'Szerver hiba az időpont ellenőrzésekor' });
+        }
+        if (idoResult.length === 0) {
+          return res.status(400).json({ error: 'Az időpont már foglalt vagy nem található' });
+        }
+
+        // Foglalás mentése
+        const insertQuery = `
+          INSERT INTO foglalasok (szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalas_datum, vallalkozas_id)
+          VALUES (?, ?, ?, ?, ?, ?)`
+        db.query(insertQuery, [szolgaltatas_id, ido_id, felhasznalo_id, statusz, foglalasDatum, req.body.vallalkozas_id], (insertErr, insertResult) => {
+          if (insertErr) {
+            console.error('Hiba a foglalás során:', insertErr);
+            return res.status(500).json({ error: 'Hiba a foglalás során' });
+          }
+
+          res.status(200).json({ message: 'Foglalás sikeresen létrejött!' });
+        });
+      });
+    });
+  } else {
+    return res.status(400).json({ error: 'Érvénytelen felhasználói típus' });
+  }
 });
 
 module.exports = router;
