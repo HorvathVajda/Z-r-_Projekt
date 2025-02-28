@@ -138,7 +138,7 @@ html, body {
   font-size: 40px;
   font-weight: bold;
   text-decoration: none;
-  color: #6B00D0;
+  color: black;
   margin: 0;
   padding: 0;
   line-height: 60px;
@@ -192,7 +192,7 @@ html, body {
 }
 
 .nav-link {
-  color: #6B00D0;
+  color: black;
   text-decoration: none;
   font-size: 23px;
   padding: 0 15px;

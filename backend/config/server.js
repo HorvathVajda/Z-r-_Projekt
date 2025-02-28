@@ -54,6 +54,9 @@ app.use(
 
 app.use(express.json());
 
+// Authentikációs middleware eltávolítva, nem szükséges token
+// app.use(authenticateToken);  // Ezt a sort eltávolíthatod
+
 app.use("/api/auth", authRoutes);
 app.use("/api/businesses", businessRoutes);
 app.use("/api/foglalasok", bookingRoutes);
@@ -132,8 +135,7 @@ app.post("/api/contact", async (req, res) => {
   }
 });
 
-const PORT = process.env.PORT || 5000;
-const HOST = process.env.HOST || "0.0.0.0";
-app.listen(PORT, HOST, () => {
-  console.log(`Szerver fut a következő címen: http://${HOST}:${PORT}`);
+
+app.listen(5000, 'localhost', () => {
+  console.log('Server running on http://localhost:5000');
 });

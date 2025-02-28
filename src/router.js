@@ -26,6 +26,8 @@ const routes = [
   { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
   { path: '/foglalas', name: 'Foglalas', component: Foglalas },
+  //{ path: '/foglalas/:vallalkozas_id', name: 'Foglalas', component: Foglalas, props: true },
+
 
   {
     path: '/',
