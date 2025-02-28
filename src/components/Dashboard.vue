@@ -45,40 +45,42 @@
       <div class="form-container">
         <form @submit.prevent="isEdit ? updateBusiness() : addBusiness()">
           <h2>{{ isEdit ? 'Vállalkozás Szerkesztése' : 'Új Vállalkozás Hozzáadása' }}</h2>
-          <div class="form-group" v-for="(value, key) in activeBusiness" :key="key">
-            <label :for="key">{{ fieldLabels[key] }}:</label>
-            <template v-if="key !== 'category'">
-              <input
-                type="text"
-                :id="key"
-                v-model="activeBusiness[key]"
-                :required="key !== 'ajto'"
-              />
-            </template>
-            <template v-else>
-              <select
-                :id="key"
-                v-model="activeBusiness.category"
-                required
-                @change="handleCategoryChange"
-              >
-                <option value="" disabled selected>Válassz típust</option>
-                <option value="Fodraszat">Fodrászat</option>
-                <option value="Autoszerviz">Autószerviz</option>
-                <option value="Fogaszat">Fogászat</option>
-                <option value="Masszazs">Masszázs</option>
-                <option value="Kozmetika">Kozmetikai szalon</option>
-                <option value="Kutyakozmetika">Kutyakozmetika</option>
-                <option value="SzemelyiEdzo">Személyi edző</option>
-                <option value="other">Más...</option>
-              </select>
-              <input
-                v-if="showCustomCategoryInput"
-                type="text"
-                v-model="customCategory"
-                placeholder="Írd be az új vállalkozás típust"
-              />
-            </template>
+          <div class="form-group">
+            <label for="vallalkozas_neve">Vállalkozás neve:</label>
+            <input type="text" id="vallalkozas_neve" v-model="activeBusiness.vallalkozas_neve" required />
+          </div>
+          <div class="form-group">
+            <label for="iranyitoszam">Irányítószám:</label>
+            <input type="text" id="iranyitoszam" v-model="activeBusiness.iranyitoszam" required />
+          </div>
+          <div class="form-group">
+            <label for="varos">Város:</label>
+            <input type="text" id="varos" v-model="activeBusiness.varos" required />
+          </div>
+          <div class="form-group">
+            <label for="utca">Utca:</label>
+            <input type="text" id="utca" v-model="activeBusiness.utca" required />
+          </div>
+          <div class="form-group">
+            <label for="hazszam">Házszám:</label>
+            <input type="text" id="hazszam" v-model="activeBusiness.hazszam" required />
+          </div>
+          <div class="form-group">
+            <label for="ajto">Ajtó (opcionális):</label>
+            <input type="text" id="ajto" v-model="activeBusiness.ajto" />
+          </div>
+          <div class="form-group">
+            <label for="category">Vállalkozás típusa:</label>
+            <select id="category" v-model="activeBusiness.category" required @change="handleCategoryChange">
+              <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
+              <option value="other">Más...</option>
+            </select>
+            <input
+              v-if="showCustomCategoryInput"
+              type="text"
+              v-model="customCategory"
+              placeholder="Írd be az új vállalkozás típust"
+            />
           </div>
           <div class="form-buttons">
             <button type="submit" class="submit-button">
@@ -101,6 +103,7 @@ export default {
   data() {
     return {
       businesses: [],
+      categories: [], // új változó a kategóriák tárolására
       selectedBusiness: null,
       showForm: false,
       isEdit: false,
@@ -142,6 +145,7 @@ export default {
   },
   mounted() {
     this.fetchBusinesses();
+    this.fetchCategories(); // Kategóriák betöltése
   },
   methods: {
     async fetchBusinesses() {
@@ -155,6 +159,14 @@ export default {
         this.businesses = response.data;
       } catch (error) {
         console.error('Hiba a vállalkozások betöltésekor:', error);
+      }
+    },
+    async fetchCategories() {
+      try {
+        const response = await axios.get('/api/businesses/categories'); // Kategóriák lekérése
+        this.categories = response.data;
+      } catch (error) {
+        console.error('Hiba a kategóriák betöltésekor:', error);
       }
     },
     handleCategoryChange() {
@@ -224,91 +236,57 @@ export default {
 };
 </script>
 
+
 <style scoped>
-/* Az eredeti CSS változatlan marad */
+html, body {
+  height: 100%;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.dashboard-wrapper {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
 .dashboard-content {
   padding: 20px;
+  flex-grow: 1;
+  overflow: auto; /* Ha a tartalom túllépi a képernyő magasságát, görgethető lesz */
 }
 
-.business-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  gap: 20px;
-}
-
-.business-card {
-  background-color: white;
-  border: 1px solid #c3b1e1;
-  border-radius: 8px;
-  padding: 20px;
-  text-align: center;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-  transition: transform 0.3s, box-shadow 0.3s;
-  cursor: pointer;
-}
-
-.business-card:hover {
-  transform: translateY(-5px);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-}
-
-.business-card.selected {
-  border: 2px solid #5a3472;
-  box-shadow: 0 6px 15px rgba(90, 52, 114, 0.5);
-  background-color: #f3f1ff;
-}
-
-.business-card-actions {
-  margin-top: 10px;
-}
-
-.business-card-actions button {
-  margin: 5px;
-  padding: 8px 15px;
-  background-color: #6327a2;
+.add-business-btn {
+  display: block;
+  width: 100%;
+  background: #6327a2;
   color: white;
+  padding: 12px;
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  font-size: 16px;
+  text-align: center;
+  margin-top: 20px;
 }
 
-.business-card-actions button:hover {
-  background-color: #5a3472;
-}
-
-.add-business-card {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 32px;
-  font-weight: bold;
-  color: #5a3472;
-  background-color: white;
-  cursor: pointer;
-  transition: background-color 0.3s, transform 0.3s;
-  width: 100%;
-  height: 100%;
-  border-radius: 8px;
-  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-}
-
-.add-business-card:hover {
-  background-color: #f3f1ff;
-  transform: scale(1.05);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
+.add-business-btn:hover {
+  background: #5a3472;
 }
 
 .form-overlay {
+  display: flex;
+  justify-content: center;
+  align-items: center;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
-  display: flex;
-  justify-content: center;
-  align-items: center;
+  z-index: 1000;
 }
 
 .form-container {
@@ -316,6 +294,8 @@ export default {
   padding: 30px;
   border-radius: 8px;
   width: 400px;
+  max-height: 90vh;
+  overflow-y: auto;
 }
 
 .form-group {
@@ -367,28 +347,43 @@ export default {
   background-color: #bbb;
 }
 
-.overlay {
-  position: fixed;
-  top: 0;
-  left: 0;
+table {
   width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  border-collapse: collapse;
+  margin-top: 20px;
 }
 
-.expanded-business {
-  background-color: white;
-  padding: 30px;
-  border-radius: 8px;
+th, td {
+  padding: 12px;
+  text-align: left;
+  border-bottom: 1px solid #ddd;
+}
+
+th {
+  background-color: #f4f4f4;
+}
+
+button {
+  background-color: #6327a2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+button:hover {
+  background-color: #5a3472;
+}
+
+/* Fix a footer és az űrlap közötti problémát */
+footer {
+  position: relative;
+  background-color: #6327a2;
+  color: white;
+  padding: 10px 0;
   text-align: center;
+  width: 100%;
 }
 
-.expanded-business h2 {
-  margin-bottom: 15px;
-}
-
-.expanded-business p {
-  margin: 10px 0;
-}
 </style>
-
