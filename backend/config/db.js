@@ -4,14 +4,10 @@ const dotenv = require('dotenv');
 dotenv.config();
 
 const db = mysql.createPool({
-  host: process.env.DB_HOST || 'localhost',
-  user: process.env.DB_USER || 'root',
-  password: process.env.DB_PASS || '',
-  database: process.env.DB_NAME || 'bookmytime',
-  port: process.env.DB_PORT || 3306,
-  waitForConnections: true,
-  connectionLimit: 2,
-  queueLimit: 0
+  host: 'localhost',
+  user: 'root',
+  password: '',
+  database: 'bookmytime',
 });
 
 db.getConnection()

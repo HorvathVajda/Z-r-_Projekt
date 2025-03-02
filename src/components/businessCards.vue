@@ -1,167 +1,121 @@
 <template>
-  <section class="business-section">
-    <h2>Válassz egy vállalkozást</h2>
-
-    <!-- Kategóriák választhatósága -->
-    <div class="category-selector">
-      <label for="category-select">Kategória:</label>
-      <select v-model="selectedCategory" @change="filterBusinesses">
-        <option value="">Minden kategória</option>
-        <option v-for="category in categories" :key="category" :value="category">
-          {{ category }}
-        </option>
-      </select>
-    </div>
-
-    <!-- Vállalkozások listája -->
-    <div class="business-cards">
+  <div id="carouselExample" class="carousel slide" data-bs-ride="carousel">
+    <div class="carousel-inner">
+      <!-- Iterálunk a vállalkozásokon, és minden három elemet egy szlájdban jelenítünk meg -->
       <div
-        class="business-card"
-        v-for="business in filteredBusinesses"
-        :key="business.id"
-      >
-        <img src="/as.jpg" alt="Business Image" class="business-image" />
-        <h3>{{ business.vallalkozas_neve }}</h3>
-        <p>{{ business.helyszin }}</p>
-        <p>{{ business.nyitva_tartas }}</p>
-        <button @click="selectBusiness(business)">Választás</button>
+        v-for="(vallalkozasokChunk, index) in paginate(vallalkozasok, 3)"
+        :key="index"
+        :class="['carousel-item', { active: index === currentIndex }]">
+
+        <div class="row">
+          <!-- A három vállalkozás egy szlájdon -->
+          <div v-for="vallalkozas in vallalkozasokChunk" :key="vallalkozas.id" class="col-4">
+            <div class="carousel-content">
+              <h3>{{ vallalkozas.vallalkozas_neve }}</h3>
+              <p><strong>Helyszín:</strong> {{ vallalkozas.helyszin }}</p>
+              <p><strong>Nyitva tartás:</strong> {{ vallalkozas.nyitva_tartas }}</p>
+            </div>
+          </div>
+        </div>
       </div>
     </div>
-  </section>
+
+    <!-- Karusszel navigációs gombok -->
+    <button class="carousel-control-prev" type="button" @click="previousSlide">
+      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+    </button>
+    <button class="carousel-control-next" type="button" @click="nextSlide">
+      <span class="carousel-control-next-icon" aria-hidden="true"></span>
+    </button>
+  </div>
 </template>
 
-<script setup>
-import { ref, onMounted, watch } from 'vue';
+<script>
 import axios from 'axios';
 
-const businesses = ref([]); // Minden vállalkozás tárolása
-const categories = ref([]); // Kategóriák tárolása
-const selectedCategory = ref(''); // A kiválasztott kategória
-const filteredBusinesses = ref([]); // A szűrt vállalkozások tárolása
-
-// Kategóriák lekérése
-const fetchCategories = async () => {
-  try {
-    const response = await axios.get('/api/foglalasok/business-categories');
-    categories.value = response.data;
-    console.log(response.data);
-  } catch (error) {
-    console.error('Hiba a kategóriák lekérésekor:', error);
+export default {
+  data() {
+    return {
+      vallalkozasok: [],
+      currentIndex: 0, // A jelenlegi aktív szlájdszám
+    };
+  },
+  mounted() {
+    axios.get('/api/foglalasok/vallalkozasok')
+      .then(response => {
+        this.vallalkozasok = response.data;
+      })
+      .catch(error => {
+        console.error('Hiba a vállalkozások betöltésekor:', error);
+      });
+  },
+  methods: {
+    // A vállalkozásokat három elemre oldjuk, hogy egy szlájdon három vállalkozás jelenjen meg
+    paginate(arr, size) {
+      let result = [];
+      for (let i = 0; i < arr.length; i += size) {
+        result.push(arr.slice(i, i + size));
+      }
+      return result;
+    },
+    nextSlide() {
+      if (this.currentIndex < this.paginate(this.vallalkozasok, 3).length - 1) {
+        this.currentIndex++;
+      } else {
+        this.currentIndex = 0;
+      }
+    },
+    previousSlide() {
+      if (this.currentIndex > 0) {
+        this.currentIndex--;
+      } else {
+        this.currentIndex = this.paginate(this.vallalkozasok, 3).length - 1;
+      }
+    }
   }
 };
-
-// Vállalkozások lekérése
-const fetchBusinesses = async () => {
-  try {
-    const response = await axios.get('/api/foglalasok/vallalkozasok');
-    console.log('API válasz:', response.data); // Logolj a válasz adatait
-    businesses.value = response.data;
-    // Mivel a vállalkozások most már betöltődtek, inicializáljuk a filteredBusinesses-t is
-    filteredBusinesses.value = response.data;
-    filterBusinesses(); // Ha szükséges, szűrjük a vállalkozásokat a kezdeti szűrő alapján
-  } catch (error) {
-    console.error('Hiba a vállalkozások betöltésekor:', error.response || error);
-  }
-};
-
-
-// Kategóriák szerint történő szűrés
-const filterBusinesses = () => {
-  console.log('Kiválasztott kategória:', selectedCategory.value);  // Kiválasztott kategória (egyszerű sztring)
-  console.log('Vállalkozások:', JSON.stringify(businesses.value)); // Az összes vállalkozás, JSON formátumban
-  console.log('Szűrés előtt:', JSON.stringify(businesses.value.filter((business) => business.category)));
-
-  filteredBusinesses.value = selectedCategory.value
-    ? businesses.value.filter((business) =>
-        business.category
-          ? String(business.category).toLowerCase().trim() === String(selectedCategory.value).toLowerCase().trim()
-          : false
-      )
-    : businesses.value;
-
-  console.log('Szűrt vállalkozások:', JSON.stringify(filteredBusinesses.value)); // JSON formátumban
-};
-
-
-// Vállalkozás választása
-const selectBusiness = (business) => {
-  alert(`Választottad a következő vállalkozást: ${business.vallalkozas_neve}`);
-  // Ezen a ponton elindítható a foglalás, például a megfelelő szolgáltatás és időpont lekérésével.
-};
-
-
-// Adatok lekérése és beállítása az oldal betöltésekor
-onMounted(() => {
-  fetchCategories();
-  fetchBusinesses();  // Csak egyszer hívjuk meg, hogy a vállalkozások betöltődjenek
-});
-
-watch(selectedCategory, (newCategory) => {
-  console.log('Kiválasztott kategória változás:', newCategory);
-  filterBusinesses(); // A szűrés mostantól csak itt történik
-});
 </script>
 
 <style scoped>
-.business-section {
-  padding: 40px;
-  background-color: #f9f9f9;
+.carousel-content {
   text-align: center;
-}
-
-.category-selector {
-  margin-bottom: 20px;
-}
-
-select {
-  padding: 10px;
-  font-size: 16px;
-  border-radius: 5px;
-  border: 1px solid #ddd;
-}
-
-.business-cards {
-  display: flex;
-  justify-content: space-around;
-  flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 30px;
-}
-
-.business-card {
-  background-color: white;
   padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-  width: 250px; /* A kártyák szélessége megnövelve */
-  text-align: center;
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-}
-
-.business-card:hover {
-  transform: translateY(-10px);
-  box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-}
-
-.business-image {
-  width: 100%;
-  height: 150px;
-  object-fit: cover;
-  border-radius: 10px;
-}
-
-button {
-  margin-top: 10px;
-  background-color: #6b00d0;
+  background: rgba(0, 0, 0, 0.6);
   color: white;
-  border: none;
-  padding: 10px;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
+  border-radius: 10px;
+  margin-bottom: 20px;
+  max-width: 160px;
+  max-height: 160px;
+  margin-left: auto;
+  margin-right: auto;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
 }
 
-button:hover {
-  background-color: #5a00b0;
+.carousel-inner {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.carousel-item {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+
+.d-flex {
+  display: flex;
+}
+
+.col-4 {
+  display: flex;
+  justify-content: center;
+  padding: 0 5px;
+}
+
+.carousel-control-prev,
+.carousel-control-next {
+  background-color: rgba(0, 0, 0, 0.5);
+  border-radius: 50%;
 }
 </style>
