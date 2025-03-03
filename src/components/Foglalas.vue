@@ -97,38 +97,49 @@ export default {
     },
 
     async bookAppointment() {
-      if (!this.selectedIdo) {
-        alert('Válassz egy szabad időpontot!');
-        return;
-      }
-      const authData = JSON.parse(localStorage.getItem('authData'));
-      const userId = authData.id;
-      const foglaloTipus = authData ? authData.tipus : null;
+  if (!this.selectedIdo) {
+    alert('Válassz egy szabad időpontot!');
+    return;
+  }
 
-      if (!userId || !foglaloTipus) {
-        alert('Nem vagy bejelentkezve!');
-        return;
-      }
+  const authData = JSON.parse(localStorage.getItem('authData'));
 
-      const payload = {
-        szolgaltatas_id: this.selectedSzolgaltatasId,
-        ido_id: this.selectedIdo,
-        felhasznalo_id: userId,
-        vallalkozas_id: this.vallalkozasId,  // itt használjuk
-        foglalo_tipus: foglaloTipus,
-      };
+  if (!authData) {
+    alert('Nem vagy bejelentkezve!');
+    return;
+  }
 
-      try {
-        const response = await axios.post('/api/foglalasok/foglalas', payload, {
-          timeout: 5000
-        });
-        alert(response.data.message);
-        this.modalVisible = false;
-      } catch (error) {
-        console.error('Hiba a foglalás során:', error);
-        alert("Hiba történt a foglalás során.");
-      }
-    }
+  const userId = authData.id;
+  const foglaloTipus = authData.tipus;
+  const email = authData.email || '';
+
+  if (!userId || !foglaloTipus) {
+    alert('Nem vagy bejelentkezve!');
+    return;
+  }
+
+  const payload = {
+    szolgaltatas_id: this.selectedSzolgaltatasId,
+    ido_id: this.selectedIdo,
+    felhasznalo_id: userId,
+    vallalkozas_id: this.vallalkozasId,
+    foglalo_tipus: foglaloTipus,
+    email: email
+  };
+
+  try {
+    const response = await axios.post('/api/foglalasok/foglalas', payload, {
+      timeout: 5000
+    });
+
+    alert(response.data.message);
+    this.modalVisible = false;
+  } catch (error) {
+    console.error('Hiba a foglalás során:', error);
+    alert("Hiba történt a foglalás során.");
+  }
+}
+
 
   }
 };
