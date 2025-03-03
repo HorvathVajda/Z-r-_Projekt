@@ -46,23 +46,25 @@ import { useRoute, useRouter } from 'vue-router';
 export default {
   data() {
     return {
-      szolgaltatasok: [], // Store all the fetched services
+      szolgaltatasok: [],
       modalVisible: false,
       szabadIdopontok: [],
       selectedIdo: null,
       selectedSzolgaltatasId: null,
+      vallalkozasId: null,  // hozzáadjuk ide
     };
   },
   mounted() {
     const route = useRoute();
     const router = useRouter();
-    const vallalkozasId = route.params.vallalkozas_id;
+    this.vallalkozasId = this.$route.params.vallalkozas_id; // itt beállítjuk
+    console.log('Vállalkozás ID:', this.vallalkozasId);
 
-    if (!vallalkozasId) {
+    if (!this.vallalkozasId) {
       alert("Nincs érvényes vállalkozás ID!");
-      router.push('/');
+      router.push('/');  // Visszairányítunk a főoldalra, ha nincs vállalkozás ID
     } else {
-      this.fetchSzolgaltatasok(vallalkozasId);
+      this.fetchSzolgaltatasok(this.vallalkozasId);  // Szolgáltatások betöltése
     }
   },
   methods: {
@@ -99,9 +101,8 @@ export default {
         alert('Válassz egy szabad időpontot!');
         return;
       }
-
       const authData = JSON.parse(localStorage.getItem('authData'));
-      const userId = authData ? authData.id : null;
+      const userId = authData.id;
       const foglaloTipus = authData ? authData.tipus : null;
 
       if (!userId || !foglaloTipus) {
@@ -112,11 +113,10 @@ export default {
       const payload = {
         szolgaltatas_id: this.selectedSzolgaltatasId,
         ido_id: this.selectedIdo,
-        felhasznalo_id: foglaloTipus === 'felhasznalo' ? userId : null,
-        vallalkozas_id: foglaloTipus === 'vallalkozó' ? userId : null, // Itt a vállalkozás ID is userId lehet, ha a logika ezt igényli
+        felhasznalo_id: userId,
+        vallalkozas_id: this.vallalkozasId,  // itt használjuk
         foglalo_tipus: foglaloTipus,
       };
-
 
       try {
         const response = await axios.post('/api/foglalasok/foglalas', payload, {
@@ -129,6 +129,7 @@ export default {
         alert("Hiba történt a foglalás során.");
       }
     }
+
   }
 };
 </script>

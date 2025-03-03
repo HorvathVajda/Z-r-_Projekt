@@ -82,13 +82,12 @@ router.post('/foglalas', async (req, res) => {
     const foglalasData = {
       szolgaltatas_id,
       ido_id,
-      felhasznalo_id: foglalo_tipus === 'felhasznalo' ? felhasznalo_id : null,
-      vallalkozas_id: foglalo_tipus === 'vallalkozó' ? vallalkozas_id : null,
+      felhasznalo_id: felhasznalo_id || null,  // Ha van felhasználó, akkor legyen beállítva
+      vallalkozas_id: vallalkozas_id || null,  // Ha van vállalkozás, akkor legyen beállítva
       statusz: 'foglalt',
       foglalas_datum: new Date(),
       foglalo_tipus,
     };
-
 
     console.log('Foglalás adat:', foglalasData); // Debug log
 
