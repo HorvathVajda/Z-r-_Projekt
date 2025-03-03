@@ -199,15 +199,30 @@ export default {
     },
     async addBusiness() {
       try {
-        if (this.showCustomCategoryInput) {
+        if (this.showCustomCategoryInput && this.customCategory.trim() !== "") {
           this.newBusiness.category = this.customCategory;
         }
+
+        // Ellenőrzés, hogy minden szükséges mező ki van-e töltve
+        if (!this.newBusiness.vallalkozas_neve || !this.newBusiness.iranyitoszam || 
+            !this.newBusiness.varos || !this.newBusiness.utca || !this.newBusiness.hazszam ||
+            !this.newBusiness.category) {
+          console.error('Minden mezőt ki kell tölteni!');
+          return;
+        }
+
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
+
         const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness);
-        this.businesses.push(response.data);
+
+        if (response.data) {
+          this.businesses.push(response.data);
+        }
+
         this.closeForm();
+        this.fetchBusinesses(); // Frissítés az új adatokkal
       } catch (error) {
-        console.error('Hiba az új vállalkozás hozzáadásakor:', error);
+        console.error('Hiba az új vállalkozás hozzáadásakor:', error.response ? error.response.data : error.message);
       }
     },
     async deleteBusiness(businessId) {
@@ -235,6 +250,7 @@ export default {
   }
 };
 </script>
+
 
 
 <style scoped>
