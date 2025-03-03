@@ -51,14 +51,21 @@ INSERT INTO `felhasznalo` (`felhasznalo_id`, `nev`, `email`, `jelszo`, `telefons
 --
 
 CREATE TABLE `foglalasok` (
-  `foglalas_id` int NOT NULL,
+  `foglalas_id` int NOT NULL AUTO_INCREMENT,
   `szolgaltatas_id` int NOT NULL,
   `ido_id` int NOT NULL,
   `felhasznalo_id` int DEFAULT NULL,
-  `vallalkozas_id` int DEFAULT NULL,
-  `statusz` enum('szabad','foglalt') COLLATE utf8mb3_hungarian_ci DEFAULT 'szabad',
-  `foglalas_datum` datetime DEFAULT CURRENT_TIMESTAMP
+  `vallalkozo_id` int DEFAULT NULL,  -- módosítva
+  `statusz` enum('szabad', 'foglalt') COLLATE utf8mb3_hungarian_ci DEFAULT 'szabad',
+  `foglalas_datum` datetime DEFAULT CURRENT_TIMESTAMP,
+  `foglalo_tipus` enum('felhasznalo', 'vallalkozó') COLLATE utf8mb3_hungarian_ci DEFAULT 'felhasznalo',
+  CONSTRAINT `chk_foglalasok_felhasznalo_vallalkozas_check`
+    CHECK (
+      (felhasznalo_id IS NOT NULL AND vallalkozo_id IS NULL) OR
+      (felhasznalo_id IS NULL AND vallalkozo_id IS NOT NULL)
+    )
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_hungarian_ci;
+
 
 -- --------------------------------------------------------
 
@@ -210,7 +217,7 @@ ALTER TABLE `foglalasok`
 ALTER TABLE `idopontok`
   ADD PRIMARY KEY (`ido_id`),
   ADD KEY `szolgaltatas_id` (`szolgaltatas_id`),
-  ADD KEY `idx_idopontok` (`ido_id`,`szolgaltatas_id`),
+  ADD KEY `idx_idopontok` (`ido_id`, `szolgaltatas_id`),
   ADD KEY `ido_id` (`ido_id`);
 
 --

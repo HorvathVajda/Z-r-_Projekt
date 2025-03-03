@@ -41,55 +41,45 @@
 <script>
 import axios from "axios";
 import { ref, onMounted } from 'vue';
-import { useRoute } from 'vue-router';
-
-//const route = useRoute();
-//const vallalkozasId = ref(route.params.vallalkozas_id);
+import { useRoute, useRouter } from 'vue-router';
 
 export default {
   data() {
     return {
-      szolgaltatasok: [],
+      szolgaltatasok: [], // Store all the fetched services
       modalVisible: false,
       szabadIdopontok: [],
       selectedIdo: null,
-      selectedSzolgaltatasId: null, // Store the selected service ID
+      selectedSzolgaltatasId: null,
     };
   },
   mounted() {
-    this.fetchSzolgaltatasok();
+    const route = useRoute();
+    const router = useRouter();
+    const vallalkozasId = route.params.vallalkozas_id;
+
+    if (!vallalkozasId) {
+      alert("Nincs érvényes vállalkozás ID!");
+      router.push('/');
+    } else {
+      this.fetchSzolgaltatasok(vallalkozasId);
+    }
   },
   methods: {
-    async fetchSzolgaltatasok() {
+    async fetchSzolgaltatasok(vallalkozasId) {
       try {
-        // Token lekérése a localStorage-ból
-        const token = JSON.parse(localStorage.getItem('authData')).token;
-
-        // API hívás a megfelelő fejléc hozzáadásával
-        const response = await axios.get("/api/foglalasok/szolgaltatasok", {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
-
-        // A válasz tárolása a szolgáltatások tömbben
+        const response = await axios.get(`/api/foglalasok/szolgaltatasok/${vallalkozasId}`);
         this.szolgaltatasok = response.data;
       } catch (error) {
         console.error("Hiba a szolgáltatások lekérdezésekor:", error);
         alert("Hiba történt a szolgáltatások lekérésekor!");
       }
     },
+
     async fetchSzabadIdopontok(szolgaltatasId) {
-      this.selectedSzolgaltatasId = szolgaltatasId; // Store the selected service ID
+      this.selectedSzolgaltatasId = szolgaltatasId;
       try {
-        // Token lekérése a localStorage-ból
         const token = JSON.parse(localStorage.getItem('authData')).token;
-
-        if (!token) {
-          throw new Error("Token nem található.");
-        }
-
-        // API hívás a megfelelő fejléc hozzáadásával
         const response = await axios.get(`/api/foglalasok/szabad-idopontok/${szolgaltatasId}`, {
           headers: {
             'Authorization': `Bearer ${token}`
@@ -97,76 +87,49 @@ export default {
         });
 
         this.szabadIdopontok = response.data;
-        this.modalVisible = true; // Open the modal
+        this.modalVisible = true;
       } catch (error) {
         console.error("Hiba a szabad időpontok lekérésekor:", error);
         alert("Hiba történt a szabad időpontok lekérésekor.");
       }
     },
+
     async bookAppointment() {
-      console.log({
+      if (!this.selectedIdo) {
+        alert('Válassz egy szabad időpontot!');
+        return;
+      }
+
+      const authData = JSON.parse(localStorage.getItem('authData'));
+      const userId = authData ? authData.id : null;
+      const foglaloTipus = authData ? authData.tipus : null;
+
+      if (!userId || !foglaloTipus) {
+        alert('Nem vagy bejelentkezve!');
+        return;
+      }
+
+      const payload = {
         szolgaltatas_id: this.selectedSzolgaltatasId,
         ido_id: this.selectedIdo,
-        felhasznalo_id: this.getUserId(),
-        vallalkozas_id: this.getVallalkozasId() // Új függvény, ha vállalkozóról van szó
-      });
+        felhasznalo_id: foglaloTipus === 'felhasznalo' ? userId : null,
+        vallalkozas_id: foglaloTipus === 'vallalkozó' ? userId : null, // Itt a vállalkozás ID is userId lehet, ha a logika ezt igényli
+        foglalo_tipus: foglaloTipus,
+      };
 
-      if (this.selectedIdo && this.selectedSzolgaltatasId) {
-        try {
-          const response = await axios.post('/api/foglalasok/foglalas', {
-            szolgaltatas_id: this.selectedSzolgaltatasId,
-            ido_id: this.selectedIdo,
-            felhasznalo_id: this.getUserId() ? this.getUserId() : null,
-            vallalkozas_id: this.getVallalkozasId() ? this.getVallalkozasId() : null
-          });
 
-          if (response.data.message) {
-            alert("A foglalás sikeresen megtörtént!");
-            this.modalVisible = false;
-            this.selectedIdo = null;
-          } else if (response.data.error) {
-            alert(response.data.error);
-          }
-        } catch (error) {
-          console.error('Hiba a foglalás során:', error);
-          alert('Hiba történt a foglalás során!');
-        }
-      } else {
-        alert('Kérjük, válasszon szolgáltatást és időpontot!');
+      try {
+        const response = await axios.post('/api/foglalasok/foglalas', payload, {
+          timeout: 5000
+        });
+        alert(response.data.message);
+        this.modalVisible = false;
+      } catch (error) {
+        console.error('Hiba a foglalás során:', error);
+        alert("Hiba történt a foglalás során.");
       }
-    },
-
-    getVallalkozasId() {
-      const authData = localStorage.getItem('authData');
-      if (authData) {
-        try {
-          const parsedData = JSON.parse(authData);
-          return parsedData.tipus === 'vallalkozo' ? parsedData.id : null;
-        } catch (error) {
-          console.error("Hiba az authData parse során:", error);
-          return null;
-        }
-      }
-      console.warn("authData nem található a localStorage-ban.");
-      return null;
-    },
-
-    getUserId() {
-      const authData = localStorage.getItem('authData');
-      if (authData) {
-        try {
-          const parsedData = JSON.parse(authData);
-          return parsedData.id;
-        } catch (error) {
-          console.error("Hiba az authData parse során:", error);
-          return null;
-        }
-      }
-      console.warn("authData nem található a localStorage-ban.");
-      return null;
-    },
-
-  },
+    }
+  }
 };
 </script>
 
