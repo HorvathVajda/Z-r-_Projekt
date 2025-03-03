@@ -20,7 +20,7 @@
                   <h5 class="card-title">{{ vallalkozas.vallalkozas_neve }}</h5>
                   <p class="card-text"><strong>Helyszín:</strong> {{ vallalkozas.helyszin }}</p>
                   <p class="card-text"><strong>Nyitva tartás:</strong> {{ vallalkozas.nyitva_tartas }}</p>
-                  <button @click="handleButtonClick(vallalkozas)" class="btn btn-primary mt-3">
+                  <button @click="handleButtonClick(vallalkozas)" class="btn mt-3">
                     Szabad időpontok
                   </button>
                 </div>
@@ -164,7 +164,7 @@ export default {
 }
 
 .btn {
-  width: 100%; /* Gomb szélesség */
+  width: 100%;
   font-size: 1rem;
   background-color: #6B00D0;
   border: none;
@@ -172,9 +172,30 @@ export default {
   padding: 10px;
   margin-top: 10px;
   cursor: pointer;
+  outline: none;  /* Eltávolítja a fókusz körvonalat */
 }
+
+/* Hover állapot */
 .btn:hover {
   background-color: #6B00D0;
+  box-shadow: none;  /* Eltávolítja a hover árnyékot */
+  color: white;
+}
+
+/* Focus állapot */
+.btn:focus {
+  background-color: #6B00D0;
+  box-shadow: none;  /* Eltávolítja a fókusz árnyékot */
+  outline: none;  /* Eltávolítja a fókusz körvonalat */
+  color: white;
+}
+
+/* Active állapot */
+.btn:active {
+  background-color: #6B00D0;
+  box-shadow: none;  /* Eltávolítja az aktív állapot árnyékot */
+  outline: none;  /* Eltávolítja az aktív körvonalat */
+  color: white;
 }
 
 </style>

@@ -99,45 +99,7 @@ router.post('/foglalas', async (req, res) => {
     await db.query('UPDATE idopontok SET statusz = "foglalt" WHERE ido_id = ?', [ido_id]);
     console.log('Időpont státusz frissítve:', ido_id);
 
-    // **Email küldés az EmailJS REST API-val**
-    const templateParams = {
-      to_email: email,  // A frontend által küldött email cím
-      subject: 'Új foglalás érkezett!',
-      message: `Új foglalás érkezett a következő adatokkal:
-        - Szolgáltatás ID: ${szolgaltatas_id}
-        - Időpont: ${results[0].szabad_ido}
-        - Foglaló típusa: ${foglalo_tipus}`
-    };
-
-
-
-    try {
-      const emailResponse = await fetch('https://api.emailjs.com/api/v1.0/email/send', {
-        method: 'POST',
-        headers: {
-            'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-            service_id: 'service_et6yxeo',  // Az EmailJS által megadott saját service ID
-            template_id: 'template_4aq3f4g', // Az EmailJS által megadott saját template ID
-            user_id: 'An_2K3rlynQaF-gOD',    // Az EmailJS által megadott saját user ID
-            template_params: templateParams,  // A dinamikus paraméterek
-        })
-    });
-
-
-      if (!emailResponse.ok) {
-        throw new Error(`Hiba az email küldés során! Status: ${emailResponse.status}`);
-      }
-
-      console.log('Email sikeresen elküldve.');
-    } catch (error) {
-      console.error('Hiba történt az email küldésekor:', error.message);
-      console.log(error.stack);  // Részletes hiba információ
-    }
-
-
-    return res.status(201).json({ message: 'Foglalás sikeresen létrehozva és email elküldve.' });
+    return res.status(201).json();
 
   } catch (err) {
     console.error('SQL hiba:', err);

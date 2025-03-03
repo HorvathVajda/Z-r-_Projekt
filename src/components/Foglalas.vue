@@ -35,6 +35,11 @@
         <button class="foglalas-btn" @click="bookAppointment">Foglalás</button>
       </div>
     </div>
+
+    <!-- Error/Info Box -->
+    <div v-if="alertMessage" class="alert-box">
+      <p>{{ alertMessage }}</p>
+    </div>
   </div>
 </template>
 
@@ -51,17 +56,18 @@ export default {
       szabadIdopontok: [],
       selectedIdo: null,
       selectedSzolgaltatasId: null,
-      vallalkozasId: null,  // hozzáadjuk ide
+      vallalkozasId: null,
+      alertMessage: null,  // Hibaüzenet változó
     };
   },
   mounted() {
     const route = useRoute();
     const router = useRouter();
-    this.vallalkozasId = this.$route.params.vallalkozas_id; // itt beállítjuk
+    this.vallalkozasId = this.$route.params.vallalkozas_id;
     console.log('Vállalkozás ID:', this.vallalkozasId);
 
     if (!this.vallalkozasId) {
-      alert("Nincs érvényes vállalkozás ID!");
+      this.showAlert("Nincs érvényes vállalkozás ID!");
       router.push('/');  // Visszairányítunk a főoldalra, ha nincs vállalkozás ID
     } else {
       this.fetchSzolgaltatasok(this.vallalkozasId);  // Szolgáltatások betöltése
@@ -74,7 +80,7 @@ export default {
         this.szolgaltatasok = response.data;
       } catch (error) {
         console.error("Hiba a szolgáltatások lekérdezésekor:", error);
-        alert("Hiba történt a szolgáltatások lekérésekor!");
+        this.showAlert("Hiba történt a szolgáltatások lekérésekor!");
       }
     },
 
@@ -92,55 +98,55 @@ export default {
         this.modalVisible = true;
       } catch (error) {
         console.error("Hiba a szabad időpontok lekérésekor:", error);
-        alert("Hiba történt a szabad időpontok lekérésekor.");
+        this.showAlert("Hiba történt a szabad időpontok lekérésekor.");
       }
     },
 
     async bookAppointment() {
-  if (!this.selectedIdo) {
-    alert('Válassz egy szabad időpontot!');
-    return;
-  }
+      if (!this.selectedIdo) {
+        this.showAlert('Válassz egy szabad időpontot!');
+        return;
+      }
 
-  const authData = JSON.parse(localStorage.getItem('authData'));
+      const authData = JSON.parse(localStorage.getItem('authData'));
+      const userId = authData.id;
+      const foglaloTipus = authData.tipus;
+      const email = authData.email || '';
 
-  if (!authData) {
-    alert('Nem vagy bejelentkezve!');
-    return;
-  }
+      if (!userId || !foglaloTipus) {
+        this.showAlert('Nem vagy bejelentkezve!');
+        return;
+      }
 
-  const userId = authData.id;
-  const foglaloTipus = authData.tipus;
-  const email = authData.email || '';
+      const payload = {
+        szolgaltatas_id: this.selectedSzolgaltatasId,
+        ido_id: this.selectedIdo,
+        felhasznalo_id: userId,
+        vallalkozas_id: this.vallalkozasId,
+        foglalo_tipus: foglaloTipus,
+        email: email
+      };
 
-  if (!userId || !foglaloTipus) {
-    alert('Nem vagy bejelentkezve!');
-    return;
-  }
+      try {
+        const response = await axios.post('/api/foglalasok/foglalas', payload, {
+          timeout: 5000
+        });
 
-  const payload = {
-    szolgaltatas_id: this.selectedSzolgaltatasId,
-    ido_id: this.selectedIdo,
-    felhasznalo_id: userId,
-    vallalkozas_id: this.vallalkozasId,
-    foglalo_tipus: foglaloTipus,
-    email: email
-  };
+        this.showAlert("Sikeres foglalás!");
+        this.modalVisible = false;
+      } catch (error) {
+        console.error('Hiba a foglalás során:', error);
+        this.showAlert("Hiba történt a foglalás során.");
+      }
+    },
 
-  try {
-    const response = await axios.post('/api/foglalasok/foglalas', payload, {
-      timeout: 5000
-    });
-
-    alert(response.data.message);
-    this.modalVisible = false;
-  } catch (error) {
-    console.error('Hiba a foglalás során:', error);
-    alert("Hiba történt a foglalás során.");
-  }
-}
-
-
+    // Alert Message Setter
+    showAlert(message) {
+      this.alertMessage = message;
+      setTimeout(() => {
+        this.alertMessage = null;  // Üzenet eltűnik 5 másodperc után
+      }, 5000);
+    }
   }
 };
 </script>
@@ -220,7 +226,7 @@ button:hover {
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: space-between; /* Ensures space between content and button */
+  justify-content: space-between;
 }
 
 .foglalas-btn {
@@ -231,7 +237,7 @@ button:hover {
   border-radius: 5px;
   cursor: pointer;
   transition: transform 0.3s ease, background-color 0.3s ease;
-  margin-top: auto; /* Pushes the button to the bottom */
+  margin-top: auto;
 }
 
 .foglalas-btn:hover {
@@ -251,5 +257,19 @@ button:hover {
   color: red;
   text-decoration: none;
   cursor: pointer;
+}
+
+/* Alert Box Styles */
+.alert-box {
+  position: fixed;
+  bottom: 20px;  /* Set the box to the bottom */
+  left: 20px;    /* Set the box to the left */
+  background-color: #ffcc00;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100;
 }
 </style>
