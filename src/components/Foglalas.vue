@@ -57,7 +57,7 @@ export default {
       selectedIdo: null,
       selectedSzolgaltatasId: null,
       vallalkozasId: null,
-      alertMessage: null,  // Hibaüzenet változó
+      alertMessage: null,
     };
   },
   mounted() {
@@ -68,9 +68,9 @@ export default {
 
     if (!this.vallalkozasId) {
       this.showAlert("Nincs érvényes vállalkozás ID!");
-      router.push('/');  // Visszairányítunk a főoldalra, ha nincs vállalkozás ID
+      router.push('/');
     } else {
-      this.fetchSzolgaltatasok(this.vallalkozasId);  // Szolgáltatások betöltése
+      this.fetchSzolgaltatasok(this.vallalkozasId); 
     }
   },
   methods: {

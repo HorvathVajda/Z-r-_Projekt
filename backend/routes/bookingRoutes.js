@@ -3,24 +3,32 @@ const router = express.Router();
 const db = require("../config/db");
 const emailjs = require('emailjs-com');
 
-// Vállalkozás ID alapján szolgáltatásokat lekérdező végpont
-router.get("/szolgaltatasok/:vallalkozas_id", async (req, res) => {
+// Szolgáltatások lekérdezése vállalkozás ID alapján (vagy az összes, ha nincs ID)
+router.get("/szolgaltatasok/:vallalkozas_id?", async (req, res) => {
   const { vallalkozas_id } = req.params;
 
   try {
-    const [rows] = await db.query(`
+    let query = `
       SELECT szolgaltatas.*, vallalkozas.vallalkozas_neve
       FROM szolgaltatas
       JOIN vallalkozas ON szolgaltatas.vallalkozas_id = vallalkozas.id
-      WHERE szolgaltatas.vallalkozas_id = ?
-    `, [vallalkozas_id]);
+    `;
 
+    const queryParams = [];
+
+    if (vallalkozas_id) {
+      query += " WHERE szolgaltatas.vallalkozas_id = ?";
+      queryParams.push(vallalkozas_id);
+    }
+
+    const [rows] = await db.query(query, queryParams);
     res.json(rows);
   } catch (error) {
     console.error("Hiba a szolgáltatások lekérésekor:", error);
     res.status(500).json({ error: "Szerver hiba" });
   }
 });
+
 
 // Vállalkozások listája lekérdezése
 router.get('/vallalkozasok', async (req, res) => {

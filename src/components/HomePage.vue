@@ -62,7 +62,7 @@ export default {
     };
 
     const goToBooking = () => {
-      if(!isLoggedIn){
+      if(isLoggedIn){
         router.push(`/foglalas`);
       }
       else{
