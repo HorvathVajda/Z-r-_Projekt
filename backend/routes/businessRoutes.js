@@ -2,58 +2,48 @@ const express = require("express");
 const router = express.Router(); // Router létrehozása
 const db = require("../config/db");
 const jwt = require("jsonwebtoken");
-const businessController = require("../controllers/businessController");
+//const businessController = require("../controllers/businessController");
 
 const secretKey = "titkoskulcs";
 
-// Middleware: JWT token ellenőrzése
-function verifyToken(req, res, next) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader) {
-    return res.status(401).json({ error: "No token provided" });
+router.get('/vallalkozo_vallalkozasai', (req, res) => {
+  const { email } = req.query; // Az emailt a frontend küldi el query paraméterként
+
+  if (!email) {
+      return res.status(400).json({ error: 'Hiányzó email paraméter' });
   }
-  const token = authHeader.split(" ")[1];
-  jwt.verify(token, secretKey, (err, decoded) => {
-    if (err) {
-      return res.status(401).json({ error: "Invalid token" });
-    }
-    req.user = decoded;
-    next();
+
+  // Első lépés: a 'vallalkozo' táblából kinyerni a 'vallalkozo_id'-t
+  const sqlVallalkozo = 'SELECT vallalkozo_id FROM vallalkozo WHERE email = ?';
+  db.query(sqlVallalkozo, [email], (err, results) => {
+      if (err) {
+          console.error('Lekérdezési hiba a vallalkozo táblából:', err);
+          return res.status(500).json({ error: 'Adatbázis hiba' });
+      }
+
+      if (results.length === 0) {
+          return res.status(404).json({ error: 'Nem található felhasználó ezzel az email címmel' });
+      }
+
+      const vallalkozo_id = results[0].vallalkozo_id;
+
+      // Második lépés: lekérdezni a 'vallalkozas' táblát a 'vallalkozo_id' alapján
+      const sqlVallalkozas = 'SELECT * FROM vallalkozas WHERE vallalkozo_id = ?';
+      db.query(sqlVallalkozas, [vallalkozo_id], (err, businessResults) => {
+          if (err) {
+              console.error('Lekérdezési hiba a vallalkozas táblából:', err);
+              return res.status(500).json({ error: 'Adatbázis hiba' });
+          }
+
+          res.json(businessResults); // Válaszban visszaküldjük a vállalkozásokat
+      });
   });
-}
-
-// A verifyToken middleware eltávolítása minden végpontról
-// A verifyToken middleware eltávolítása minden végpontról
-router.get('/vallalkozo_vallalkozasai', async (req, res) => {
-  try {
-    const userEmail = req.headers['email'];  // Az email headerből történő lekérés
-
-    // Ha nincs email, hibát adunk vissza
-    if (!userEmail) {
-      return res.status(400).json({ error: 'Nincs bejelentkezett felhasználó.' });
-    }
-
-    // Adatbázis lekérdezés
-    const [results] = await db.execute(
-      'SELECT * FROM vallalkozas WHERE email = ?',
-      [userEmail]
-    );
-
-    // Ha nem találunk adatot, jelezzük a hibát
-    if (results.length === 0) {
-      return res.status(404).json({ error: 'Nincs ilyen vállalkozás a felhasználóhoz.' });
-    }
-
-    // Sikeres lekérdezés
-    res.json(results);
-  } catch (error) {
-    console.error('Hiba a vállalkozások lekérdezésénél:', error);
-    res.status(500).json({ error: 'Szerverhiba' });
-  }
 });
 
+
+
 // Új vállalkozás hozzáadása, már nincs token ellenőrzés
-router.post("/add", async (req, res) => {
+/*router.post("/add", async (req, res) => {
   const { vallalkozas_neve, iranyitoszam, varos, utca, hazszam, ajto, category } = req.body;
 
   if (!vallalkozas_neve || !iranyitoszam || !varos || !utca || !hazszam || !category) {
@@ -281,6 +271,6 @@ router.get('/business-categories', async (req, res) => {
     console.error('Error fetching categories: ', error);
     res.status(500).json({ message: 'Error fetching categories', error: error.message });
   }
-});
+});*/
 
 module.exports = router;

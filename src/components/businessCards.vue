@@ -106,8 +106,16 @@ export default {
       }
     },
     handleButtonClick(vallalkozas) {
-      this.router.push({ name: 'Foglalas', params: { vallalkozas_id: vallalkozas.id } });
+      // A 'vallalkozas' objektum egy elemében lévő 'category' értéke
+      const category = vallalkozas.category;
+
+      // A vállalkozás ID-ját és a kategóriát is átadjuk
+      this.router.push({
+        name: 'Foglalas',
+        params: { vallalkozas_id: vallalkozas.id, category }
+      });
     }
+
   },
   beforeDestroy() {
     if (this.slideTimer) {

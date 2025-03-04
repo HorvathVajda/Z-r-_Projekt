@@ -63,16 +63,25 @@ export default {
     };
 
     const fetchServicesByCategory = async () => {
+      console.log("Keresett kategória a frontendről:", searchQuery.value); // Debug üzenet
+
       try {
-        const response = await axios.get(`/api/foglalasok/szolgaltatasok/${searchQuery.value}`);
+        const response = await axios.get(`/api/foglalasok/vallalkozasok`, {
+          params: {
+            category: searchQuery.value // Add át a keresett kategóriát
+          }
+        });
         businesses.value = response.data.map(business => ({
           vallalkozas_neve: business.vallalkozas_neve,
-          services: business.services // Szolgáltatások adatainak kezelése
+          category: business.category,
+          services: business.services
         }));
       } catch (error) {
         console.error("Hiba történt a szolgáltatások lekérésekor:", error);
       }
     };
+
+
 
     const filterCategories = () => {
       if (!searchQuery.value) {
@@ -92,8 +101,27 @@ export default {
     };
 
     const goToCategoryPage = () => {
-      if (searchQuery.value) {
-        router.push(`/foglalas/${searchQuery.value}`);
+      console.log("searchQuery:", searchQuery.value);
+      console.log("Businesses:", businesses.value);
+
+      const selectedBusiness = businesses.value.find(b => {
+        console.log("business category:", b.category);
+        console.log("searchQuery:", searchQuery.value);
+
+        // Ellenőrizzük, hogy a category nem undefined vagy null
+        return b.category && searchQuery.value && b.category.toLowerCase() === searchQuery.value.toLowerCase();
+      });
+
+      if (selectedBusiness) {
+        console.log("Selected business:", selectedBusiness);
+
+        // Csak a category-t adjuk át, mert nem szükséges az id
+        router.push({
+  name: 'Foglalas',
+  query: { category: searchQuery.value } // Kategóriát query paraméterként adjuk át
+});
+      } else {
+        console.error('Nincs ilyen kategória.');
       }
     };
 

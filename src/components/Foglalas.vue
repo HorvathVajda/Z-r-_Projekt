@@ -76,15 +76,17 @@ export default {
     };
   },
   mounted() {
-    const route = useRoute();
-    const router = useRouter();
-    this.vallalkozasId = this.$route.params.vallalkozas_id;
-    this.category = this.$route.params.category;
-    console.log('Vállalkozás ID:', this.vallalkozasId);
+  const route = useRoute();
 
-    // Ha nincs vállalkozás ID, akkor az összes szolgáltatást lekéri
-    this.fetchSzolgaltatasok(this.vallalkozasId);
-  },
+  this.vallalkozasId = route.params.vallalkozas_id || null; // Lehet null, ha nincs ID
+  this.category = route.query.category || ''; // Kategóriát query paraméterből olvassuk
+
+  console.log('Vállalkozás ID:', this.vallalkozasId);
+  console.log('Keresett kategória:', this.category);
+
+  this.fetchSzolgaltatasok(this.vallalkozasId, this.category);
+},
+
   methods: {
     // Például, ha a 'vallalkozas_id' numerikus és a backend azt várja
 fetchSzolgaltatasok(vallalkozasId, category) {

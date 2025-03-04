@@ -145,44 +145,34 @@ export default {
   },
   mounted() {
     this.fetchBusinesses();
-    this.fetchCategories();
   },
   methods: {
     async fetchBusinesses() {
       try {
-        const userEmail = JSON.parse(localStorage.getItem('authData')).email;
+          const authData = JSON.parse(localStorage.getItem('authData'));
+          const email = authData?.email;
+          if (!email) {
+              console.error('Nincs bejelentkezett felhasználó email cím!');
+              return;
+          }
 
-        if (!userEmail) {
-          console.error('Nincs bejelentkezett felhasználó email cím!');
-          return;
-        }
+          const response = await axios.get(`/api/businesses/vallalkozo_vallalkozasai?email=${encodeURIComponent(email)}`);
 
-        const response = await axios.get('http://localhost:5000/api/businesses/vallalkozo_vallalkozasai', {
-          headers: { 'email': userEmail }
-        });
-
-        this.businesses = response.data;
+          this.businesses = response.data;
       } catch (error) {
-        console.error('Hiba a vállalkozások betöltésekor:', error);
-        
-        // Részletesebb hibaüzenet
-        if (error.response) {
-          console.error('Backend válasz:', error.response.data);
-        } else if (error.request) {
-          console.error('A kérés nem érkezett meg a backendhez:', error.request);
-        } else {
-          console.error('Hiba a kérés küldése közben:', error.message);
-        }
+          console.error('Hiba a vállalkozások betöltésekor:', error);
+
+          // Részletesebb hibaüzenet
+          if (error.response) {
+              console.error('Backend válasz:', error.response.data);
+          } else if (error.request) {
+              console.error('A kérés nem érkezett meg a backendhez:', error.request);
+          } else {
+              console.error('Hiba a kérés küldése közben:', error.message);
+          }
       }
-    },
-    async fetchCategories() {
-      try {
-        const response = await axios.get('http://localhost:5000/api/businesses/business-categories');
-        this.categories = response.data;
-      } catch (error) {
-        console.error('Hiba a kategóriák betöltésekor:', error);
-      }
-    },
+  },
+
     handleCategoryChange() {
       if (this.activeBusiness.category === "other") {
         this.showCustomCategoryInput = true;
@@ -217,14 +207,14 @@ export default {
         if (this.showCustomCategoryInput && this.customCategory.trim() !== "") {
           this.newBusiness.category = this.customCategory;
         }
-        if (!this.newBusiness.vallalkozas_neve || !this.newBusiness.iranyitoszam || 
+        if (!this.newBusiness.vallalkozas_neve || !this.newBusiness.iranyitoszam ||
             !this.newBusiness.varos || !this.newBusiness.utca || !this.newBusiness.hazszam ||
             !this.newBusiness.category) {
           console.error('Minden mezőt ki kell tölteni!');
           return;
         }
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
-        
+
         const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness);
         if (response.data) {
           this.businesses.push(response.data);
@@ -248,7 +238,7 @@ export default {
       }
     },
     openEditForm(business) {
-      this.selectedBusiness = { ...business }; 
+      this.selectedBusiness = { ...business };
       this.isEdit = true;
       this.showForm = true;
     },

@@ -37,18 +37,28 @@ router.get("/szolgaltatasok", async (req, res) => {
   }
 });
 
-
-
-// Vállalkozások listája lekérdezése
 router.get('/vallalkozasok', async (req, res) => {
+  const { category } = req.query;
+  console.log("Keresett kategória:", category); // Debug üzenet
+
   try {
-    const [results] = await db.query('SELECT * FROM vallalkozas');
+    let query = 'SELECT * FROM vallalkozas';
+    const queryParams = [];
+
+    if (category) {
+      query += ' WHERE category = ?';
+      queryParams.push(category);
+    }
+
+    const [results] = await db.query(query, queryParams);
     res.json(results);
   } catch (err) {
     console.error("SQL hiba:", err.message);
     res.status(500).json({ error: err.message });
   }
 });
+
+
 
 // Kategóriák lekérése
 router.get('/business-categories', async (req, res) => {
