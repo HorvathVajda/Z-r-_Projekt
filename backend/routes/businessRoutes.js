@@ -33,18 +33,24 @@ router.get('/vallalkozo_vallalkozasai', async (req, res) => {
       return res.status(400).json({ error: 'Nincs bejelentkezett felhasználó.' });
     }
 
+    // Adatbázis lekérdezés
     const [results] = await db.execute(
       'SELECT * FROM vallalkozas WHERE email = ?',
       [userEmail]
     );
 
+    // Ha nem találunk adatot, jelezzük a hibát
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Nincs ilyen vállalkozás a felhasználóhoz.' });
+    }
+
+    // Sikeres lekérdezés
     res.json(results);
   } catch (error) {
     console.error('Hiba a vállalkozások lekérdezésénél:', error);
     res.status(500).json({ error: 'Szerverhiba' });
   }
 });
-
 
 // Új vállalkozás hozzáadása, már nincs token ellenőrzés
 router.post("/add", async (req, res) => {
@@ -89,44 +95,32 @@ router.post('/update-bio', async (req, res) => {
   });
 });
 
-// Vállalkozói profil lekérése ID alapján
-router.get("/vallalkozo-profile", async (req, res) => {
-  const { vallalkozo_id, email } = req.query;
-
-  if (!vallalkozo_id && !email) {
-    return res.status(400).json({ error: "Vállalkozó ID vagy e-mail megadása szükséges!" });
-  }
-
+// A vállalkozások lekérdezése a felhasználó e-mailje alapján
+router.get('/vallalkozo_vallalkozasai', async (req, res) => {
   try {
-    let query = "SELECT * FROM vallalkozo WHERE ";
-    let queryParams = [];
+    const userEmail = req.headers['email'];  // Az email headerből történő lekérés
 
-    if (vallalkozo_id) {
-      query += "vallalkozo_id = ?";
-      queryParams.push(vallalkozo_id);
-    } else if (email) {
-      query += "email = ?";
-      queryParams.push(email);
+    if (!userEmail) {
+      return res.status(400).json({ error: 'Nincs bejelentkezett felhasználó.' });
     }
 
-    const [results] = await db.query(query, queryParams);
+    // A helyes táblát és mezőt használjuk: vallalkozo.email
+    const [results] = await db.execute(
+      'SELECT * FROM vallalkozas WHERE vallalkozo_id IN (SELECT vallalkozo_id FROM vallalkozo WHERE email = ?)',
+      [userEmail]
+    );
 
     if (results.length === 0) {
-      return res.status(404).json({ error: "A vállalkozó nem található!" });
+      return res.status(404).json({ error: 'Nincs ilyen vállalkozás a felhasználóhoz.' });
     }
 
-    const vallalkozo = results[0];
-    res.json({
-      name: vallalkozo.nev,
-      bio: vallalkozo.bio,
-      email: vallalkozo.email,
-      phone: vallalkozo.telefonszam
-    });
-  } catch (err) {
-    console.error("Adatbázis hiba:", err);
-    res.status(500).json({ error: "Adatbázis hiba történt!" });
+    res.json(results);
+  } catch (error) {
+    console.error('Hiba a vállalkozások lekérdezésénél:', error);
+    res.status(500).json({ error: 'Szerverhiba' });
   }
 });
+
 
 
 // Foglalások lekérdezése
@@ -276,5 +270,17 @@ router.delete('/api/businesses/:id', businessController.deleteBusiness);
 
 // Kategóriák lekérése
 router.get('/api/businesses/categories', businessController.getCategories);
+
+
+// Kategóriák lekérése
+router.get('/business-categories', async (req, res) => {
+  try {
+    const [rows] = await db.query('SELECT DISTINCT category FROM vallalkozas');
+    res.json(rows);
+  } catch (error) {
+    console.error('Error fetching categories: ', error);
+    res.status(500).json({ message: 'Error fetching categories', error: error.message });
+  }
+});
 
 module.exports = router;

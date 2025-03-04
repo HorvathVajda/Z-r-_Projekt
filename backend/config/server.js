@@ -14,11 +14,16 @@ const app = express();
 // Új kategóriák hozzáadása
 app.post("/api/categories", async (req, res) => {
   const { name } = req.body;
+
+  if (!name || name.trim() === "") {
+    return res.status(400).json({ error: "A kategória neve kötelező!" });
+  }
+
   try {
     await db.query("INSERT INTO categories (name) VALUES (?)", [name]);
     res.status(201).json({ message: "Kategória hozzáadva" });
   } catch (error) {
-    console.error(error);
+    console.error("Kategória hozzáadási hiba:", error);
     res.status(500).json({ error: "Nem sikerült hozzáadni a kategóriát." });
   }
 });
@@ -35,14 +40,15 @@ app.get("/api/categories", async (req, res) => {
 
     res.json(results);
   } catch (err) {
-    console.error(err);
+    console.error("Adatbázis hiba:", err);
     res.status(500).send("Adatbázis hiba");
   }
 });
 
+// Hibakezelő middleware
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  res.status(500).send("Valami hiba történt!");
+  console.error("Globális hiba:", err);
+  res.status(500).send("Belső rendszerhiba történt.");
 });
 
 app.use(
@@ -65,18 +71,25 @@ app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
 });
 
+// Foglalások lekérése
 app.get("/api/bookings", async (req, res) => {
   try {
     const [results] = await db.query("SELECT * FROM foglalasok");
     res.json(results);
   } catch (err) {
-    console.error(err);
+    console.error("Adatbázis hiba:", err);
     res.status(500).send("Adatbázis hiba");
   }
 });
 
+// Új foglalás hozzáadása
 app.post("/api/bookings", async (req, res) => {
   const { user_id, service_id, appointment_time } = req.body;
+
+  if (!user_id || !service_id || !appointment_time) {
+    return res.status(400).json({ error: "Minden mező kitöltése kötelező!" });
+  }
+
   try {
     await db.query(
       "INSERT INTO foglalasok (user_id, service_id, appointment_time) VALUES (?, ?, ?)",
@@ -84,11 +97,12 @@ app.post("/api/bookings", async (req, res) => {
     );
     res.status(201).send("Foglalás sikeresen hozzáadva");
   } catch (err) {
-    console.error(err);
+    console.error("Adatbázis hiba:", err);
     res.status(500).send("Adatbázis hiba");
   }
 });
 
+// Kapcsolatfelvételi üzenet küldése
 app.post("/api/contact", async (req, res) => {
   const { email, message } = req.body;
 
@@ -121,21 +135,16 @@ app.post("/api/contact", async (req, res) => {
       text: `Feladó: ${email}\nÜzenet: ${message}`
     };
 
-    transporter.sendMail(mailOptions, (error, info) => {
-      if (error) {
-        console.error("Email küldési hiba:", error);
-        return res.status(500).json({ error: "Nem sikerült elküldeni az e-mailt!" });
-      }
-      console.log("Email elküldve:", info.response);
-      res.status(200).json({ message: "Üzeneted sikeresen elküldtük az adminnak!" });
-    });
+    await transporter.sendMail(mailOptions);
+    console.log("Email elküldve");
+    res.status(200).json({ message: "Üzeneted sikeresen elküldtük az adminnak!" });
   } catch (err) {
     console.error("Adatbázis hiba:", err);
     res.status(500).json({ error: "Adatbázis hiba történt!" });
   }
 });
 
-
+// Szerver indítása
 app.listen(5000, 'localhost', () => {
   console.log('Server running on http://localhost:5000');
 });

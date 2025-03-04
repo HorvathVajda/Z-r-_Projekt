@@ -9,7 +9,7 @@
         v-for="(business, index) in businesses"
         :key="index"
         class="business-card"
-        :class="{ selected: selectedBusiness && selectedBusiness.id === business.id, expanded: isExpanded }"
+        :class="{ selected: selectedBusiness && selectedBusiness.id === business.id }"
         @click="selectBusiness(business)"
       >
         <h3>{{ business.vallalkozas_neve }}</h3>
@@ -30,7 +30,7 @@
       </div>
     </div>
 
-    <div v-if="isExpanded" class="overlay" @click="closeExpandedView">
+    <div v-if="selectedBusiness" class="overlay" @click="closeExpandedView">
       <div class="expanded-business">
         <h2>{{ selectedBusiness.vallalkozas_neve }}</h2>
         <p>
@@ -103,7 +103,7 @@ export default {
   data() {
     return {
       businesses: [],
-      categories: [], // új változó a kategóriák tárolására
+      categories: [],
       selectedBusiness: null,
       showForm: false,
       isEdit: false,
@@ -145,25 +145,39 @@ export default {
   },
   mounted() {
     this.fetchBusinesses();
-    this.fetchCategories(); // Kategóriák betöltése
+    this.fetchCategories();
   },
   methods: {
     async fetchBusinesses() {
       try {
         const userEmail = JSON.parse(localStorage.getItem('authData')).email;
-        const response = await axios.get('/api/businesses/vallalkozo_vallalkozasai', {
-          headers: {
-            'email': userEmail
-          }
+
+        if (!userEmail) {
+          console.error('Nincs bejelentkezett felhasználó email cím!');
+          return;
+        }
+
+        const response = await axios.get('http://localhost:5000/api/businesses/vallalkozo_vallalkozasai', {
+          headers: { 'email': userEmail }
         });
+
         this.businesses = response.data;
       } catch (error) {
         console.error('Hiba a vállalkozások betöltésekor:', error);
+        
+        // Részletesebb hibaüzenet
+        if (error.response) {
+          console.error('Backend válasz:', error.response.data);
+        } else if (error.request) {
+          console.error('A kérés nem érkezett meg a backendhez:', error.request);
+        } else {
+          console.error('Hiba a kérés küldése közben:', error.message);
+        }
       }
     },
     async fetchCategories() {
       try {
-        const response = await axios.get('/api/businesses/categories'); // Kategóriák lekérése
+        const response = await axios.get('http://localhost:5000/api/businesses/business-categories');
         this.categories = response.data;
       } catch (error) {
         console.error('Hiba a kategóriák betöltésekor:', error);
@@ -189,6 +203,7 @@ export default {
           category: this.selectedBusiness.category,
           helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
         };
+
         const response = await axios.put(`http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`, updatedBusiness);
         console.log('Frissítés sikeres:', response);
         this.fetchBusinesses();
@@ -202,54 +217,69 @@ export default {
         if (this.showCustomCategoryInput && this.customCategory.trim() !== "") {
           this.newBusiness.category = this.customCategory;
         }
-
-        // Ellenőrzés, hogy minden szükséges mező ki van-e töltve
         if (!this.newBusiness.vallalkozas_neve || !this.newBusiness.iranyitoszam || 
             !this.newBusiness.varos || !this.newBusiness.utca || !this.newBusiness.hazszam ||
             !this.newBusiness.category) {
           console.error('Minden mezőt ki kell tölteni!');
           return;
         }
-
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
-
+        
         const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness);
-
         if (response.data) {
           this.businesses.push(response.data);
         }
-
         this.closeForm();
-        this.fetchBusinesses(); // Frissítés az új adatokkal
+        this.fetchBusinesses();
       } catch (error) {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error.response ? error.response.data : error.message);
       }
     },
     async deleteBusiness(businessId) {
+      if (!confirm('Biztosan törölni szeretnéd ezt a vállalkozást?')) {
+        return;
+      }
       try {
-        await axios.delete(`http://localhost:5000/api/businesses/delete/${businessId}`);
+        await axios.delete(`http://localhost:5000/api/businesses/${businessId}`);
+        console.log('Vállalkozás törölve');
         this.fetchBusinesses();
       } catch (error) {
         console.error('Hiba a vállalkozás törlésénél:', error);
       }
     },
     openEditForm(business) {
-      this.selectedBusiness = { ...business };
-      this.showForm = true;
+      this.selectedBusiness = { ...business }; 
       this.isEdit = true;
-    },
-    closeForm() {
-      this.showForm = false;
-      this.isEdit = false;
-      this.selectedBusiness = null;
+      this.showForm = true;
     },
     openNewForm() {
       this.showForm = true;
       this.isEdit = false;
+      this.newBusiness = {
+        vallalkozas_neve: "",
+        iranyitoszam: "",
+        varos: "",
+        utca: "",
+        hazszam: "",
+        ajto: "",
+        category: ""
+      };
+    },
+    closeForm() {
+      this.showForm = false;
+      this.isEdit = false;
+      this.customCategory = "";
+    },
+    closeExpandedView() {
+      this.selectedBusiness = null;
+    },
+    selectBusiness(business) {
+      this.selectedBusiness = this.selectedBusiness === business ? null : business;
     }
   }
 };
 </script>
+
 
 
 
