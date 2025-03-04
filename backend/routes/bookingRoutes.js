@@ -3,9 +3,9 @@ const router = express.Router();
 const db = require("../config/db");
 const emailjs = require('emailjs-com');
 
-// Szolgáltatások lekérdezése vállalkozás ID alapján (vagy az összes, ha nincs ID)
-router.get("/szolgaltatasok/:vallalkozas_id?", async (req, res) => {
-  const { vallalkozas_id } = req.params;
+// Szolgáltatások lekérdezése vállalkozás ID vagy kategória alapján
+router.get("/szolgaltatasok", async (req, res) => {
+  const { vallalkozas_id, category } = req.query;
 
   try {
     let query = `
@@ -13,12 +13,20 @@ router.get("/szolgaltatasok/:vallalkozas_id?", async (req, res) => {
       FROM szolgaltatas
       JOIN vallalkozas ON szolgaltatas.vallalkozas_id = vallalkozas.id
     `;
-
     const queryParams = [];
 
-    if (vallalkozas_id) {
+    if (vallalkozas_id && category) {
+      // Ha mindkét paraméter meg van adva, mindkettőt figyelembe vesszük
+      query += " WHERE szolgaltatas.vallalkozas_id = ? AND vallalkozas.category = ?";
+      queryParams.push(vallalkozas_id, category);
+    } else if (vallalkozas_id) {
+      // Ha csak a vallalkozas_id van
       query += " WHERE szolgaltatas.vallalkozas_id = ?";
       queryParams.push(vallalkozas_id);
+    } else if (category) {
+      // Ha csak a category van
+      query += " WHERE vallalkozas.category = ?";
+      queryParams.push(category);
     }
 
     const [rows] = await db.query(query, queryParams);
@@ -28,6 +36,7 @@ router.get("/szolgaltatasok/:vallalkozas_id?", async (req, res) => {
     res.status(500).json({ error: "Szerver hiba" });
   }
 });
+
 
 
 // Vállalkozások listája lekérdezése
@@ -136,7 +145,7 @@ router.get("/szolgaltatasok/:category", async (req, res) => {
 
     // Lekérdezés végrehajtása
     const [rows] = await db.query(query, queryParams);
-    
+
     // Eredmény visszaadása
     res.json(rows);
   } catch (error) {

@@ -26,7 +26,7 @@
         src="/kereses_logo.png"
         alt="Search"
         class="search-icon"
-        @click="fetchServicesByCategory"
+        @click="goToCategoryPage"
       />
     </div>
     <ul v-if="filteredCategories.length" class="suggestions">
@@ -34,18 +34,6 @@
         {{ category }}
       </li>
     </ul>
-  </div>
-
-  <div v-if="businesses.length" class="business-list">
-    <h3>Vállalkozások és Szolgáltatásaik</h3>
-    <div v-for="business in businesses" :key="business.id" class="business-item">
-      <h4>{{ business.vallalkozas_neve }}</h4>
-      <ul>
-        <li v-for="service in business.services" :key="service.szolgaltatas_id">
-          {{ service.szolgaltatas_neve }} - {{ service.ar }} Ft
-        </li>
-      </ul>
-    </div>
   </div>
 </template>
 
@@ -103,6 +91,12 @@ export default {
       fetchServicesByCategory(); // Szolgáltatások lekérése
     };
 
+    const goToCategoryPage = () => {
+      if (searchQuery.value) {
+        router.push(`/foglalas/${searchQuery.value}`);
+      }
+    };
+
     const goToLogin = () => {
       router.push("/login");
     };
@@ -121,17 +115,17 @@ export default {
 
     onMounted(fetchCategories);
 
-    return { 
-      isLoggedIn, 
-      goToLogin, 
-      goToRegister, 
-      goToBooking, 
-      businesses, 
+    return {
+      isLoggedIn,
+      goToLogin,
+      goToRegister,
+      goToBooking,
+      businesses,
       searchQuery,
       filteredCategories,
       filterCategories,
       selectCategory,
-      fetchServicesByCategory 
+      goToCategoryPage
     };
   },
 };

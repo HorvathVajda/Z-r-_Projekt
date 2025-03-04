@@ -1,6 +1,20 @@
 <template>
   <div class="container">
     <h2>Szolgáltatások</h2>
+
+    <!-- Rendezés legördülő menü -->
+    <div class="filter">
+      <label for="sortOptions">Rendezés:</label>
+      <select id="sortOptions" v-model="selectedSortOption" @change="sortServices">
+        <option value="nameAsc">Vállalkozás név szerint (ABC, növekvő)</option>
+        <option value="nameDesc">Vállalkozás név szerint (ABC, csökkenő)</option>
+        <option value="durationAsc">Időtartam szerint (növekvő)</option>
+        <option value="durationDesc">Időtartam szerint (csökkenő)</option>
+        <option value="priceAsc">Ár szerint (növekvő)</option>
+        <option value="priceDesc">Ár szerint (csökkenő)</option>
+      </select>
+    </div>
+
     <div class="cards">
       <div
         v-for="szolgaltatas in szolgaltatasok"
@@ -58,31 +72,59 @@ export default {
       selectedSzolgaltatasId: null,
       vallalkozasId: null,
       alertMessage: null,
+      selectedSortOption: "nameAsc",  // Alapértelmezett rendezés
     };
   },
   mounted() {
     const route = useRoute();
     const router = useRouter();
     this.vallalkozasId = this.$route.params.vallalkozas_id;
+    this.category = this.$route.params.category;
     console.log('Vállalkozás ID:', this.vallalkozasId);
 
     // Ha nincs vállalkozás ID, akkor az összes szolgáltatást lekéri
     this.fetchSzolgaltatasok(this.vallalkozasId);
   },
   methods: {
-    async fetchSzolgaltatasok(vallalkozasId) {
-      try {
-        let url = "/api/foglalasok/szolgaltatasok";
-        if (vallalkozasId) {
-          url += `/${vallalkozasId}`;
-        }
+    // Például, ha a 'vallalkozas_id' numerikus és a backend azt várja
+fetchSzolgaltatasok(vallalkozasId, category) {
+  const params = new URLSearchParams();
 
-        const response = await fetch(url);
-        this.szolgaltatasok = await response.json();
-      } catch (error) {
-        console.error("Hiba a szolgáltatások lekérésekor:", error);
+  if (vallalkozasId) {
+    params.append('vallalkozas_id', vallalkozasId); // itt ID-t küldünk
+  }
+
+  if (category) {
+    params.append('category', category);
+  }
+
+  axios
+    .get(`/api/foglalasok/szolgaltatasok?${params.toString()}`)
+    .then((response) => {
+      this.szolgaltatasok = response.data;
+    })
+    .catch((error) => {
+      console.error("Hiba a szolgáltatások lekérésekor:", error);
+    });
+},
+
+    // Rendezés metódusa
+    sortServices() {
+      if (this.selectedSortOption === "nameAsc") {
+        this.szolgaltatasok.sort((a, b) => a.vallalkozas_neve.localeCompare(b.vallalkozas_neve));
+      } else if (this.selectedSortOption === "nameDesc") {
+        this.szolgaltatasok.sort((a, b) => b.vallalkozas_neve.localeCompare(a.vallalkozas_neve));
+      } else if (this.selectedSortOption === "durationAsc") {
+        this.szolgaltatasok.sort((a, b) => a.idotartam - b.idotartam);
+      } else if (this.selectedSortOption === "durationDesc") {
+        this.szolgaltatasok.sort((a, b) => b.idotartam - a.idotartam);
+      } else if (this.selectedSortOption === "priceAsc") {
+        this.szolgaltatasok.sort((a, b) => a.ar - b.ar);
+      } else if (this.selectedSortOption === "priceDesc") {
+        this.szolgaltatasok.sort((a, b) => b.ar - a.ar);
       }
     },
+
     async fetchSzabadIdopontok(szolgaltatasId) {
       this.selectedSzolgaltatasId = szolgaltatasId;
       try {
@@ -161,6 +203,17 @@ export default {
 h2 {
   text-align: center;
   margin-bottom: 20px;
+}
+
+.filter {
+  margin-bottom: 20px;
+  text-align: center;
+}
+
+.filter select {
+  padding: 10px;
+  background-color: #f0f0f0;
+  border-radius: 5px;
 }
 
 .cards {
