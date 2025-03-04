@@ -27,7 +27,7 @@
 
 /* semantic color variables for this project */
 :root {
-  --color-background: #F4F4F4;
+  --color-background: white;
   --color-background-soft: var(--vt-c-white-soft);
   --color-background-mute: var(--vt-c-white-mute);
 
@@ -43,7 +43,7 @@
 @media (prefers-color-scheme: dark) {
   :root {
     --navbar-height: 80px;
-    --color-background: #F4F4F4;
+    --color-background: white;
     --color-background-soft: var(--vt-c-black-soft);
     --color-background-mute: var(--vt-c-black-mute);
 
@@ -69,7 +69,7 @@ html, body {
   height: 100%;
   width: 100%;
   font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  background-color: #f4f4f4;
+  background-color: white;
 }     
 body { 
   color: var(--color-text);

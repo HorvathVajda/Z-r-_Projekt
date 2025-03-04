@@ -25,8 +25,7 @@ const routes = [
   { path: '/editprofile', name: 'editProfile', component: editProfile },
   { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
-  { path: '/foglalas/:vallalkozas_id?', name: 'Foglalas', component: Foglalas, props: true },
-
+  { path: '/foglalas/:vallalkozas_id?/:category?', name: 'Foglalas', component: Foglalas, props: true },
 
   {
     path: '/',

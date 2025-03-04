@@ -119,4 +119,29 @@ router.post('/foglalas', async (req, res) => {
   }
 });
 
+// Szolgáltatások lekérdezése kategória alapján
+router.get("/szolgaltatasok/:category", async (req, res) => {
+  const { category } = req.params;
+
+  try {
+    let query = `
+      SELECT szolgaltatas.*, vallalkozas.vallalkozas_neve
+      FROM szolgaltatas
+      JOIN vallalkozas ON szolgaltatas.vallalkozas_id = vallalkozas.id
+      WHERE vallalkozas.category = ?
+    `;
+
+    // Paraméterek a queryhez
+    const queryParams = [category];
+
+    // Lekérdezés végrehajtása
+    const [rows] = await db.query(query, queryParams);
+    
+    // Eredmény visszaadása
+    res.json(rows);
+  } catch (error) {
+    console.error("Hiba a szolgáltatások lekérésekor:", error);
+    res.status(500).json({ error: "Szerver hiba" });
+  }
+});
 module.exports = router;

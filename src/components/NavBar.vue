@@ -10,7 +10,7 @@
         <a
           v-if="isLoggedIn"
           class="navbar-brand logo"
-          href="/Foglalas">BookMyTime
+          href="/">BookMyTime
         </a>
 
         <!-- Hamburger menü gomb -->
@@ -114,7 +114,7 @@ html, body {
   justify-content: space-between;
   font-family: 'Franklin Gothic Medium';
   height: 70px; /* Fix magasság */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Alsó árnyék */
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Alsó árnyék */
   border-radius: 0; /* Nincs lekerekített sarkak */
 }
 

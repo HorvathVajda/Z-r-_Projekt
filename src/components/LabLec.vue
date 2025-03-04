@@ -20,7 +20,7 @@ export default {
   width: 100%;
   background-color: #f4f4f4;
   color: #333; /* Darker color for better contrast */
-  padding: 20px 0;
+  padding: 10px;
   text-align: center;
   position: relative;
   bottom: 0;

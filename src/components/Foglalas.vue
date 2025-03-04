@@ -66,24 +66,23 @@ export default {
     this.vallalkozasId = this.$route.params.vallalkozas_id;
     console.log('Vállalkozás ID:', this.vallalkozasId);
 
-    if (!this.vallalkozasId) {
-      this.showAlert("Nincs érvényes vállalkozás ID!");
-      router.push('/');
-    } else {
-      this.fetchSzolgaltatasok(this.vallalkozasId); 
-    }
+    // Ha nincs vállalkozás ID, akkor az összes szolgáltatást lekéri
+    this.fetchSzolgaltatasok(this.vallalkozasId);
   },
   methods: {
     async fetchSzolgaltatasok(vallalkozasId) {
       try {
-        const response = await axios.get(`/api/foglalasok/szolgaltatasok/${vallalkozasId}`);
-        this.szolgaltatasok = response.data;
+        let url = "/api/foglalasok/szolgaltatasok";
+        if (vallalkozasId) {
+          url += `/${vallalkozasId}`;
+        }
+
+        const response = await fetch(url);
+        this.szolgaltatasok = await response.json();
       } catch (error) {
-        console.error("Hiba a szolgáltatások lekérdezésekor:", error);
-        this.showAlert("Hiba történt a szolgáltatások lekérésekor!");
+        console.error("Hiba a szolgáltatások lekérésekor:", error);
       }
     },
-
     async fetchSzabadIdopontok(szolgaltatasId) {
       this.selectedSzolgaltatasId = szolgaltatasId;
       try {
@@ -154,8 +153,9 @@ export default {
 <style scoped>
 .container {
   padding: 20px;
-  max-width: 1200px;
+  max-width: 2000px;
   margin: auto;
+  background-color: white;
 }
 
 h2 {
@@ -171,8 +171,8 @@ h2 {
 }
 
 .card {
-  background: #222;
-  color: #fff;
+  background: white;
+  color: black;
   padding: 15px;
   border-radius: 10px;
   width: 350px;
@@ -236,18 +236,18 @@ button:hover {
   border: none;
   border-radius: 5px;
   cursor: pointer;
-  transition: transform 0.3s ease, background-color 0.3s ease;
+  transition: transform none, background-color 0.3s ease;
   margin-top: auto;
 }
 
 .foglalas-btn:hover {
   background-color: #7600e5;
-  transform: scale(1.05);
+  transform: none;
 }
 
 .close {
   color: black;
-  font-size: 28px;
+  font-size: 50px;
   font-weight: bold;
   cursor: pointer;
 }
