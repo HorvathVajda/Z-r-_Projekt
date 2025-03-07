@@ -7,36 +7,35 @@ const jwt = require("jsonwebtoken");
 const secretKey = "titkoskulcs";
 
 router.get('/vallalkozo_vallalkozasai', (req, res) => {
-  const { email } = req.query; // Az emailt a frontend küldi el query paraméterként
+  const { email } = req.query;
+  console.log('Kapott paraméterek (Vállalkozások lekérése):', req.query);
 
   if (!email) {
-      return res.status(400).json({ error: 'Hiányzó email paraméter' });
+    return res.status(400).json({ error: 'Hiányzó email paraméter' });
   }
 
-  // Első lépés: a 'vallalkozo' táblából kinyerni a 'vallalkozo_id'-t
   const sqlVallalkozo = 'SELECT vallalkozo_id FROM vallalkozo WHERE email = ?';
   db.query(sqlVallalkozo, [email], (err, results) => {
+    if (err) {
+      console.error('Lekérdezési hiba a vallalkozo táblából:', err);
+      return res.status(500).json({ error: 'Adatbázis hiba' });
+    }
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: 'Nem található felhasználó ezzel az email címmel' });
+    }
+
+    const vallalkozo_id = results[0].vallalkozo_id;
+
+    const sqlVallalkozas = 'SELECT * FROM vallalkozas WHERE vallalkozo_id = ?';
+    db.query(sqlVallalkozas, [vallalkozo_id], (err, businessResults) => {
       if (err) {
-          console.error('Lekérdezési hiba a vallalkozo táblából:', err);
-          return res.status(500).json({ error: 'Adatbázis hiba' });
+        console.error('Lekérdezési hiba a vallalkozas táblából:', err);
+        return res.status(500).json({ error: 'Adatbázis hiba' });
       }
 
-      if (results.length === 0) {
-          return res.status(404).json({ error: 'Nem található felhasználó ezzel az email címmel' });
-      }
-
-      const vallalkozo_id = results[0].vallalkozo_id;
-
-      // Második lépés: lekérdezni a 'vallalkozas' táblát a 'vallalkozo_id' alapján
-      const sqlVallalkozas = 'SELECT * FROM vallalkozas WHERE vallalkozo_id = ?';
-      db.query(sqlVallalkozas, [vallalkozo_id], (err, businessResults) => {
-          if (err) {
-              console.error('Lekérdezési hiba a vallalkozas táblából:', err);
-              return res.status(500).json({ error: 'Adatbázis hiba' });
-          }
-
-          res.json(businessResults); // Válaszban visszaküldjük a vállalkozásokat
-      });
+      res.json(businessResults);
+    });
   });
 });
 

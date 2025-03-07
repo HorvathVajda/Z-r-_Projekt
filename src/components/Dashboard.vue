@@ -4,30 +4,37 @@
       <h1>Vállalkozásaim</h1>
     </header>
 
-    <div class="business-grid">
+    <button @click="fetchBusinesses">Vállalkozások betöltése</button>
+
+    <div v-if="businesses.length > 0" class="business-grid">
       <div
-        v-for="(business, index) in businesses"
-        :key="index"
+        v-for="business in businesses"
+        :key="business.vallalkozas_id"
         class="business-card"
-        :class="{ selected: selectedBusiness && selectedBusiness.id === business.id }"
+        :class="{ selected: selectedBusiness && selectedBusiness.vallalkozas_id === business.vallalkozas_id }"
         @click="selectBusiness(business)"
       >
         <h3>{{ business.vallalkozas_neve }}</h3>
+
         <p>
-          {{ business.iranyitoszam }} {{ business.varos }} {{ business.utca }} {{ business.hazszam }}
-          <span v-if="business.ajto">{{ business.ajto }}</span>
+          {{ business.iranyitoszam }} {{ business.varos }},
+          {{ business.utca }} {{ business.hazszam }}
         </p>
-        <p>Kategória: {{ business.kategoria }}</p>
+
+        <p>Kategória: {{ business.category }}</p>
 
         <div class="business-card-actions">
           <button @click.stop="openEditForm(business)">Szerkesztés</button>
-          <button @click.stop="deleteBusiness(business.id)">Törlés</button>
         </div>
       </div>
 
       <div class="business-card add-business-card" @click="openNewForm">
         <span>+</span>
       </div>
+    </div>
+
+    <div v-else>
+      <p>Még nincs betöltve egyetlen vállalkozás sem.</p>
     </div>
 
     <div v-if="selectedBusiness" class="overlay" @click="closeExpandedView">
@@ -37,7 +44,7 @@
           {{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }},
           {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}
         </p>
-        <p>Kategória: {{ selectedBusiness.kategoria }}</p>
+        <p>Kategória: {{ selectedBusiness.category }}</p>
       </div>
     </div>
 
@@ -64,10 +71,6 @@
           <div class="form-group">
             <label for="hazszam">Házszám:</label>
             <input type="text" id="hazszam" v-model="activeBusiness.hazszam" required />
-          </div>
-          <div class="form-group">
-            <label for="ajto">Ajtó (opcionális):</label>
-            <input type="text" id="ajto" v-model="activeBusiness.ajto" />
           </div>
           <div class="form-group">
             <label for="category">Vállalkozás típusa:</label>
@@ -148,30 +151,37 @@ export default {
   },
   methods: {
     async fetchBusinesses() {
-      try {
-          const authData = JSON.parse(localStorage.getItem('authData'));
-          const email = authData?.email;
-          if (!email) {
-              console.error('Nincs bejelentkezett felhasználó email cím!');
-              return;
-          }
+  try {
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const email = authData?.email;
+    if (!email) {
+      console.error('Nincs bejelentkezett felhasználó email cím!');
+      return;
+    }
 
-          const response = await axios.get(`/api/businesses/vallalkozo_vallalkozasai?email=${encodeURIComponent(email)}`);
+    const response = await axios.get(`/api/businesses/vallalkozo_vallalkozasai`, {
+      params: { email },
+      timeout: 10000  // Time-out növelése, hogy több idő legyen a válaszra
+    });
 
-          this.businesses = response.data;
-      } catch (error) {
-          console.error('Hiba a vállalkozások betöltésekor:', error);
+    console.log('Válasz adat:', response.data);
 
-          // Részletesebb hibaüzenet
-          if (error.response) {
-              console.error('Backend válasz:', error.response.data);
-          } else if (error.request) {
-              console.error('A kérés nem érkezett meg a backendhez:', error.request);
-          } else {
-              console.error('Hiba a kérés küldése közben:', error.message);
-          }
-      }
-  },
+    if (response.data && Array.isArray(response.data)) {
+      this.businesses = response.data;
+    } else {
+      console.error('Nem megfelelő formátumú válasz!');
+    }
+  } catch (error) {
+    console.error('Hiba a vállalkozások betöltésekor:', error);
+    if (error.response) {
+      console.error('Backend válasz:', error.response.data);
+    } else if (error.request) {
+      console.error('A kérés nem érkezett meg a backendhez:', error.request);
+    } else {
+      console.error('Hiba a kérés küldése közben:', error.message);
+    }
+  }
+},
 
     handleCategoryChange() {
       if (this.activeBusiness.category === "other") {
@@ -194,7 +204,7 @@ export default {
           helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
         };
 
-        const response = await axios.put(`http://localhost:5000/api/businesses/update/${this.selectedBusiness.id}`, updatedBusiness);
+        const response = await axios.put(`api/businesses/update/${this.selectedBusiness.id}`, updatedBusiness);
         console.log('Frissítés sikeres:', response);
         this.fetchBusinesses();
         this.closeForm();
@@ -215,7 +225,7 @@ export default {
         }
         this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
 
-        const response = await axios.post('http://localhost:5000/api/businesses/add', this.newBusiness);
+        const response = await axios.post('/api/businesses/add', this.newBusiness);
         if (response.data) {
           this.businesses.push(response.data);
         }
@@ -225,23 +235,13 @@ export default {
         console.error('Hiba az új vállalkozás hozzáadásakor:', error.response ? error.response.data : error.message);
       }
     },
-    async deleteBusiness(businessId) {
-      if (!confirm('Biztosan törölni szeretnéd ezt a vállalkozást?')) {
-        return;
-      }
-      try {
-        await axios.delete(`http://localhost:5000/api/businesses/${businessId}`);
-        console.log('Vállalkozás törölve');
-        this.fetchBusinesses();
-      } catch (error) {
-        console.error('Hiba a vállalkozás törlésénél:', error);
-      }
-    },
+
     openEditForm(business) {
       this.selectedBusiness = { ...business };
       this.isEdit = true;
       this.showForm = true;
     },
+
     openNewForm() {
       this.showForm = true;
       this.isEdit = false;
@@ -255,23 +255,23 @@ export default {
         category: ""
       };
     },
+
     closeForm() {
       this.showForm = false;
       this.isEdit = false;
       this.customCategory = "";
     },
+
     closeExpandedView() {
       this.selectedBusiness = null;
     },
+
     selectBusiness(business) {
       this.selectedBusiness = this.selectedBusiness === business ? null : business;
     }
   }
 };
 </script>
-
-
-
 
 <style scoped>
 html, body {

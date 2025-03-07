@@ -58,7 +58,7 @@ CREATE TABLE `foglalasok` (
   `vallalkozas_id` int DEFAULT NULL,
   `statusz` enum('szabad','foglalt') CHARACTER SET utf8mb3 COLLATE utf8mb3_hungarian_ci DEFAULT 'szabad',
   `foglalas_datum` datetime DEFAULT CURRENT_TIMESTAMP,
-  `foglalo_tipus` enum('felhasznalo','vallalkozó') CHARACTER SET utf8mb3 COLLATE utf8mb3_hungarian_ci DEFAULT 'felhasznalo'
+  `foglalo_tipus` enum('felhasznalo','vallalkozo') CHARACTER SET utf8mb3 COLLATE utf8mb3_hungarian_ci DEFAULT 'felhasznalo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_hungarian_ci;
 
 --
