@@ -3,8 +3,8 @@ import { reactive, computed } from "vue";
 // store.js
 export const store = reactive({
   authData: JSON.parse(localStorage.getItem("authData")) || null,
-  isLoggedIn: computed(() => !!store.authData), 
-
+  isLoggedIn: computed(() => !!store.authData),
+  vallalkozo: computed(() => store.authData?.tipus === "vallalkozo"),
 
   // Frissíti az authData-t és a localStorage-ban tárolt adatokat
   updateAuthData(data) {

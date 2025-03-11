@@ -16,6 +16,7 @@ import Notifications from './components/Ertesitesek.vue';
 import Foglalas from './components/Foglalas.vue';
 import businessCard from './components/businessCards.vue';
 import felhasznaloHome from  './components/felhasznaloHome.vue';
+import BusinessDetails from './components/BusinessDetails.vue';
 
 const routes = [
   { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
