@@ -15,6 +15,7 @@ import Settings from './components/Beallitasok.vue';
 import Notifications from './components/Ertesitesek.vue';
 import Foglalas from './components/Foglalas.vue';
 import businessCard from './components/businessCards.vue';
+import BusinessDetails from './components/BusinessDetails.vue';
 
 const routes = [
   { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
@@ -43,6 +44,7 @@ const routes = [
       { path: 'beallitasok', name: 'Beallitasok', component: Settings },
       { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
       { path: 'profil', name: 'Profil', component: Profil },
+      { path: 'ceg/:id', name: 'CegProfil', component: BusinessDetails, props: true},
     ]
   }
 ];
