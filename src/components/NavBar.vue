@@ -3,12 +3,12 @@
     <nav class="navbar navbar-expand-lg" :class="navbarClass">
       <div class="container-fluid">
         <a
-          v-if="!isLoggedIn"
+          v-if="vallalkozo"
           class="navbar-brand logo"
-          href="/">BookMyTime
+          href="/vallalkozoHome">BookMyTime
         </a>
         <a
-          v-if="isLoggedIn"
+        v-if="!vallalkozo"
           class="navbar-brand logo"
           href="/">BookMyTime
         </a>
@@ -60,6 +60,7 @@ import { store } from "../store";
 
 const router = useRouter();
 const isLoggedIn = computed(() => store.isLoggedIn);
+const vallalkozo = computed(() => store.vallalkozo);
 const navbarClass = ref("normal-navbar");
 
 function handleLogout() {

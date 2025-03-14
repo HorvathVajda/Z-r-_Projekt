@@ -1,97 +1,69 @@
 <template>
   <div class="dashboard-content">
-    <header>
+    <div>
       <h1>Vállalkozásaim</h1>
-    </header>
+      <div class="business-cards">
+        <!-- Display businesses as cards -->
+        <div v-for="business in businesses" :key="business.id" class="business-card">
+          <h3>{{ business.vallalkozas_neve }}</h3>
+          <p>{{ business.helyszin }}</p>
+          <router-link :to="'/vallalkozoHome/ceg/' + business.id" class="business-link">
+            <button class="go-to-business-btn">Tovább a vállalkozásra</button>
+          </router-link>
+        </div>
 
-    <button @click="fetchBusinesses">Vállalkozások betöltése</button>
-
-    <div v-if="businesses.length > 0" class="business-grid">
-      <div
-        v-for="business in businesses"
-        :key="business.vallalkozas_id"
-        class="business-card"
-        :class="{ selected: selectedBusiness && selectedBusiness.vallalkozas_id === business.vallalkozas_id }"
-        @click="selectBusiness(business)"
-      >
-        <h3>{{ business.vallalkozas_neve }}</h3>
-
-        <p>
-          {{ business.iranyitoszam }} {{ business.varos }},
-          {{ business.utca }} {{ business.hazszam }}
-        </p>
-
-        <p>Kategória: {{ business.category }}</p>
-
-        <div class="business-card-actions">
-          <button @click.stop="openEditForm(business)">Szerkesztés</button>
+        <!-- Plus card to add a new business -->
+        <div class="add-business-card" @click="showForm = true">
+          <span class="plus-icon">+</span>
+          <p>Új vállalkozás hozzáadása</p>
         </div>
       </div>
-
-      <div class="business-card add-business-card" @click="openNewForm">
-        <span>+</span>
-      </div>
     </div>
 
-    <div v-else>
-      <p>Még nincs betöltve egyetlen vállalkozás sem.</p>
-    </div>
-
-    <div v-if="selectedBusiness" class="overlay" @click="closeExpandedView">
-      <div class="expanded-business">
-        <h2>{{ selectedBusiness.vallalkozas_neve }}</h2>
-        <p>
-          {{ selectedBusiness.iranyitoszam }} {{ selectedBusiness.varos }},
-          {{ selectedBusiness.utca }} {{ selectedBusiness.hazszam }}
-        </p>
-        <p>Kategória: {{ selectedBusiness.category }}</p>
-      </div>
-    </div>
-
+    <!-- Form modal for adding a new business -->
     <div v-if="showForm" class="form-overlay">
       <div class="form-container">
-        <form @submit.prevent="isEdit ? updateBusiness() : addBusiness()">
-          <h2>{{ isEdit ? 'Vállalkozás Szerkesztése' : 'Új Vállalkozás Hozzáadása' }}</h2>
+        <h2>Új Vállalkozás</h2>
+        <form @submit.prevent="submitBusinessForm">
           <div class="form-group">
-            <label for="vallalkozas_neve">Vállalkozás neve:</label>
-            <input type="text" id="vallalkozas_neve" v-model="activeBusiness.vallalkozas_neve" required />
+            <label for="businessName">Vállalkozás neve</label>
+            <input type="text" id="businessName" v-model="newBusiness.vallalkozas_neve" required />
           </div>
           <div class="form-group">
-            <label for="iranyitoszam">Irányítószám:</label>
-            <input type="text" id="iranyitoszam" v-model="activeBusiness.iranyitoszam" required />
+            <label for="postalCode">Irányítószám</label>
+            <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" @input="validatePostalCode" required />
           </div>
           <div class="form-group">
-            <label for="varos">Város:</label>
-            <input type="text" id="varos" v-model="activeBusiness.varos" required />
+            <label for="city">Város</label>
+            <input type="text" id="city" v-model="newBusiness.varos" required />
           </div>
           <div class="form-group">
-            <label for="utca">Utca:</label>
-            <input type="text" id="utca" v-model="activeBusiness.utca" required />
+            <label for="street">Utca</label>
+            <input type="text" id="street" v-model="newBusiness.utca" required />
           </div>
           <div class="form-group">
-            <label for="hazszam">Házszám:</label>
-            <input type="text" id="hazszam" v-model="activeBusiness.hazszam" required />
+            <label for="houseNumber">Házszám</label>
+            <input type="text" id="houseNumber" v-model="newBusiness.hazszam" required />
           </div>
           <div class="form-group">
-            <label for="category">Vállalkozás típusa:</label>
-            <select id="category" v-model="activeBusiness.category" required @change="handleCategoryChange">
-              <option v-for="category in categories" :key="category" :value="category">{{ category }}</option>
-              <option value="other">Más...</option>
-            </select>
+            <label for="openingHours">Nyitvatartás (HH:MM-HH:MM)</label>
             <input
-              v-if="showCustomCategoryInput"
               type="text"
-              v-model="customCategory"
-              placeholder="Írd be az új vállalkozás típust"
+              id="openingHours"
+              v-model="newBusiness.nyitva_tartas"
+              required
+              placeholder="00:00-00:00"
+              maxlength="11"
+              @input="formatOpeningHours"
             />
           </div>
+          <div class="form-group">
+            <label for="category">Kategória</label>
+            <input type="text" id="category" v-model="newBusiness.category" />
+          </div>
           <div class="form-buttons">
-            <button type="submit" class="submit-button">
-              {{ isEdit ? 'Szerkesztés' : 'Hozzáadás' }}
-            </button>
-            <button type="button" @click="closeForm" class="cancel-button">
-              Mégse
-            </button>
+            <button type="submit" class="submit-button">Mentés</button>
+            <button type="button" class="cancel-button" @click="showForm = false">Mégse</button>
           </div>
         </form>
       </div>
@@ -99,181 +71,160 @@
   </div>
 </template>
 
-<script>
+<script setup>
+import { ref, onMounted } from 'vue';
 import axios from 'axios';
 
-export default {
-  data() {
-    return {
-      businesses: [],
-      categories: [],
-      selectedBusiness: null,
-      showForm: false,
-      isEdit: false,
-      newBusiness: {
-        vallalkozas_neve: "",
-        iranyitoszam: "",
-        varos: "",
-        utca: "",
-        hazszam: "",
-        ajto: "",
-        category: ""
-      },
-      customCategory: "",
-      showCustomCategoryInput: false,
-      fieldLabels: {
-        vallalkozas_neve: "Vállalkozás neve",
-        iranyitoszam: "Irányítószám",
-        varos: "Város",
-        utca: "Utca",
-        hazszam: "Házszám",
-        ajto: "Ajtó (opcionális)",
-        category: "Vállalkozás típusa"
-      }
-    };
-  },
-  computed: {
-    activeBusiness: {
-      get() {
-        return this.isEdit ? this.selectedBusiness : this.newBusiness;
-      },
-      set(val) {
-        if (this.isEdit) {
-          this.selectedBusiness = val;
-        } else {
-          this.newBusiness = val;
-        }
-      }
-    }
-  },
-  mounted() {
-    this.fetchBusinesses();
-  },
-  methods: {
-    async fetchBusinesses() {
+const businesses = ref([]);
+const showForm = ref(false);
+const newBusiness = ref({
+  vallalkozas_neve: '',
+  iranyitoszam: '',
+  varos: '',
+  utca: '',
+  hazszam: '',
+  nyitva_tartas: '',
+  category: ''
+});
+const fetchBusinesses = async () => {
   try {
     const authData = JSON.parse(localStorage.getItem('authData'));
-    const email = authData?.email;
-    if (!email) {
-      console.error('Nincs bejelentkezett felhasználó email cím!');
+    if (!authData || !authData.id) {
+      console.error('Hiányzó felhasználói adatok');
       return;
     }
-
-    const response = await axios.get(`/api/businesses/vallalkozo_vallalkozasai`, {
-      params: { email },
-      timeout: 10000  // Time-out növelése, hogy több idő legyen a válaszra
+    const response = await axios.get('/api/businesses/vallalkozasok', {
+      params: { vallalkozo_id: authData.id }
     });
-
-    console.log('Válasz adat:', response.data);
-
-    if (response.data && Array.isArray(response.data)) {
-      this.businesses = response.data;
-    } else {
-      console.error('Nem megfelelő formátumú válasz!');
-    }
+    businesses.value = response.data;
   } catch (error) {
     console.error('Hiba a vállalkozások betöltésekor:', error);
-    if (error.response) {
-      console.error('Backend válasz:', error.response.data);
-    } else if (error.request) {
-      console.error('A kérés nem érkezett meg a backendhez:', error.request);
-    } else {
-      console.error('Hiba a kérés küldése közben:', error.message);
-    }
   }
-},
+};
 
-    handleCategoryChange() {
-      if (this.activeBusiness.category === "other") {
-        this.showCustomCategoryInput = true;
-        this.customCategory = "";
-      } else {
-        this.showCustomCategoryInput = false;
-      }
-    },
-    async updateBusiness() {
-      try {
-        const updatedBusiness = {
-          vallalkozas_neve: this.selectedBusiness.vallalkozas_neve,
-          iranyitoszam: this.selectedBusiness.iranyitoszam,
-          varos: this.selectedBusiness.varos,
-          utca: this.selectedBusiness.utca,
-          hazszam: this.selectedBusiness.hazszam,
-          ajto: this.selectedBusiness.ajto,
-          category: this.selectedBusiness.category,
-          helyszin: `${this.selectedBusiness.iranyitoszam} ${this.selectedBusiness.varos} ${this.selectedBusiness.utca} ${this.selectedBusiness.hazszam}${this.selectedBusiness.ajto ? " " + this.selectedBusiness.ajto : ""}`
-        };
+const validatePostalCode = () => {
+  if (newBusiness.value.iranyitoszam) {
+    // Csak számokat engedünk be
+    newBusiness.value.iranyitoszam = newBusiness.value.iranyitoszam.replace(/[^0-9]/g, '');
 
-        const response = await axios.put(`api/businesses/update/${this.selectedBusiness.id}`, updatedBusiness);
-        console.log('Frissítés sikeres:', response);
-        this.fetchBusinesses();
-        this.closeForm();
-      } catch (error) {
-        console.error('Hiba a vállalkozás frissítésekor:', error.response ? error.response.data : error.message);
-      }
-    },
-    async addBusiness() {
-      try {
-        if (this.showCustomCategoryInput && this.customCategory.trim() !== "") {
-          this.newBusiness.category = this.customCategory;
-        }
-        if (!this.newBusiness.vallalkozas_neve || !this.newBusiness.iranyitoszam ||
-            !this.newBusiness.varos || !this.newBusiness.utca || !this.newBusiness.hazszam ||
-            !this.newBusiness.category) {
-          console.error('Minden mezőt ki kell tölteni!');
-          return;
-        }
-        this.newBusiness.helyszin = `${this.newBusiness.iranyitoszam} ${this.newBusiness.varos} ${this.newBusiness.utca} ${this.newBusiness.hazszam}${this.newBusiness.ajto ? " " + this.newBusiness.ajto : ""}`;
-
-        const response = await axios.post('/api/businesses/add', this.newBusiness);
-        if (response.data) {
-          this.businesses.push(response.data);
-        }
-        this.closeForm();
-        this.fetchBusinesses();
-      } catch (error) {
-        console.error('Hiba az új vállalkozás hozzáadásakor:', error.response ? error.response.data : error.message);
-      }
-    },
-
-    openEditForm(business) {
-      this.selectedBusiness = { ...business };
-      this.isEdit = true;
-      this.showForm = true;
-    },
-
-    openNewForm() {
-      this.showForm = true;
-      this.isEdit = false;
-      this.newBusiness = {
-        vallalkozas_neve: "",
-        iranyitoszam: "",
-        varos: "",
-        utca: "",
-        hazszam: "",
-        ajto: "",
-        category: ""
-      };
-    },
-
-    closeForm() {
-      this.showForm = false;
-      this.isEdit = false;
-      this.customCategory = "";
-    },
-
-    closeExpandedView() {
-      this.selectedBusiness = null;
-    },
-
-    selectBusiness(business) {
-      this.selectedBusiness = this.selectedBusiness === business ? null : business;
+    // Ha több mint 4 számjegy van, levágjuk
+    if (newBusiness.value.iranyitoszam.length > 4) {
+      newBusiness.value.iranyitoszam = newBusiness.value.iranyitoszam.slice(0, 4);
     }
   }
 };
+
+// Nyitvatartás formázása (HH:MM-HH:MM formátumban)
+const formatOpeningHours = (event) => {
+  let value = event.target.value;
+
+  // Csak számokat és ":" karaktert engedünk
+  value = value.replace(/[^0-9:]/g, '');
+
+  // Első két szám után helyezzük el a ":" karaktert, ha nem létezik
+  if (value.length > 2 && value[2] !== ':') {
+    value = value.substring(0, 2) + ':' + value.substring(2);
+  }
+
+  // A "-" karaktert a 5. pozícióra rakjuk, ha már 5 karakter van
+  if (value.length > 5 && value[5] !== '-') {
+    value = value.substring(0, 5) + '-' + value.substring(5);
+  }
+
+  // A második ":" karaktert a 8. pozícióra rakjuk
+  if (value.length > 8 && value[8] !== ':') {
+    value = value.substring(0, 8) + ':' + value.substring(8);
+  }
+
+  // Csak 11 karakter lehet (HH:MM-HH:MM formátum)
+  if (value.length > 11) {
+    value = value.substring(0, 11);
+  }
+
+  // Ellenőrzés, hogy az órák és percek érvényesek-e (00-24, 00-59)
+  const parts = value.split(':');
+  if (parts.length === 2) {
+    const openingHour = parseInt(parts[0], 10);
+    const openingMinute = parseInt(parts[1].slice(0, 2), 10);
+
+    // Ellenőrizzük, hogy az első óra és perc érvényes-e
+    if (openingHour > 24) {
+      value = '24:' + value.slice(3);
+    }
+    if (openingMinute > 59) {
+      value = value.slice(0, 3) + '59' + value.slice(5);
+    }
+
+    // Második időpont (zárás)
+    if (parts[1].includes('-')) {
+      const closingHour = parseInt(parts[1].split('-')[1].slice(0, 2), 10);
+      const closingMinute = parseInt(parts[1].split('-')[1].slice(3, 5), 10);
+
+      // Ha a záró óra nagyobb, mint 24, akkor állítsuk be 24-re
+      if (closingHour > 24) {
+        value = value.slice(0, 6) + '24' + value.slice(8);
+      }
+
+      // Ha a záró perc nagyobb, mint 59, akkor állítsuk be 59-re
+      if (closingMinute > 59) {
+        value = value.slice(0, 8) + '59';
+      }
+    }
+  }
+
+  event.target.value = value;
+  newBusiness.value.nyitva_tartas = value;
+};
+
+const submitBusinessForm = async () => {
+  try {
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    if (!authData || !authData.id) {
+      console.error('Hiányzó felhasználói adatok');
+      return;
+    }
+
+    const helyszin = `${newBusiness.value.iranyitoszam} ${newBusiness.value.varos}, ${newBusiness.value.utca} ${newBusiness.value.hazszam}`;
+
+    const businessData = {
+      vallalkozas_neve: newBusiness.value.vallalkozas_neve,
+      helyszin: helyszin,
+      nyitva_tartas: newBusiness.value.nyitva_tartas,
+      category: newBusiness.value.category,
+      vallalkozo_id: authData.id
+    };
+
+    console.log('Business data being sent:', businessData); // Log the data being sent
+
+    const response = await axios.post('/api/businesses/vallalkozasokHozzaadasa', businessData);
+
+    console.log('Vállalkozás hozzáadva:', response.data);
+    businesses.value.push(response.data); // Add the new business to the list
+    showForm.value = false; // Hide the form
+  } catch (error) {
+    console.error('Hiba a vállalkozás hozzáadásakor:', error);
+  }
+};
+
+
+onMounted(fetchBusinesses);
 </script>
 
 <style scoped>
+.go-to-business-btn {
+  background-color: #6327a2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 16px;
+  margin-top: 10px;
+}
+
+.go-to-business-btn:hover {
+  background-color: #5a3472;
+}
 html, body {
   height: 100%;
   margin: 0;
@@ -281,17 +232,37 @@ html, body {
   flex-direction: column;
 }
 
-.dashboard-wrapper {
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  overflow: hidden;
-}
-
 .dashboard-content {
   padding: 20px;
   flex-grow: 1;
-  overflow: auto; /* Ha a tartalom túllépi a képernyő magasságát, görgethető lesz */
+  overflow: auto;
+}
+
+.business-cards {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.business-card, .add-business-card{
+  background-color: #fff;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  padding: 20px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  text-align: center;
+}
+
+.business-card h3 {
+  font-size: 18px;
+  color: #6327a2;
+  margin-bottom: 10px;
+}
+
+.business-card p {
+  font-size: 14px;
+  color: #666;
 }
 
 .add-business-btn {
@@ -308,30 +279,29 @@ html, body {
   margin-top: 20px;
 }
 
-.add-business-btn:hover {
-  background: #5a3472;
+.plus-icon {
+  font-size: 40px;
+  margin-bottom: 10px;
 }
 
 .form-overlay {
-  display: flex;
-  justify-content: center;
-  align-items: center;
   position: fixed;
   top: 0;
   left: 0;
   width: 100%;
   height: 100%;
   background: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
   z-index: 1000;
 }
 
 .form-container {
-  background-color: white;
-  padding: 30px;
+  background-color: #fff;
+  padding: 20px;
   border-radius: 8px;
   width: 400px;
-  max-height: 90vh;
-  overflow-y: auto;
 }
 
 .form-group {
@@ -344,8 +314,7 @@ html, body {
   margin-bottom: 5px;
 }
 
-.form-group input,
-.form-group select {
+.form-group input {
   width: 100%;
   padding: 8px;
   border: 1px solid #ccc;
@@ -382,44 +351,4 @@ html, body {
 .cancel-button:hover {
   background-color: #bbb;
 }
-
-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-top: 20px;
-}
-
-th, td {
-  padding: 12px;
-  text-align: left;
-  border-bottom: 1px solid #ddd;
-}
-
-th {
-  background-color: #f4f4f4;
-}
-
-button {
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-}
-
-button:hover {
-  background-color: #5a3472;
-}
-
-/* Fix a footer és az űrlap közötti problémát */
-footer {
-  position: relative;
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 0;
-  text-align: center;
-  width: 100%;
-}
-
 </style>

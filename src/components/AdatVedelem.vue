@@ -3,13 +3,13 @@
     <h1>Általános Szerződési Feltételek (ÁSZF)</h1>
     <h2 id="hatalyos">Hatályos: 2024. Szeptember 01.</h2>
 
-    <p>Jelen Általános Szerződési Feltételek (ÁSZF) a [Projekt neve] által nyújtott online időpontfoglaló rendszer igénybevételének feltételeit tartalmazza. A rendszer használatával Ön elfogadja az alábbi feltételeket.</p>
+    <p>Jelen Általános Szerződési Feltételek (ÁSZF) a BookMyTime által nyújtott online időpontfoglaló rendszer igénybevételének feltételeit tartalmazza. A rendszer használatával Ön elfogadja az alábbi feltételeket.</p>
 
     <h2>1. Szolgáltató adatai</h2>
-    <p>Szolgáltató neve: Book My Time</p>
+    <p>Szolgáltató neve: BookMyTime</p>
     <p>Székhely: Városföld Béke utca 2.</p>
     <p>Adószám: [Ha van]</p>
-    <p>Kapcsolattartó e-mail cím: [E-mail cím]</p>
+    <p>Kapcsolattartó e-mail cím: bookmytime884@gmail.com</p>
     <p>Kapcsolattartó telefonszám: [Telefonszám]</p>
 
     <h2>2. A szolgáltatás célja</h2>
@@ -29,7 +29,7 @@
     <p>Az ügyfelek a foglaláskor előleget vagy teljes összeget fizethetnek online, ha a szolgáltató ezt megköveteli. A fizetés bankkártyával vagy más online fizetési módszerrel történik. Lemondás esetén az előleg visszatérítésére a szolgáltató saját szabályai vonatkoznak.</p>
 
     <h2>7. Felelősség kizárása</h2>
-    <p>A szolgáltató nem vállal felelősséget a foglalások során bekövetkező adatbeviteli hibákért vagy harmadik felek okozta technikai problémákért. A rendszer használata során fellépő hibák esetén kérjük, vegye fel velünk a kapcsolatot a [e-mail cím] címen.</p>
+    <p>A szolgáltató nem vállal felelősséget a foglalások során bekövetkező adatbeviteli hibákért vagy harmadik felek okozta technikai problémákért. A rendszer használata során fellépő hibák esetén kérjük, vegye fel velünk a kapcsolatot a bookmytime884@gmail.com címen.</p>
 
     <h2>8. Adatvédelem</h2>
     <p>Az időpontfoglaló rendszer használata során megadott adatokat a Szolgáltató bizalmasan kezeli, harmadik fél számára nem adja ki, kivéve jogszabályban előírt esetekben. Az adatkezeléssel kapcsolatos részletek az Adatvédelmi Szabályzatban találhatók.</p>
@@ -38,7 +38,7 @@
     <p>Az ügyfelek bármikor megszüntethetik regisztrációjukat. A szolgáltató fenntartja a jogot a felhasználói fiókok törlésére, ha a felhasználók megszegik az ÁSZF-et.</p>
 
     <h2>10. Egyéb rendelkezések</h2>
-    <p>A szolgáltató fenntartja a jogot az ÁSZF egyoldalú módosítására, amelyről a felhasználókat legalább [XX nappal] előzetesen értesíti. Az ÁSZF-ben nem szabályozott kérdésekre a magyar jog az irányadó.</p>
+    <p>A szolgáltató fenntartja a jogot az ÁSZF egyoldalú módosítására, amelyről a felhasználókat legalább 14 nappal előzetesen értesíti. Az ÁSZF-ben nem szabályozott kérdésekre a magyar jog az irányadó.</p>
   </section>
 </template>
 

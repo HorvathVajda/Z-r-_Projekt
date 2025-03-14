@@ -44,8 +44,8 @@ export default {
   background-color: #6B00D0; /* Sötét lila */
   color: white;
   padding: 20px;
-  box-shadow: 2px 0 5px rgba(0, 0, 0, 0.1);
-  margin-top: 80px;
+  box-shadow: 5px 0 5px rgba(0, 0, 0, 0.5);
+  margin-top: 20px;
   border-radius: 15px;
   margin-left: 10px;
 }

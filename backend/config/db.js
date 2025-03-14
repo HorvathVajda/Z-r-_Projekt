@@ -1,12 +1,12 @@
 const mysql = require('mysql2/promise');
 const dotenv = require('dotenv');
-
+const mysqlPassword = process.env.MYSQL_PASSWORD || '';
 dotenv.config();
 
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: 'mysql' || '',
+  password: '' || '',
   database: 'bookmytime',
 });
 
