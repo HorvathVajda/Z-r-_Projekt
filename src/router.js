@@ -17,6 +17,7 @@ import Foglalas from './components/Foglalas.vue';
 import businessCard from './components/businessCards.vue';
 import felhasznaloHome from  './components/felhasznaloHome.vue';
 import BusinessDetails from './components/BusinessDetails.vue';
+import felhasznaloProfil from './components/vallalkozoReszek/felhasznaloProfil.vue';  
 
 const routes = [
   { path: '/kapcsolat', name: 'Kapcsolat', component: KapcsolatPage },
@@ -29,6 +30,7 @@ const routes = [
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
   { path: '/foglalas/:vallalkozas_id?/:category?', name: 'Foglalas', component: Foglalas, props: true },
   { path: '/felhasznaloHome', name: 'felhasznaloHome', component: felhasznaloHome },
+  {path: '/felhasznaloProfil', name: 'felhasznaloProfil', component: felhasznaloProfil},
 
   {
     path: '/',

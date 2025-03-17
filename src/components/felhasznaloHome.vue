@@ -7,13 +7,10 @@
         </h2>
         <ul>
           <li>
-            <router-link to="">Profil</router-link>
+            <router-link to="/felhasznaloProfil">Profil</router-link>
           </li>
           <li>
             <router-link to="/Foglalas">Foglalj</router-link>
-          </li>
-          <li>
-            <button @click="logout" class="logout-button">Kijelentkezés</button>
           </li>
         </ul>
       </aside>
