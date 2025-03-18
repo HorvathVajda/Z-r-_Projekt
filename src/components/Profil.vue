@@ -370,4 +370,194 @@ li {
 strong {
   font-weight: bold;
 }
+
+
+
+
+
+/* Alap elrendezés */
+.container, .content {
+  display: unset;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+  width: 100%;
+}
+
+.row {
+  display: flex;
+  justify-content: space-between;
+  gap: 20px;
+  margin-bottom: 20px;
+  width: 100%;
+  padding: 10px;
+}
+
+/* Profil kártya */
+.profile-card {
+  text-align: center;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);  /* Finomított árnyék */
+  margin-bottom: 20px;
+  max-width: 100%;
+  width: 100%; /* Biztosítja, hogy a kártya szélesebb legyen */
+  transition: transform 0.3s ease;
+}
+
+.profile-card:hover {
+  transform: translateY(-5px);  /* Hover animáció a kiemeléshez */
+}
+
+.profile-image {
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
+  object-fit: cover;
+}
+
+button {
+  margin: 5px;
+  padding: 10px;
+  border: none;
+  cursor: pointer;
+}
+
+/* Foglalás gomb */
+.follow-btn {
+  background: #6327A2;
+  color: white;
+  width: 60%; /* Nagyobb gomb */
+  font-size: 18px;
+  font-weight: bold;
+  padding: 0.55rem 1rem;
+  border-radius: 100px;
+  margin: 10px;
+  transition: transform 0.3s;
+}
+
+.follow-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Editálás gomb */
+.edit-btn {
+  position: absolute;
+  right: 5%;
+  top: 30%;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0.55rem 1rem;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.edit-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Személyes adatok és foglalások */
+.user-info, .stats, .foglalasok, .idopontok {
+  flex: 1;
+  background: #fff;
+  padding: 20px;
+  border-radius: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1); /* Finomított árnyék */
+  min-width: 45%;
+  flex-direction: column;
+  align-items: flex-start;
+  position: relative;
+  transition: transform 0.3s ease;
+}
+
+.user-info:hover, .stats:hover, .foglalasok:hover, .idopontok:hover {
+  transform: translateY(-3px); /* Hover animáció */
+}
+
+/* Bio szakasz */
+.bio-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+}
+
+.edit-bio-container {
+  display: flex;
+  gap: 5px;
+}
+
+.bio-input {
+  padding: 5px;
+  font-size: 14px;
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  outline: none;
+}
+
+.edit-icon {
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+/* Mentés és Mégse gombok */
+.save-btn, .cancel-btn {
+  padding: 5px 10px;
+  font-size: 14px;
+  border: none;
+  cursor: pointer;
+  border-radius: 5px;
+}
+
+.save-btn {
+  background: #9d9ff4;
+  color: white;
+}
+
+.cancel-btn {
+  background: #dc3545;
+  color: white;
+}
+
+.user-info-input {
+  padding: 8px 12px;
+  font-size: 16px;
+  border: 2px solid #6327A2;
+  border-radius: 8px;
+  outline: none;
+  width: 100%;
+  background: #f9f9f9;
+  transition: all 0.3s ease-in-out;
+}
+
+.user-info-input:focus {
+  border-color: #9d9ff4;
+  background: #fff;
+  box-shadow: 0 0 8px rgba(99, 39, 162, 0.3);
+}
+
+/* Alap stílusok és elrendezés */
+h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+
+strong {
+  font-weight: bold;
+}
+
 </style>
