@@ -6,6 +6,7 @@ const cors = require('cors');
 const dotenv = require("dotenv");
 const db = require("./db");
 const nodemailer = require("nodemailer");
+const UserRoutes = require("../routes/UserRoutes");
 
 dotenv.config();
 
@@ -26,6 +27,7 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use("/api/foglalasok", bookingRoutes);
+app.use('/api/felhasznalo', UserRoutes); 
 
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
