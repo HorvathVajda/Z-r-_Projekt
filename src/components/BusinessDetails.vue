@@ -14,6 +14,15 @@
             <h3>{{ service.szolgaltatas_neve }}</h3>
             <p><strong>Ár:</strong> {{ service.ar }} Ft</p>
             <p><strong>Időtartam:</strong> {{ service.idotartam }} perc</p>
+
+            <!-- Dátum és időpont választó -->
+            <div class="available-times">
+              <label :for="'availableTime' + service.szolgaltatas_id">Szabad időpontok hozzáadása:</label>
+              <input type="datetime-local" v-model="service.selectedTime" :id="'availableTime' + service.szolgaltatas_id" />
+            </div>
+
+            <!-- Hozzáadás gomb -->
+            <button @click="addAvailableTime(service)" class="add-time-button">Hozzáadás</button>
           </div>
         </div>
       </div>
@@ -43,14 +52,25 @@
         </form>
       </div>
 
-      <div class="back-button">
-        <router-link to="/vallalkozoHome">
-          <button class="go-back-btn">Vissza a vállalkozásokhoz</button>
-        </router-link>
+      <!-- Back and Delete buttons -->
+      <div class="button-container">
+        <div class="back-button">
+          <router-link to="/vallalkozoHome">
+            <button class="go-back-btn">Vissza a vállalkozásokhoz</button>
+          </router-link>
+        </div>
+        <div class="delete-button">
+          <button @click="deleteBusiness">Törlés</button>
+        </div>
       </div>
     </div>
     <div v-else>
       <p>Betöltés...</p>
+    </div>
+
+    <!-- Error/Info Box -->
+    <div v-if="alertMessage" class="alert-box">
+      <p>{{ alertMessage }}</p>
     </div>
   </div>
 </template>
@@ -58,7 +78,7 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import axios from 'axios';
-import { useRoute } from 'vue-router';
+import { useRoute, useRouter } from 'vue-router';
 
 const business = ref(null);
 const services = ref([]);
@@ -68,18 +88,19 @@ const newService = ref({
   price: ''
 });
 const route = useRoute();
-const isAddingService = ref(false);  // Állapot a szolgáltatás hozzáadásához
+const router = useRouter();
+const isAddingService = ref(false);
+const alertMessage = ref(null);
 
 const fetchBusinessDetails = async () => {
   try {
     const response = await axios.get(`/api/businesses/vallalkozasok/${route.params.id}/details`);
     business.value = response.data;
 
-    // Load services for the business
     const servicesResponse = await axios.get(`/api/businesses/vallalkozasok/${route.params.id}/szolgaltatasok`);
     services.value = servicesResponse.data;
   } catch (error) {
-    console.error('Hiba a vállalkozás adatainak betöltésekor:', error);
+    showAlert('Hiba a vállalkozás adatainak betöltésekor: ' + error.message);
   }
 };
 
@@ -91,25 +112,111 @@ const addService = async () => {
       ar: newService.value.price
     });
 
-    services.value.push(response.data); // Add the new service to the list
+    services.value.push(response.data);
     newService.value.name = '';
     newService.value.duration = '';
     newService.value.price = '';
-    isAddingService.value = false;  // Close the form after submission
+    isAddingService.value = false;
   } catch (error) {
-    console.error('Hiba a szolgáltatás hozzáadásakor:', error);
+    showAlert('Hiba a szolgáltatás hozzáadásakor: ' + error.message);
   }
 };
 
-// Toggle the form visibility for adding a service
 const toggleAddServiceForm = () => {
   isAddingService.value = !isAddingService.value;
+};
+
+const deleteBusiness = async () => {
+  try {
+    const response = await axios.post(`/api/businesses/delete/${business.value.id}`);
+
+    if (response.status === 200) {
+      showAlert('Az üzlet sikeresen törölve.');
+
+      // Visszairányítás 5 másodperc után
+      setTimeout(() => {
+        router.push('/vallalkozoHome');
+      }, 5000);
+    } else {
+      showAlert('Hiba történt a törlés során');
+    }
+  } catch (error) {
+    console.error('Hálózati hiba:', error);
+    showAlert('Hálózati hiba történt');
+  }
+};
+
+const addAvailableTime = async (service) => {
+  if (service.selectedTime) {
+    try {
+      const availableTimeData = {
+        szabad_ido: service.selectedTime,  // A választott időpontot ISO formátumban küldjük
+        szolgaltatas_id: service.szolgaltatas_id
+      };
+
+      // Logoljuk a küldött adatokat a konzolra
+      console.log(availableTimeData);
+
+      if (availableTimeData.szabad_ido && availableTimeData.szolgaltatas_id) {
+        const response = await axios.post(`/api/businesses/${business.value.id}/add-idopont`, availableTimeData);
+
+        if (response.status === 200) {
+          showAlert(`Szabad időpont hozzáadva: ${service.selectedTime}`);
+          service.selectedTime = '';  // Kiürítjük a választott időpontot
+        }
+      } else {
+        showAlert('Hibás adatok! Ellenőrizd a választott időpontot és szolgáltatást!');
+      }
+    } catch (error) {
+      showAlert(`Hiba történt: ${error.response ? error.response.data.message : error.message}`);
+    }
+  } else {
+    showAlert('Kérlek válassz egy időpontot!');
+  }
+};
+
+
+const showAlert = (message) => {
+  alertMessage.value = message;
+  setTimeout(() => {
+    alertMessage.value = null; // Hide message after 5 seconds
+  }, 5000);
 };
 
 onMounted(fetchBusinessDetails);
 </script>
 
 <style scoped>
+.add-time-button {
+  background-color: #6327a2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-top: 10px;
+}
+
+.add-time-button:hover {
+  background-color: #5a3472;
+}
+
+.available-times {
+  margin-bottom: 10px;
+}
+.alert-box {
+  position: fixed;
+  bottom: 20px;  /* Set the box to the bottom */
+  left: 20px;    /* Set the box to the left */
+  background-color: #ffcc00;
+  color: black;
+  padding: 10px;
+  border-radius: 5px;
+  font-size: 16px;
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+  z-index: 100;
+}
+
 .business-details {
   padding: 20px;
 }
@@ -230,5 +337,23 @@ onMounted(fetchBusinessDetails);
 
 .go-back-btn:hover {
   background-color: #5a3472;
+}
+
+.button-container {
+  display: flex;
+  gap: 10px;
+}
+
+.delete-button button {
+  background-color: red;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.delete-button button:hover {
+  background-color: darkred;
 }
 </style>

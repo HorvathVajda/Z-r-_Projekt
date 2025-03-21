@@ -109,4 +109,48 @@ router.get('/vallalkozasok/:id/szolgaltatasok', async (req, res) => {
   }
 });
 
+router.post('/delete/:id', (req, res) => {
+  const { id } = req.params;  // Az ID most már az URL-ből van
+
+  const query = 'DELETE FROM vallalkozas WHERE id = ?';
+
+  db.execute(query, [id], (err, result) => {
+    if (err) {
+      console.error('Hiba a törlés során: ', err);
+      return res.status(500).json({ error: 'Hiba történt a törlés során' });
+    }
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'Nem található ilyen üzlet' });
+    }
+    return res.status(200).json({ message: 'Üzlet sikeresen törölve' });
+  });
+});
+
+const moment = require('moment-timezone');
+
+router.post('/:id/add-idopont', (req, res) => {
+  const { id } = req.params;
+  const { szabad_ido, szolgaltatas_id } = req.body;
+
+  if (!szabad_ido || !szolgaltatas_id) {
+    return res.status(400).json({ error: 'Minden mezőt ki kell tölteni!' });
+  }
+
+  // Konvertáljuk a beérkező időpontot magyar időzónára (figyelembe vesszük a nyári időszámítást is)
+  const magyarIdo = moment.tz(szabad_ido, 'Europe/Budapest').format('YYYY-MM-DD HH:mm:ss');
+
+  console.log('Konvertált magyar idő:', magyarIdo); // Segít a hibák feltárásában
+
+  const query = 'INSERT INTO idopontok (szabad_ido, statusz, szolgaltatas_id) VALUES (?, ?, ?)';
+
+  db.execute(query, [magyarIdo, 'szabad', szolgaltatas_id])
+    .then(([results]) => {
+      res.status(200).json({ message: 'Időpont sikeresen hozzáadva!', idopont_id: results.insertId });
+    })
+    .catch((err) => {
+      res.status(500).json({ error: 'Hiba történt az időpont hozzáadása közben.', details: err });
+    });
+});
+
+
 module.exports = router;

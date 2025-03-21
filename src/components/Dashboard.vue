@@ -72,11 +72,15 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
+import { useRouter } from 'vue-router'; // Ne felejtsd el importálni a router-t
 
-const businesses = ref([]);
-const showForm = ref(false);
+const router = useRouter(); // Router inicializálása
+
+// Reaktív változók
+const businesses = ref([]); // Az üres listád
+const showForm = ref(false); // A form megjelenítésének állapota
 const newBusiness = ref({
   vallalkozas_neve: '',
   iranyitoszam: '',
@@ -86,6 +90,8 @@ const newBusiness = ref({
   nyitva_tartas: '',
   category: ''
 });
+
+// Vállalkozások betöltése
 const fetchBusinesses = async () => {
   try {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -102,80 +108,29 @@ const fetchBusinesses = async () => {
   }
 };
 
+// Irányítószám validálása
 const validatePostalCode = () => {
   if (newBusiness.value.iranyitoszam) {
-    // Csak számokat engedünk be
     newBusiness.value.iranyitoszam = newBusiness.value.iranyitoszam.replace(/[^0-9]/g, '');
-
-    // Ha több mint 4 számjegy van, levágjuk
     if (newBusiness.value.iranyitoszam.length > 4) {
       newBusiness.value.iranyitoszam = newBusiness.value.iranyitoszam.slice(0, 4);
     }
   }
 };
 
-// Nyitvatartás formázása (HH:MM-HH:MM formátumban)
-const formatOpeningHours = (event) => {
-  let value = event.target.value;
-
-  // Csak számokat és ":" karaktert engedünk
-  value = value.replace(/[^0-9:]/g, '');
-
-  // Első két szám után helyezzük el a ":" karaktert, ha nem létezik
-  if (value.length > 2 && value[2] !== ':') {
-    value = value.substring(0, 2) + ':' + value.substring(2);
-  }
-
-  // A "-" karaktert a 5. pozícióra rakjuk, ha már 5 karakter van
-  if (value.length > 5 && value[5] !== '-') {
-    value = value.substring(0, 5) + '-' + value.substring(5);
-  }
-
-  // A második ":" karaktert a 8. pozícióra rakjuk
-  if (value.length > 8 && value[8] !== ':') {
-    value = value.substring(0, 8) + ':' + value.substring(8);
-  }
-
-  // Csak 11 karakter lehet (HH:MM-HH:MM formátum)
-  if (value.length > 11) {
+// Nyitvatartás formázása
+const formatOpeningHours = () => {
+  let value = newBusiness.value.nyitva_tartas.replace(/[^0-9:-]/g, '');
+  if (/^\d{2}$/.test(value)) value += ':';
+  if (/^\d{2}:\d{2}$/.test(value)) value += '-';
+  if (/^\d{2}:\d{2}-\d{2}$/.test(value)) value += ':';
+  if (!/^\d{2}:\d{2}-\d{2}:\d{2}$/.test(value) && value.length > 11) {
     value = value.substring(0, 11);
   }
-
-  // Ellenőrzés, hogy az órák és percek érvényesek-e (00-24, 00-59)
-  const parts = value.split(':');
-  if (parts.length === 2) {
-    const openingHour = parseInt(parts[0], 10);
-    const openingMinute = parseInt(parts[1].slice(0, 2), 10);
-
-    // Ellenőrizzük, hogy az első óra és perc érvényes-e
-    if (openingHour > 24) {
-      value = '24:' + value.slice(3);
-    }
-    if (openingMinute > 59) {
-      value = value.slice(0, 3) + '59' + value.slice(5);
-    }
-
-    // Második időpont (zárás)
-    if (parts[1].includes('-')) {
-      const closingHour = parseInt(parts[1].split('-')[1].slice(0, 2), 10);
-      const closingMinute = parseInt(parts[1].split('-')[1].slice(3, 5), 10);
-
-      // Ha a záró óra nagyobb, mint 24, akkor állítsuk be 24-re
-      if (closingHour > 24) {
-        value = value.slice(0, 6) + '24' + value.slice(8);
-      }
-
-      // Ha a záró perc nagyobb, mint 59, akkor állítsuk be 59-re
-      if (closingMinute > 59) {
-        value = value.slice(0, 8) + '59';
-      }
-    }
-  }
-
-  event.target.value = value;
   newBusiness.value.nyitva_tartas = value;
 };
 
+// Vállalkozás hozzáadása
 const submitBusinessForm = async () => {
   try {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -185,7 +140,6 @@ const submitBusinessForm = async () => {
     }
 
     const helyszin = `${newBusiness.value.iranyitoszam} ${newBusiness.value.varos}, ${newBusiness.value.utca} ${newBusiness.value.hazszam}`;
-
     const businessData = {
       vallalkozas_neve: newBusiness.value.vallalkozas_neve,
       helyszin: helyszin,
@@ -194,21 +148,44 @@ const submitBusinessForm = async () => {
       vallalkozo_id: authData.id
     };
 
-    console.log('Business data being sent:', businessData); // Log the data being sent
+    // Vállalkozás hozzáadása
+    await axios.post('/api/businesses/vallalkozasokHozzaadasa', businessData);
 
-    const response = await axios.post('/api/businesses/vallalkozasokHozzaadasa', businessData);
+    showAlert('A vállalkozás sikeresen hozzáadva!');
 
-    console.log('Vállalkozás hozzáadva:', response.data);
-    businesses.value.push(response.data); // Add the new business to the list
-    showForm.value = false; // Hide the form
+    // Űrlap bezárása és mezők alaphelyzetbe állítása
+    showForm.value = false;
+    newBusiness.value = {
+      vallalkozas_neve: '',
+      iranyitoszam: '',
+      varos: '',
+      utca: '',
+      hazszam: '',
+      nyitva_tartas: '',
+      category: ''
+    };
+
+    // Frissítés közvetlenül a listához
+    businesses.value = [...businesses.value, businessData];
+
+    // Kényszerített újrarenderelés, hogy a lista frissüljön
+    await nextTick(() => {
+      // Navigálás vissza a listához
+      router.push('/vallalkozoHome');
+    });
+
   } catch (error) {
     console.error('Hiba a vállalkozás hozzáadásakor:', error);
+    showAlert('Hiba történt a vállalkozás hozzáadása során');
   }
 };
 
-
-onMounted(fetchBusinesses);
+onMounted(async () => {
+  await fetchBusinesses();
+});
 </script>
+
+
 
 <style scoped>
 .go-to-business-btn {

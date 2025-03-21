@@ -3,12 +3,6 @@
     <nav class="navbar navbar-expand-lg" :class="navbarClass">
       <div class="container-fluid">
         <a
-          v-if="vallalkozo"
-          class="navbar-brand logo"
-          href="/vallalkozoHome">BookMyTime
-        </a>
-        <a
-        v-if="!vallalkozo"
           class="navbar-brand logo"
           href="/">BookMyTime
         </a>
@@ -28,6 +22,24 @@
         <!-- Navigációs menü -->
         <div class="collapse navbar-collapse" id="navbarNav">
           <ul class="navbar-nav ms-auto">
+            <li class="nav-item">
+              <a
+                v-if="vallalkozo"
+                class="nav-link login-link"
+                href="/vallalkozoHome"
+                @click="toggleMenu"
+              >
+                Vállalkozásaim
+              </a>
+              <a
+                v-if="felhasznalo"
+                class="nav-link login-link"
+                href="/felhasznaloHome"
+                @click="toggleMenu"
+              >
+                Profil
+              </a>
+            </li>
             <li class="nav-item">
               <a
                 v-if="!isLoggedIn"
@@ -61,6 +73,7 @@ import { store } from "../store";
 const router = useRouter();
 const isLoggedIn = computed(() => store.isLoggedIn);
 const vallalkozo = computed(() => store.vallalkozo);
+const felhasznalo = computed(() => store.felhasznalo);
 const navbarClass = ref("normal-navbar");
 
 function handleLogout() {

@@ -68,13 +68,7 @@ async function handleLogin() {
 
     // A localStorage-ban elmentjük az authData-t
     localStorage.setItem('authData', JSON.stringify(authData));
-
-    // Utána navigálunk a megfelelő oldalra
-    if (tipus === "vallalkozo") {
-      router.push("/vallalkozoHome");
-    } else {
-      router.push("/");
-    }
+    router.push("/");
   } catch (error) {
     errorMessage.value = error.response?.data?.message || "Hiba történt a bejelentkezés során.";
   }
