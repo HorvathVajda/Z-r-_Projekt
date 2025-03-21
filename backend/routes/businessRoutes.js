@@ -152,5 +152,33 @@ router.post('/:id/add-idopont', (req, res) => {
     });
 });
 
+//Profil
+router.get('/vallalkozo-profile', (req, res) => {
+  const vallalkozoId = req.query.vallalkozo_id;
+  console.log('Received vallalkozo_id:', vallalkozoId); // Logolj minden kérést
+
+  if (!vallalkozoId) {
+    return res.status(400).json({ message: 'vallalkozo_id is required' });
+  }
+
+  const query = `SELECT nev, bio, email, telefonszam FROM vallalkozo WHERE vallalkozo_id = ?`;
+  db.execute(query, [vallalkozoId], (err, results) => {
+    if (err) {
+      console.error('Database error:', err);
+      return res.status(500).json({ message: 'Internal server error' });
+    }
+
+    console.log('Database query results:', results); // Logolj az adatbázis eredményeit
+
+    if (results.length > 0) {
+      const businessProfile = results[0];
+      res.json(businessProfile);
+    } else {
+      res.status(404).json({ message: 'Business not found' });
+    }
+  });
+});
+
+
 
 module.exports = router;
