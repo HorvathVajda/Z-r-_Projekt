@@ -73,7 +73,8 @@ const userData = ref({
 const foglalasok = ref([]);
 const statisztikak = ref({
   osszesFoglalas: 0,
-  utolsoFoglalas: ''
+  utolsoFoglalas: '',
+  aktivitas: 0
 });
 
 const fetchUserData = async () => {
@@ -83,7 +84,7 @@ const fetchUserData = async () => {
       console.error('Hiányzó felhasználói adatok');
       return;
     }
-    const response = await axios.get('/api/users/felhasznalo', {
+    const response = await axios.get('/api/felhasznalo', {
       params: { id: authData.id }
     });
     userData.value = response.data;
@@ -98,20 +99,28 @@ const fetchFoglalasok = async () => {
     if (!authData || !authData.id) {
       return;
     }
-    const response = await axios.get('/api/foglalasok', {
+    const response = await axios.get('/api/felhasznalo/foglalasok', {
       params: { felhasznalo_id: authData.id }
     });
     foglalasok.value = response.data;
-    statisztikak.value.osszesFoglalas = foglalasok.value.length;
-    statisztikak.value.utolsoFoglalas = foglalasok.value.length > 0 ? foglalasok.value[foglalasok.value.length - 1].datum : '';
   } catch (error) {
     console.error('Hiba a foglalások betöltésekor:', error);
+  }
+};
+
+const fetchStatisztikak = async () => {
+  try {
+    const response = await axios.get('/api/felhasznalo/statisztikak');
+    statisztikak.value = response.data;
+  } catch (error) {
+    console.error('Hiba a statisztikák betöltésekor:', error);
   }
 };
 
 onMounted(() => {
   fetchUserData();
   fetchFoglalasok();
+  fetchStatisztikak();
 });
 </script>
 
