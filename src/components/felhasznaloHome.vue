@@ -7,7 +7,7 @@
       </h2>
       <ul>
         <li>
-          <router-link to="/felhasznaloProfil">Profil</router-link>
+          <router-link to="/felhasznaloProfil">Profil Szerkesztés</router-link>
         </li>
         <li>
           <router-link to="/Foglalas">Foglalj</router-link>
@@ -27,7 +27,7 @@
         <!-- Személyes adatok -->
         <div class="info-card">
           <h2>Személyes adatok</h2>
-          <p>Teljes név: {{ userData.name }}</p>
+          <p>Teljes név: {{ userData.nev }}</p>
           <p>Email: {{ userData.email }}</p>
           <p>Telefon: {{ userData.telefon || 'Nincs megadva' }}</p>
         </div>
@@ -84,7 +84,7 @@ const fetchUserData = async () => {
       console.error('Hiányzó felhasználói adatok');
       return;
     }
-    const response = await axios.get('/api/felhasznalo', {
+    const response = await axios.get('/api/felhasznalo/felhasznalo', {
       params: { id: authData.id }
     });
     userData.value = response.data;
