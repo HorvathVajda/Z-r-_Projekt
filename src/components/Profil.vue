@@ -45,7 +45,7 @@
         <!-- Foglalások -->
         <div class="foglalasok">
           <h3>Foglalások</h3>
-          <div v-if="bookings.length">
+          <div v-if="bookings.length > 0">
             <div v-for="(booking, index) in bookings" :key="index" class="foglalas-item">
               <p><strong>Időpont:</strong> {{ booking.date }} - {{ booking.time }}</p>
               <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
@@ -104,23 +104,41 @@ export default {
   },
   mounted() {
   const authData = JSON.parse(localStorage.getItem('authData'));
+  const email = authData.email;
   if (authData && authData.email) {
     // Fetch business profile and bookings based on the email
     this.getBusinessProfile(authData.email);
-    this.getBookings(authData.email); // Fetch bookings
+    this.getBookings(authData.id); // Fetch bookings
   }
 },
   methods: {
-    getBookings(email) {
-  axios.get(`/api/businesses/bookings?email=${email}`)
+    getBookings(vallalkozo_id) {
+  if (!vallalkozo_id) {
+    console.error('Vállalkozó ID nem található!');
+    return;  // Ha nincs vállalkozó_id, ne folytasd a lekérdezést
+  }
+
+  console.log('Küldött vállalkozó_id:', vallalkozo_id);  // Logoljuk a küldött vállalkozó ID-t
+
+  // Küldd el a vallalkozo_id-t a backendnek
+  axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}`)
     .then(response => {
-      if (response.data) {
-        console.log(response.data);  // Ellenőrizd, hogy mi érkezik a válaszként
-        this.bookings = response.data;  // Eredmény elmentése a bookings változóba
+      console.log('Backend válasz:', response.data);  // Logoljuk a választ
+      if (response.data && Array.isArray(response.data)) {
+        // Itt már közvetlenül a foglalásokat kezeljük
+        this.bookings = response.data.map(booking => ({
+          date: booking.datum || 'N/A',  // a válaszban a dátum a 'datum' kulcs alatt jön
+          time: booking.ora || 'N/A',    // az idő a 'ora' kulcs alatt jön
+          clientName: 'Ügyfél'  // itt hozzáadhatsz egy másik logikát, ha szükséges
+        }));
+      } else {
+        console.error('Hibás API válasz:', response.data);
+        this.bookings = [];
       }
     })
     .catch(error => {
-      console.error('Hiba történt a foglalások lekérése során:', error);  // Hibakezelés
+      console.error('Hiba történt a foglalások lekérése során:', error);
+      this.bookings = [];
     });
 },
 
