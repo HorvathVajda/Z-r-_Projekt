@@ -234,21 +234,24 @@ router.post('/update-user', (req, res) => {
   });
 });
 
-router.get('/bookings', (req, res) => {
-  const email = req.query.email; // Az email paramétert a frontend küldi
-
-  // SQL lekérdezés
-  const query = `SELECT * FROM foglalasok WHERE felhasznalo_id = (SELECT vallalkozo_id FROM vallalkozo WHERE email = ?)`;
-
-  // Lekérdezés futtatása a db.query segítségével
-  db.query(query, [email], (error, results) => {
-    if (error) {
-      console.error('SQL hiba történt:', error);  // Hibakezelés
-      return res.status(500).json({ message: 'Hiba történt a foglalások lekérése során', error });
-    }
-
-    // Eredmények visszaadása a frontendnek
-    res.json(results);
-  });
+router.get('/bookings', async (req, res) => {
+  const { felhasznalo_id } = req.query;
+  if (!felhasznalo_id) {
+      return res.status(400).json({ error: 'Felhasználói azonosító szükséges' });
+  }
+  try {
+      const [rows] = await db.execute(
+          'SELECT foglalas_id, DATE(foglalas_datum) AS datum, TIME(foglalas_datum) AS ora FROM foglalasok WHERE felhasznalo_id = ?',
+          [felhasznalo_id]
+      );
+      res.json(rows);
+  } catch (error) {
+      console.error('Hiba a foglalások lekérésekor:', error);
+      res.status(500).json({ error: 'Szerverhiba' });
+  }
 });
+
+
+
+
 module.exports = router;
