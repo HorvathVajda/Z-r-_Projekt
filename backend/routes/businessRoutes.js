@@ -155,29 +155,44 @@ router.post('/:id/add-idopont', (req, res) => {
 //Profil
 router.get('/vallalkozo-profile', (req, res) => {
   const vallalkozoId = req.query.vallalkozo_id;
-  console.log('Received vallalkozo_id:', vallalkozoId); // Logolj minden kérést
+  console.log('Received vallalkozo_id:', vallalkozoId);  // Logoljuk a kapott ID-t
 
   if (!vallalkozoId) {
     return res.status(400).json({ message: 'vallalkozo_id is required' });
   }
 
-  const query = `SELECT nev, bio, email, telefonszam FROM vallalkozo WHERE vallalkozo_id = ?`;
+  if (isNaN(vallalkozoId)) {
+    return res.status(400).json({ message: 'Invalid vallalkozo_id' });
+  }
+
+  const query = `SELECT nev, email, telefonszam, bio FROM vallalkozo WHERE vallalkozo_id = ?`;
+
   db.execute(query, [vallalkozoId], (err, results) => {
     if (err) {
       console.error('Database error:', err);
       return res.status(500).json({ message: 'Internal server error' });
     }
 
-    console.log('Database query results:', results); // Logolj az adatbázis eredményeit
-
     if (results.length > 0) {
-      const businessProfile = results[0];
+      const businessProfile = {
+        nev: results[0].nev || 'Nincs név',
+        email: results[0].email || 'Nincs e-mail',
+        telefonszam: results[0].telefonszam || 'Nincs telefonszám',
+        bio: results[0].bio || 'Nincs megadott bio'
+      };
+
+      // Logoljuk a visszaküldött adatokat
+      console.log('Küldött adat:', businessProfile);
+
+      // Küldjük vissza az adatokat a kliensnek
       res.json(businessProfile);
     } else {
+      console.log('Nincs találat a vállalkozóra, id:', vallalkozoId);  // Ha nincs találat, ezt logoljuk
       res.status(404).json({ message: 'Business not found' });
     }
   });
 });
+
 
 
 

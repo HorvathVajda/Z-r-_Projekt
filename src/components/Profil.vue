@@ -3,9 +3,9 @@
     <!-- Profil rész -->
     <div class="profile-card">
       <img :src="profileImage" alt="Profilkép" class="profile-image" />
-      <h2>{{ userName }}</h2>
+      <h2>{{ user.nev }}</h2>
       <div class="bio-container">
-        <p v-if="!isEditingBio">{{ userBio }}</p>
+        <p v-if="!isEditingBio">{{ user.bio }}</p>
         <div v-else class="edit-bio-container">
           <input v-model="editedBio" class="bio-input" />
           <button @click="saveBio" class="save-btn">Mentés</button>
@@ -23,7 +23,7 @@
           <ul>
             <li>
               <strong>Teljes név: </strong>
-              <span v-if="!isEditingUserData">{{ userName }}</span>
+              <span v-if="!isEditingUserData">{{ user.nev }}</span>
               <input v-else v-model="editedUserName" class="user-info-input" />
             </li>
             <li>
@@ -33,7 +33,7 @@
             </li>
             <li>
               <strong>Telefon: </strong>
-              <span v-if="!isEditingUserData">{{ user.phone }}</span>
+              <span v-if="!isEditingUserData">{{ user.telefonszam }}</span>
               <input v-else v-model="editedUserPhone" class="user-info-input" />
             </li>
             <button class="edit-btn" @click="toggleEditUserData" v-if="!isEditingUserData">Szerkesztés</button>
@@ -51,7 +51,7 @@
               <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
             </div>
           </div>
-          <p>Nincs még foglalás.</p>
+          <p v-if="bookings.length === 0">Nincs még foglalás.</p>
         </div>
       </div>
 
@@ -60,14 +60,14 @@
         <div class="stats">
           <h3>Statisztikák</h3>
           <div class="stat-item" v-for="(stat, index) in stats" :key="index">
-            <span>{{ stat.label }}</span>
+            <span>{{ stat.label }}: {{ stat.value }}</span>
           </div>
         </div>
 
         <!-- Időpontok -->
         <div class="idopontok">
           <h3>Időpontok</h3>
-          <div class="foglalas-item"></div>
+          <!-- Ezen a részen még nem látom a tartalmat -->
         </div>
       </div>
     </div>
@@ -80,24 +80,21 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      bookings: [],
-      profileImage: '/as.jpg',
-      userName: 'Vállalkozó Neve',
-      userBio: 'Rövid bemutatkozás...',
+      profileImage: '/as.jpg',  // Ide később dinamikusan jöhet a kép URL-je is
       isEditingBio: false,
-      editedBio: '',
       isEditingUserData: false,
+      user: {
+        nev: '',
+        email: '',
+        telefonszam: '',
+        bio: ''
+      },
+      editedBio: '',
       editedUserName: '',
       editedUserEmail: '',
       editedUserPhone: '',
-      user: {
-        email: localStorage.getItem('authData') ? JSON.parse(localStorage.getItem('authData')).email : '',
-        phone: '+36 30 123 4567'
-      },
-      stats: [
-        { label: 'Ügyfél elégedettség', value: 90 },
-        { label: 'Teljesítési arány', value: 75 }
-      ]
+      bookings: [],  // Hozzáadva a bookings adat
+      stats: []      // Hozzáadva a stats adat
     };
   },
   mounted() {
@@ -105,12 +102,14 @@ export default {
     if (authData && authData.email) {
       this.user.vallalkozo_id = authData.id;
       this.getBusinessProfile(authData.id);
+    } else {
+      console.error('Nincs érvényes authData');
     }
   },
   methods: {
     toggleEditBio() {
       this.isEditingBio = true;
-      this.editedBio = this.userBio;
+      this.editedBio = this.user.bio;
     },
     saveBio() {
       this.isEditingBio = false;
@@ -121,13 +120,13 @@ export default {
           bio: this.editedBio
         })
           .then(response => {
-            // handle success
+            // sikeres mentés után frissítjük a bio adatot
+            this.user.bio = this.editedBio;
           })
           .catch(error => {
             console.error('Hiba történt a mentés során:', error);
           });
       }
-      this.userBio = this.editedBio;
     },
     cancelEdit() {
       this.isEditingBio = false;
@@ -135,15 +134,13 @@ export default {
     toggleEditUserData() {
       this.isEditingUserData = !this.isEditingUserData;
       if (!this.isEditingUserData) {
-        // Reset the edited data to the original values if canceling
         this.editedUserName = '';
         this.editedUserEmail = '';
         this.editedUserPhone = '';
       } else {
-        // Populate fields with current values for editing
-        this.editedUserName = this.userName;
+        this.editedUserName = this.user.nev;
         this.editedUserEmail = this.user.email;
-        this.editedUserPhone = this.user.phone;
+        this.editedUserPhone = this.user.telefonszam;
       }
     },
     saveUserData() {
@@ -156,13 +153,13 @@ export default {
         })
           .then(response => {
             // Sikeres frissítés esetén frissítjük a frontend állapotát
+            this.user.nev = this.editedUserName;
+            this.user.telefonszam = this.editedUserPhone;
           })
           .catch(error => {
             console.error('Hiba történt a személyes adatok mentése során:', error);
           });
       }
-      this.userName = this.editedUserName;
-      this.user.phone = this.editedUserPhone;
     },
     cancelEditUserData() {
       this.isEditingUserData = false;
@@ -175,22 +172,25 @@ export default {
       this.$router.push('/login');
     },
     getBusinessProfile(vallalkozo_id) {
-      axios.get(`/api/businesses/vallalkozo-profile?vallalkozo_id=${vallalkozo_id}`)
-      .then(response => {
-        console.log('Backend válasz:', response.data); // Mi jön vissza a backendből?
-        if (response.data && response.data.nev) {
-          this.userName = response.data.nev;
-          this.userBio = response.data.bio;
-          this.user.email = response.data.email;
-          this.user.phone = response.data.telefonszam;
-        } else {
-          console.error('A válaszban nem voltak adatok');
-        }
-      })
-      .catch(error => {
-        console.error('Hiba történt a vállalkozó adatainak lekérése során:', error.response || error.message);
-      });
-    }
+  axios.get(`/api/businesses/vallalkozo-profile?vallalkozo_id=${vallalkozo_id}`)
+    .then(response => {
+      console.log('Backend válasz:', response.data); // Ellenőrizd, hogy jönnek-e adatok
+      if (response.data) {
+        this.user = {
+          nev: response.data.nev || 'Nincs név',
+          email: response.data.email || 'Nincs e-mail',
+          telefonszam: response.data.telefonszam || 'Nincs telefonszám',
+          bio: response.data.bio || 'Nincs megadott bio'
+        };
+      } else {
+        console.error('Üres válasz érkezett');
+      }
+    })
+    .catch(error => {
+      console.error('Hiba történt a vállalkozó adatainak lekérése során:', error.response || error.message);
+    });
+}
+
   }
 };
 </script>

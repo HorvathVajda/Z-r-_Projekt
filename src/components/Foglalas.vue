@@ -81,9 +81,6 @@ export default {
   this.vallalkozasId = route.params.vallalkozas_id || null; // Lehet null, ha nincs ID
   this.category = route.query.category || ''; // Kategóriát query paraméterből olvassuk
 
-  console.log('Vállalkozás ID:', this.vallalkozasId);
-  console.log('Keresett kategória:', this.category);
-
   this.fetchSzolgaltatasok(this.vallalkozasId, this.category);
 },
 
