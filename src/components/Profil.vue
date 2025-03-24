@@ -3,9 +3,9 @@
     <!-- Profil rész -->
     <div class="profile-card">
       <img :src="profileImage" alt="Profilkép" class="profile-image" />
-      <h2>{{ user.nev }}</h2>
+      <h2>{{ userName }}</h2>
       <div class="bio-container">
-        <p v-if="!isEditingBio">{{ user.bio }}</p>
+        <p v-if="!isEditingBio">{{ userBio }}</p>
         <div v-else class="edit-bio-container">
           <input v-model="editedBio" class="bio-input" />
           <button @click="saveBio" class="save-btn">Mentés</button>
@@ -23,17 +23,17 @@
           <ul>
             <li>
               <strong>Teljes név: </strong>
-              <span v-if="!isEditingUserData">{{ user.nev }}</span>
+              <span v-if="!isEditingUserData">{{ userName }}</span>
               <input v-else v-model="editedUserName" class="user-info-input" />
             </li>
             <li>
               <strong>Email: </strong>
               <span v-if="!isEditingUserData">{{ user.email }}</span>
-              <input v-else v-model="editedUserEmail" class="user-info-input" />
+              <input v-else v-model="editedUserEmail" class="user-info-input" disabled/>
             </li>
             <li>
               <strong>Telefon: </strong>
-              <span v-if="!isEditingUserData">{{ user.telefonszam }}</span>
+              <span v-if="!isEditingUserData">{{ user.phone }}</span>
               <input v-else v-model="editedUserPhone" class="user-info-input" />
             </li>
             <button class="edit-btn" @click="toggleEditUserData" v-if="!isEditingUserData">Szerkesztés</button>
@@ -45,13 +45,13 @@
         <!-- Foglalások -->
         <div class="foglalasok">
           <h3>Foglalások</h3>
-          <div>
+          <div v-if="bookings.length">
             <div v-for="(booking, index) in bookings" :key="index" class="foglalas-item">
               <p><strong>Időpont:</strong> {{ booking.date }} - {{ booking.time }}</p>
               <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
             </div>
           </div>
-          <p v-if="bookings.length === 0">Nincs még foglalás.</p>
+          <p v-else>Nincs még foglalás.</p>
         </div>
       </div>
 
@@ -60,19 +60,20 @@
         <div class="stats">
           <h3>Statisztikák</h3>
           <div class="stat-item" v-for="(stat, index) in stats" :key="index">
-            <span>{{ stat.label }}: {{ stat.value }}</span>
+            <span>{{ stat.label }}</span>
           </div>
         </div>
 
         <!-- Időpontok -->
         <div class="idopontok">
           <h3>Időpontok</h3>
-          <!-- Ezen a részen még nem látom a tartalmat -->
+          <div class="foglalas-item"></div>
         </div>
       </div>
     </div>
   </div>
 </template>
+
 
 <script>
 import axios from 'axios';
@@ -80,51 +81,66 @@ import axios from 'axios';
 export default {
   data() {
     return {
-      profileImage: '/as.jpg',  // Ide később dinamikusan jöhet a kép URL-je is
+      profileImage: '/as.jpg',
+      userName: 'Vállalkozó Neve',
+      userBio: 'Rövid bemutatkozás...',
       isEditingBio: false,
-      isEditingUserData: false,
-      user: {
-        nev: '',
-        email: '',
-        telefonszam: '',
-        bio: ''
-      },
       editedBio: '',
+      isEditingUserData: false,
       editedUserName: '',
       editedUserEmail: '',
       editedUserPhone: '',
-      bookings: [],  // Hozzáadva a bookings adat
-      stats: []      // Hozzáadva a stats adat
+      user: {
+        email: localStorage.getItem('authData') ? JSON.parse(localStorage.getItem('authData')).email : '',
+        phone: '+36 30 123 4567',
+      },
+      bookings: [], // Add this line to define bookings
+      stats: [
+        { label: 'Projekt sikeresség', value: 80 },
+        { label: 'Ügyfél elégedettség', value: 90 },
+        { label: 'Teljesítési arány', value: 75 },
+      ],
     };
   },
   mounted() {
-    const authData = JSON.parse(localStorage.getItem('authData'));
-    if (authData && authData.email) {
-      this.user.vallalkozo_id = authData.id;
-      this.getBusinessProfile(authData.id);
-    } else {
-      console.error('Nincs érvényes authData');
-    }
-  },
+  const authData = JSON.parse(localStorage.getItem('authData'));
+  if (authData && authData.email) {
+    // Fetch business profile and bookings based on the email
+    this.getBusinessProfile(authData.email);
+    this.getBookings(authData.email); // Fetch bookings
+  }
+},
   methods: {
+    getBookings(email) {
+  axios.get(`/api/businesses/bookings?email=${email}`)
+    .then(response => {
+      if (response.data) {
+        console.log(response.data);  // Ellenőrizd, hogy mi érkezik a válaszként
+        this.bookings = response.data;  // Eredmény elmentése a bookings változóba
+      }
+    })
+    .catch(error => {
+      console.error('Hiba történt a foglalások lekérése során:', error);  // Hibakezelés
+    });
+},
+
     toggleEditBio() {
       this.isEditingBio = true;
-      this.editedBio = this.user.bio;
+      this.editedBio = this.userBio;
     },
     saveBio() {
       this.isEditingBio = false;
       if (this.editedBio.trim() !== '') {
-        axios.post('/api/businesses/update-bio', {
-          email: this.user.email,
-          vallalkozo_id: this.user.vallalkozo_id,
-          bio: this.editedBio
-        })
+        // Küldjük a bio-t a backendnek
+        axios.post('/api/businesses/update-bio', { email: this.user.email, bio: this.editedBio })
           .then(response => {
-            // sikeres mentés után frissítjük a bio adatot
-            this.user.bio = this.editedBio;
+            // Ha sikeres, frissítjük a userBio változót
+            console.log('Bio frissítve:', response.data.userProfile);
+            this.userBio = response.data.userProfile.bio;  // Az új bio beállítása
+            this.userName = response.data.userProfile.name; // Esetleg más mezők frissítése
           })
           .catch(error => {
-            console.error('Hiba történt a mentés során:', error);
+            console.error('Hiba történt a bio mentése közben:', error);
           });
       }
     },
@@ -134,33 +150,37 @@ export default {
     toggleEditUserData() {
       this.isEditingUserData = !this.isEditingUserData;
       if (!this.isEditingUserData) {
+        // Reset the edited data to the original values if canceling
         this.editedUserName = '';
         this.editedUserEmail = '';
         this.editedUserPhone = '';
       } else {
-        this.editedUserName = this.user.nev;
+        // Populate fields with current values for editing
+        this.editedUserName = this.userName;
         this.editedUserEmail = this.user.email;
-        this.editedUserPhone = this.user.telefonszam;
+        this.editedUserPhone = this.user.phone;
       }
     },
     saveUserData() {
-      this.isEditingUserData = false;
-      if (this.editedUserName.trim() && this.editedUserPhone.trim()) {
-        axios.post('/api/businesses/update-user', {
-          email: this.user.email,
-          nev: this.editedUserName,
-          telefonszam: this.editedUserPhone,
-        })
-          .then(response => {
-            // Sikeres frissítés esetén frissítjük a frontend állapotát
-            this.user.nev = this.editedUserName;
-            this.user.telefonszam = this.editedUserPhone;
-          })
-          .catch(error => {
-            console.error('Hiba történt a személyes adatok mentése során:', error);
-          });
-      }
-    },
+  this.isEditingUserData = false;
+  if (this.editedUserName.trim() && this.editedUserPhone.trim()) {
+    // Frissített adatok küldése a backendnek
+    axios.post('/api/businesses/update-user', {
+      email: this.user.email, // Az eredeti emailt küldjük
+      nev: this.editedUserName, // A backend "nev"-et várja
+      telefonszam: this.editedUserPhone, // A backend "telefonszam"-ot várja
+    })
+      .then(response => {
+        // Sikeres frissítés után frissítjük a felhasználó nevét és telefonszámát
+        this.userName = this.editedUserName;
+        this.user.phone = this.editedUserPhone;
+      })
+      .catch(error => {
+        console.error('Hiba történt a személyes adatok mentése során:', error);
+      });
+  }
+},
+
     cancelEditUserData() {
       this.isEditingUserData = false;
       this.editedUserName = '';
@@ -171,29 +191,26 @@ export default {
       localStorage.removeItem('authData');
       this.$router.push('/login');
     },
-    getBusinessProfile(vallalkozo_id) {
-  axios.get(`/api/businesses/vallalkozo-profile?vallalkozo_id=${vallalkozo_id}`)
-    .then(response => {
-      console.log('Backend válasz:', response.data); // Ellenőrizd, hogy jönnek-e adatok
-      if (response.data) {
-        this.user = {
-          nev: response.data.nev || 'Nincs név',
-          email: response.data.email || 'Nincs e-mail',
-          telefonszam: response.data.telefonszam || 'Nincs telefonszám',
-          bio: response.data.bio || 'Nincs megadott bio'
-        };
-      } else {
-        console.error('Üres válasz érkezett');
-      }
-    })
-    .catch(error => {
-      console.error('Hiba történt a vállalkozó adatainak lekérése során:', error.response || error.message);
-    });
-}
-
+    getBusinessProfile(email) {
+      // Lekérjük a vállalkozó adatokat az email alapján
+      axios.get(`/api/businesses/vallalkozo-profile?email=${email}`)
+        .then(response => {
+          if (response.data) {
+            // Frissítjük az adatokat a profilban
+            this.userName = response.data.name;
+            this.userBio = response.data.bio;
+            this.user.email = response.data.email;
+            this.user.phone = response.data.phone;
+          }
+        })
+        .catch(error => {
+          console.error('Hiba történt a vállalkozó adatainak lekérése során:', error);
+        });
+    }
   }
 };
 </script>
+
 
 <style scoped>
 /* Alap elrendezés */
@@ -237,6 +254,50 @@ button {
   padding: 10px;
   border: none;
   cursor: pointer;
+}
+
+/* Foglalás gomb */
+.follow-btn {
+  background: #6327A2;
+  color: white;
+  width: 10%;
+  font-size: 18px;
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0.55rem 1rem;
+  border: none;
+  cursor: pointer;
+  border-radius: 100px;
+  margin: 10px;
+  transition: transform 0.3s;
+}
+
+.follow-btn:hover {
+  transform: translateY(-3px);
+}
+
+/* Editálás gomb */
+.edit-btn {
+  position: absolute;
+  right: 5%;
+  top: 30%;
+}
+.follow-btn:hover, .edit-btn:hover{
+  transform: translateY(-3px);
+  font-size: 20px;
+  font-weight: bold;
+  padding: 0.55rem 1rem;
+  border-radius: 100px;
+  cursor: pointer;
+}
+
+.follow-btn {
+  background: #6bb6ea;
+  color: black;
+}
+
+.edit-btn:hover {
+  transform: translateY(-3px);
 }
 
 /* Személyes adatok és foglalások */
@@ -290,6 +351,7 @@ button {
 }
 
 .save-btn {
+  background: #007bff;
   background: #9d9ff4;
   color: white;
 }
@@ -314,5 +376,26 @@ button {
   border-color: #9d9ff4;
   background: #fff;
   box-shadow: 0 0 8px rgba(99, 39, 162, 0.3);
+}
+
+/* Alap stílusok és elrendezés */
+h3 {
+  font-size: 1.5rem;
+  font-weight: bold;
+  margin-bottom: 10px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  margin: 10px 0;
+  font-size: 1.2rem;
+}
+
+strong {
+  font-weight: bold;
 }
 </style>

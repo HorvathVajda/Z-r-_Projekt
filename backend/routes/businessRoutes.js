@@ -153,47 +153,102 @@ router.post('/:id/add-idopont', (req, res) => {
 });
 
 //Profil
-router.get('/vallalkozo-profile', (req, res) => {
-  const vallalkozoId = req.query.vallalkozo_id;
-  console.log('Received vallalkozo_id:', vallalkozoId);  // Logoljuk a kapott ID-t
-
-  if (!vallalkozoId) {
-    return res.status(400).json({ message: 'vallalkozo_id is required' });
+router.get("/vallalkozo-profile", async (req, res) => {
+  const { email } = req.query;
+  if (!email) {
+    return res.status(400).json({ error: "Email megadása szükséges!" });
   }
 
-  if (isNaN(vallalkozoId)) {
-    return res.status(400).json({ message: 'Invalid vallalkozo_id' });
+  try {
+    const [results] = await db.query(
+      "SELECT * FROM vallalkozo WHERE email = ?",
+      [email]
+    );
+
+    if (results.length === 0) {
+      return res.status(404).json({ error: "A vállalkozó nem található!" });
+    }
+
+    const vallalkozo = results[0];
+    res.json({
+      name: vallalkozo.nev,
+      bio: vallalkozo.bio,
+      email: vallalkozo.email,
+      phone: vallalkozo.telefonszam
+    });
+  } catch (err) {
+    console.error("Adatbázis hiba:", err);
+    res.status(500).json({ error: "Adatbázis hiba történt!" });
+  }
+});
+
+// routes/businessRoutes.js
+router.post('/update-bio', (req, res) => {
+  const { email, bio } = req.body;
+
+  if (!email || !bio) {
+    return res.status(400).json({ message: 'Email and bio are required.' });
   }
 
-  const query = `SELECT nev, email, telefonszam, bio FROM vallalkozo WHERE vallalkozo_id = ?`;
+  // Update the user's bio in the database
+  const query = 'UPDATE vallalkozo SET bio = ? WHERE email = ?';
 
-  db.execute(query, [vallalkozoId], (err, results) => {
+  db.execute(query, [bio, email], (err, result) => {
     if (err) {
-      console.error('Database error:', err);
-      return res.status(500).json({ message: 'Internal server error' });
+      console.error('Error updating bio:', err);
+      return res.status(500).json({ message: 'Error occurred while updating the bio.' });
     }
 
-    if (results.length > 0) {
-      const businessProfile = {
-        nev: results[0].nev || 'Nincs név',
-        email: results[0].email || 'Nincs e-mail',
-        telefonszam: results[0].telefonszam || 'Nincs telefonszám',
-        bio: results[0].bio || 'Nincs megadott bio'
-      };
-
-      // Logoljuk a visszaküldött adatokat
-      console.log('Küldött adat:', businessProfile);
-
-      // Küldjük vissza az adatokat a kliensnek
-      res.json(businessProfile);
-    } else {
-      console.log('Nincs találat a vállalkozóra, id:', vallalkozoId);  // Ha nincs találat, ezt logoljuk
-      res.status(404).json({ message: 'Business not found' });
+    // Check if the row was updated
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ message: 'User not found.' });
     }
+
+    // Return the updated bio (or other user data if needed)
+    res.status(200).json({ message: 'Bio updated successfully', bio: bio });
   });
 });
 
+router.post('/update-user', (req, res) => {
+  const { email, nev, telefonszam } = req.body;
 
+  // Ellenőrizzük, hogy az email cím nem lett módosítva
+  if (!email) {
+    return res.status(400).json({ error: 'Email cím nem adható meg!' });
+  }
 
+  // SQL lekérdezés a felhasználói adatok frissítésére
+  const query = 'UPDATE vallalkozo SET nev = ?, telefonszam = ? WHERE email = ?';
+  db.query(query, [nev, telefonszam, email], (err, result) => {
+    if (err) {
+      console.error('Hiba történt az adat frissítése közben:', err);
+      return res.status(500).json({ error: 'Szerverhiba történt.' });
+    }
 
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Felhasználó nem található.' });
+    }
+
+    // Sikeres frissítés
+    res.status(200).json({ message: 'Személyes adatok frissítve.', affectedRows: result.affectedRows });
+  });
+});
+
+router.get('/bookings', (req, res) => {
+  const email = req.query.email; // Az email paramétert a frontend küldi
+
+  // SQL lekérdezés
+  const query = `SELECT * FROM foglalasok WHERE felhasznalo_id = (SELECT vallalkozo_id FROM vallalkozo WHERE email = ?)`;
+
+  // Lekérdezés futtatása a db.query segítségével
+  db.query(query, [email], (error, results) => {
+    if (error) {
+      console.error('SQL hiba történt:', error);  // Hibakezelés
+      return res.status(500).json({ message: 'Hiba történt a foglalások lekérése során', error });
+    }
+
+    // Eredmények visszaadása a frontendnek
+    res.json(results);
+  });
+});
 module.exports = router;
