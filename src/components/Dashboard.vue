@@ -31,11 +31,11 @@
           </div>
           <div class="form-group">
             <label for="postalCode">Irányítószám</label>
-            <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" @input="validatePostalCode" required />
+            <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" @input="validatePostalCode(); findCity()" required />
           </div>
           <div class="form-group">
             <label for="city">Város</label>
-            <input type="text" id="city" v-model="newBusiness.varos" required />
+            <input type="text" id="city" v-model="newBusiness.varos" readonly />
           </div>
           <div class="form-group">
             <label for="street">Utca</label>
@@ -72,15 +72,15 @@
 </template>
 
 <script setup>
+import Papa from 'papaparse';
 import { ref, onMounted, nextTick } from 'vue';
 import axios from 'axios';
-import { useRouter } from 'vue-router'; // Ne felejtsd el importálni a router-t
+import { useRouter } from 'vue-router';
 
-const router = useRouter(); // Router inicializálása
+const router = useRouter();
 
-// Reaktív változók
-const businesses = ref([]); // Az üres listád
-const showForm = ref(false); // A form megjelenítésének állapota
+const businesses = ref([]);
+const showForm = ref(false);
 const newBusiness = ref({
   vallalkozas_neve: '',
   iranyitoszam: '',
@@ -90,6 +90,7 @@ const newBusiness = ref({
   nyitva_tartas: '',
   category: ''
 });
+const locations = ref([]);
 
 // Vállalkozások betöltése
 const fetchBusinesses = async () => {
@@ -107,6 +108,25 @@ const fetchBusinesses = async () => {
     console.error('Hiba a vállalkozások betöltésekor:', error);
   }
 };
+const loadLocations = async () => {
+  try {
+    await Papa.parse('/data/IrszHnk.csv', {
+      download: true,
+      complete: (result) => {
+        locations.value = result.data.map(item => {
+        const postalCode = item[1]?.trim(); // Csak akkor alkalmazzuk a trim-et, ha létezik az érték
+        const city = item[0]?.trim(); // Csak akkor alkalmazzuk a trim-et, ha létezik az érték
+
+        if (postalCode && city) {
+          return { postalCode, city };
+        }
+      }).filter(location => location); // Eltávolítjuk a nem érvényes rekordokat
+      }
+    });
+  } catch (error) {
+    console.error('Hiba a CSV fájl betöltésekor:', error);
+  }
+};
 
 // Irányítószám validálása
 const validatePostalCode = () => {
@@ -117,6 +137,17 @@ const validatePostalCode = () => {
     }
   }
 };
+
+const findCity = () => {
+  const foundLocation = locations.value.find(location => location.postalCode === newBusiness.value.iranyitoszam);
+
+  if (foundLocation) {
+    newBusiness.value.varos = foundLocation.city;
+  } else {
+    newBusiness.value.varos = '';
+  }
+};
+
 
 // Nyitvatartás formázása
 const formatOpeningHours = () => {
@@ -138,7 +169,6 @@ const submitBusinessForm = async () => {
       console.error('Hiányzó felhasználói adatok');
       return;
     }
-
     const helyszin = `${newBusiness.value.iranyitoszam} ${newBusiness.value.varos}, ${newBusiness.value.utca} ${newBusiness.value.hazszam}`;
     const businessData = {
       vallalkozas_neve: newBusiness.value.vallalkozas_neve,
@@ -153,7 +183,6 @@ const submitBusinessForm = async () => {
 
     showAlert('A vállalkozás sikeresen hozzáadva!');
 
-    // Űrlap bezárása és mezők alaphelyzetbe állítása
     showForm.value = false;
     newBusiness.value = {
       vallalkozas_neve: '',
@@ -165,12 +194,9 @@ const submitBusinessForm = async () => {
       category: ''
     };
 
-    // Frissítés közvetlenül a listához
     businesses.value = [...businesses.value, businessData];
 
-    // Kényszerített újrarenderelés, hogy a lista frissüljön
     await nextTick(() => {
-      // Navigálás vissza a listához
       router.push('/vallalkozoHome');
     });
 
@@ -182,10 +208,9 @@ const submitBusinessForm = async () => {
 
 onMounted(async () => {
   await fetchBusinesses();
+  await loadLocations();
 });
 </script>
-
-
 
 <style scoped>
 .go-to-business-btn {

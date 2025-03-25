@@ -251,7 +251,43 @@ router.get('/bookings', async (req, res) => {
   }
 });
 
+router.get('/idopontok', (req, res) => {
+  const vallalkozoId = req.query.vallalkozo_id; // A vállalkozó ID-ját kérdezzük le
 
+  if (!vallalkozoId) {
+    return res.status(400).json({ message: 'Vállalkozó ID nem található!' });
+  }
+
+  const query = `
+    SELECT i.ido_id, i.idopont, i.statusz, f.foglalas_id, u.nev as foglalo_nev
+    FROM idopontok i
+    LEFT JOIN foglalasok f ON i.ido_id = f.ido_id
+    LEFT JOIN felhasznalo u ON f.felhasznalo_id = u.felhasznalo_id
+    WHERE i.vallalkozas_id = ?
+    ORDER BY i.idopont
+  `;
+
+  db.query(query, [vallalkozoId], (err, results) => {
+    if (err) {
+      console.error('Hiba történt az időpontok lekérése során:', err);
+      return res.status(500).json({ message: 'Hiba történt az időpontok lekérése során' });
+    }
+
+    if (results.length > 0) {
+      const idopontok = results.map(idopont => ({
+        ido_id: idopont.ido_id,
+        idopont: idopont.idopont,
+        statusz: idopont.statusz,
+        foglalas_id: idopont.foglalas_id,
+        foglalo_nev: idopont.foglalo_nev || 'Szabad'
+      }));
+
+      return res.json({ idopontok });
+    } else {
+      return res.json({ message: 'Nincs időpont ezen a vállalkozáson.' });
+    }
+  });
+});
 
 
 module.exports = router;

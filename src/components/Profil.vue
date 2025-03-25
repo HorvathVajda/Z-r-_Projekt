@@ -44,11 +44,21 @@
 
         <!-- Foglalások -->
         <div class="foglalasok">
-          <h3>Foglalások</h3>
+          <h3>Közelgő foglalások</h3>
           <div v-if="bookings.length > 0">
-            <div v-for="(booking, index) in bookings" :key="index" class="foglalas-item">
+            <!-- Show first 3 bookings -->
+            <div v-for="(booking, index) in displayedBookings" :key="index" class="foglalas-item">
               <p><strong>Időpont:</strong> {{ booking.date }} - {{ booking.time }}</p>
               <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
+            </div>
+            <!-- Show dropdown if there are more than 3 bookings -->
+            <div v-if="bookings.length > 3">
+              <select v-model="selectedBookingIndex">
+                <option disabled value="">További foglalások...</option>
+                <option v-for="(booking, index) in additionalBookings" :key="index" :value="index + 3">
+                  {{ booking.date }} - {{ booking.time }} (Ügyfél: {{ booking.clientName }})
+                </option>
+              </select>
             </div>
           </div>
           <p v-else>Nincs még foglalás.</p>
@@ -64,11 +74,19 @@
           </div>
         </div>
 
-        <!-- Időpontok -->
-        <div class="idopontok">
-          <h3>Időpontok</h3>
-          <div class="foglalas-item"></div>
+      <!-- Időpontok -->
+      <div class="idopontok">
+        <h3>Időpontok</h3>
+        <div v-if="idopontok.length > 0">
+          <div v-for="(idopont) in idopontok" :key="idopont.ido_id" class="foglalas-item">
+            <p><strong>Időpont:</strong> {{ idopont.idopont }}</p>
+            <p v-if="idopont.statusz === 'foglalt'"><strong>Foglalt:</strong> {{ idopont.foglalo_nev }}</p>
+            <p v-else><strong>Szabad</strong></p>
+          </div>
         </div>
+        <p v-else>Nincs időpont ezen a vállalkozáson.</p>
+      </div>
+
       </div>
     </div>
   </div>
@@ -100,7 +118,29 @@ export default {
         { label: 'Ügyfél elégedettség', value: 90 },
         { label: 'Teljesítési arány', value: 75 },
       ],
+      selectedBookingIndex: null,
+      idopontok: []
     };
+  },
+  computed: {
+    // Get first 3 bookings to display
+    displayedBookings() {
+      return this.bookings.slice(0, 3);
+    },
+    // Get additional bookings to display in dropdown
+    additionalBookings() {
+      return this.bookings.slice(3);
+    },
+  },
+  mounted() {
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    const email = authData.email;
+    if (authData && authData.email) {
+      // Fetch business profile and bookings based on the email
+      this.getBusinessProfile(authData.email);
+      this.getBookings(authData.id); // Fetch bookings
+      this.getIdopontok(authData.id);
+    }
   },
   mounted() {
   const authData = JSON.parse(localStorage.getItem('authData'));
@@ -113,35 +153,48 @@ export default {
 },
   methods: {
     getBookings(vallalkozo_id) {
-  if (!vallalkozo_id) {
-    console.error('Vállalkozó ID nem található!');
-    return;  // Ha nincs vállalkozó_id, ne folytasd a lekérdezést
-  }
-
-  console.log('Küldött vállalkozó_id:', vallalkozo_id);  // Logoljuk a küldött vállalkozó ID-t
-
-  // Küldd el a vallalkozo_id-t a backendnek
-  axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}`)
-    .then(response => {
-      console.log('Backend válasz:', response.data);  // Logoljuk a választ
-      if (response.data && Array.isArray(response.data)) {
-        // Itt már közvetlenül a foglalásokat kezeljük
-        this.bookings = response.data.map(booking => ({
-          date: booking.datum || 'N/A',  // a válaszban a dátum a 'datum' kulcs alatt jön
-          time: booking.ora || 'N/A',    // az idő a 'ora' kulcs alatt jön
-          clientName: 'Ügyfél'  // itt hozzáadhatsz egy másik logikát, ha szükséges
-        }));
-      } else {
-        console.error('Hibás API válasz:', response.data);
-        this.bookings = [];
+      if (!vallalkozo_id) {
+        console.error('Vállalkozó ID nem található!');
+        return;  // Ha nincs vállalkozó_id, ne folytasd a lekérdezést
       }
-    })
-    .catch(error => {
-      console.error('Hiba történt a foglalások lekérése során:', error);
-      this.bookings = [];
-    });
-},
 
+      console.log('Küldött vállalkozó_id:', vallalkozo_id);  // Logoljuk a küldött vállalkozó ID-t
+
+      // Küldd el a vallalkozo_id-t a backendnek
+      axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}`)
+        .then(response => {
+          console.log('Backend válasz:', response.data);  // Logoljuk a választ
+          if (response.data && Array.isArray(response.data)) {
+            // Itt már közvetlenül a foglalásokat kezeljük
+            this.bookings = response.data.map(booking => ({
+              date: booking.datum || 'N/A',  // a válaszban a dátum a 'datum' kulcs alatt jön
+              time: booking.ora || 'N/A',    // az idő a 'ora' kulcs alatt jön
+              clientName: 'Ügyfél'  // itt hozzáadhatsz egy másik logikát, ha szükséges
+            }));
+          } else {
+            console.error('Hibás API válasz:', response.data);
+            this.bookings = [];
+          }
+        })
+        .catch(error => {
+          console.error('Hiba történt a foglalások lekérése során:', error);
+          this.bookings = [];
+        });
+    },
+
+    getIdopontok(vallalkozoId) {
+    axios.get(`/api/businesses/idopontok?vallalkozo_id=${vallalkozoId}`)
+      .then(response => {
+        if (response.data.idopontok) {
+          this.idopontok = response.data.idopontok;
+        } else {
+          console.log('Nincs időpont ezen a vállalkozáson');
+        }
+      })
+      .catch(error => {
+        console.error('Hiba történt az időpontok lekérése során:', error);
+      });
+  },
     toggleEditBio() {
       this.isEditingBio = true;
       this.editedBio = this.userBio;
