@@ -99,8 +99,13 @@ const fetchFoglalasok = async () => {
     if (!authData || !authData.id) {
       return;
     }
+
+    const token = authData.token; // Feltételezve, hogy a token az authData-ban van
     const response = await axios.get('/api/felhasznalo/foglalasok', {
-      params: { felhasznalo_id: authData.id }
+      params: { felhasznalo_id: authData.id },
+      headers: {
+        Authorization: `Bearer ${token}`, // Hozzáadjuk a token-t a kéréshez
+      },
     });
     foglalasok.value = response.data;
   } catch (error) {

@@ -7,6 +7,7 @@ const dotenv = require("dotenv");
 const db = require("./db");
 const nodemailer = require("nodemailer");
 const UserRoutes = require("../routes/UserRoutes");
+const UserprofileRoutes = require("../routes/UserprofileRoutes");
 
 
 dotenv.config();

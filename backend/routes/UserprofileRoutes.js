@@ -1,43 +1,41 @@
+// UserprofileRoutes.js
+
 const express = require('express');
-const mysql = require('mysql2');
-
 const router = express.Router();
+const mysql = require('mysql');
 
-// MySQL adatbázis kapcsolat
+// Adatbázis kapcsolat beállítása
 const db = mysql.createConnection({
   host: 'localhost',
   user: 'root',
-  password: 'yourpassword',
+  password: '',
   database: 'bookmytime'
-});
-
-db.connect((err) => {
-  if (err) throw err;
-  console.log('MySQL connected...');
 });
 
 // Profil frissítése
 router.post('/update-profile', (req, res) => {
-  const { name, email, phone, password } = req.body;
-  // Profilkép fájl már nem szükséges
+  const { name, email, phone, password, profileImage } = req.body;
 
-  let query = 'UPDATE felhasznalo SET name = ?, email = ?, phone = ?';
-  const params = [name, email, phone];
+  // SQL lekérdezés a felhasználói adatok frissítésére
+  let updateQuery = 'UPDATE felhasznalo SET name = ?, phone = ? WHERE email = ?';
+  let updateValues = [name, phone, email];
 
-  if (password) {
-    query += ', password = ?';
-    params.push(password);
+  if (profileImage) {
+    updateQuery = 'UPDATE felhasznalo SET name = ?, phone = ?, profileImage = ? WHERE email = ?';
+    updateValues.push(profileImage);
   }
 
-  query += ' WHERE email = ?';
-  params.push(email);
+  if (password) {
+    updateQuery = 'UPDATE felhasznalo SET name = ?, phone = ?, profileImage = ?, password = ? WHERE email = ?';
+    updateValues.push(password);
+  }
 
-  db.query(query, params, (err, result) => {
+  db.query(updateQuery, updateValues, (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Hiba történt a profil frissítésekor.');
+      return res.status(500).json({ message: 'Hiba történt a profil frissítésekor.' });
     }
-    res.send('Profil sikeresen frissítve!');
+    return res.status(200).json({ message: 'Profil sikeresen frissítve!' });
   });
 });
 
@@ -45,12 +43,15 @@ router.post('/update-profile', (req, res) => {
 router.delete('/delete-profile', (req, res) => {
   const { email } = req.body;
 
-  db.query('DELETE FROM felhasznalo WHERE email = ?', [email], (err, result) => {
+  // SQL lekérdezés a profil törlésére
+  const deleteQuery = 'DELETE FROM felhasznalo WHERE email = ?';
+
+  db.query(deleteQuery, [email], (err, result) => {
     if (err) {
       console.error(err);
-      return res.status(500).send('Hiba történt a profil törlésekor.');
+      return res.status(500).json({ message: 'Hiba történt a profil törlésekor.' });
     }
-    res.send('A profil törölve lett.');
+    return res.status(200).json({ message: 'Profil sikeresen törölve.' });
   });
 });
 
