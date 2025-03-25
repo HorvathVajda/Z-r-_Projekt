@@ -25,7 +25,7 @@
         <p><strong>Vállalkozás:</strong> {{ szolgaltatas.vallalkozas_neve }}</p>
         <p><strong>Időtartam:</strong> {{ szolgaltatas.idotartam }} perc</p>
         <p><strong>Ár:</strong> {{ szolgaltatas.ar }} Ft</p>
-        <button @click="fetchSzabadIdopontok(szolgaltatas.szolgaltatas_id)">
+        <button @click="fetchSzabadIdopontok(szolgaltatas)">
           Szabad időpontok
         </button>
       </div>
@@ -60,7 +60,7 @@
 <script>
 import axios from "axios";
 import { ref, onMounted } from 'vue';
-import { useRoute, useRouter } from 'vue-router';
+import { useRoute } from 'vue-router';
 
 export default {
   data() {
@@ -70,76 +70,58 @@ export default {
       szabadIdopontok: [],
       selectedIdo: null,
       selectedSzolgaltatasId: null,
-      vallalkozasId: null,
+      vallalkozasId: ref(null),  // Reaktív változó a vállalkozás ID-hoz
       alertMessage: null,
       selectedSortOption: "nameAsc",  // Alapértelmezett rendezés
     };
   },
+
   mounted() {
-  const route = useRoute();
+    const route = useRoute();
 
-  this.vallalkozasId = route.params.vallalkozas_id || null; // Lehet null, ha nincs ID
-  this.category = route.query.category || ''; // Kategóriát query paraméterből olvassuk
+    // Ha van a route-ban vállalkozás ID, elmentjük
+    this.vallalkozasId = route.params.vallalkozas_id || null;
+    this.category = route.query.category || '';
 
-  this.fetchSzolgaltatasok(this.vallalkozasId, this.category);
-},
+    this.fetchSzolgaltatasok(this.vallalkozasId, this.category);
+  },
 
   methods: {
-    // Például, ha a 'vallalkozas_id' numerikus és a backend azt várja
-fetchSzolgaltatasok(vallalkozasId, category) {
-  const params = new URLSearchParams();
+    fetchSzolgaltatasok(vallalkozasId, category) {
+      const params = new URLSearchParams();
 
-  if (vallalkozasId) {
-    params.append('vallalkozas_id', vallalkozasId); // itt ID-t küldünk
-  }
-
-  if (category) {
-    params.append('category', category);
-  }
-
-  axios
-    .get(`/api/foglalasok/szolgaltatasok?${params.toString()}`)
-    .then((response) => {
-      this.szolgaltatasok = response.data;
-    })
-    .catch((error) => {
-      console.error("Hiba a szolgáltatások lekérésekor:", error);
-    });
-},
-
-    // Rendezés metódusa
-    sortServices() {
-      if (this.selectedSortOption === "nameAsc") {
-        this.szolgaltatasok.sort((a, b) => a.vallalkozas_neve.localeCompare(b.vallalkozas_neve));
-      } else if (this.selectedSortOption === "nameDesc") {
-        this.szolgaltatasok.sort((a, b) => b.vallalkozas_neve.localeCompare(a.vallalkozas_neve));
-      } else if (this.selectedSortOption === "durationAsc") {
-        this.szolgaltatasok.sort((a, b) => a.idotartam - b.idotartam);
-      } else if (this.selectedSortOption === "durationDesc") {
-        this.szolgaltatasok.sort((a, b) => b.idotartam - a.idotartam);
-      } else if (this.selectedSortOption === "priceAsc") {
-        this.szolgaltatasok.sort((a, b) => a.ar - b.ar);
-      } else if (this.selectedSortOption === "priceDesc") {
-        this.szolgaltatasok.sort((a, b) => b.ar - a.ar);
+      if (vallalkozasId) {
+        params.append('vallalkozas_id', vallalkozasId);
       }
+      if (category) {
+        params.append('category', category);
+      }
+
+      axios
+        .get(`/api/foglalasok/szolgaltatasok?${params.toString()}`)
+        .then((response) => {
+          this.szolgaltatasok = response.data;
+        })
+        .catch((error) => {
+          console.error("Hiba a szolgáltatások lekérésekor:", error);
+        });
     },
 
-    async fetchSzabadIdopontok(szolgaltatasId) {
-      this.selectedSzolgaltatasId = szolgaltatasId;
-      try {
-        const token = JSON.parse(localStorage.getItem('authData')).token;
-        const response = await axios.get(`/api/foglalasok/szabad-idopontok/${szolgaltatasId}`, {
-          headers: {
-            'Authorization': `Bearer ${token}`
-          }
-        });
+    // Szolgáltatás kiválasztása foglalás előtt
+    fetchSzabadIdopontok(szolgaltatas) {
+      this.selectedSzolgaltatasId = szolgaltatas.szolgaltatas_id;
+      this.vallalkozasId = szolgaltatas.vallalkozas_id;  // Elmentjük a vállalkozás ID-t
 
-        this.szabadIdopontok = response.data;
-        this.modalVisible = true;
-      } catch (error) {
-        console.error("Hiba a szabad időpontok lekérésekor:", error);
-        this.showAlert("Hiba történt a szabad időpontok lekérésekor.");
-      }
+      axios
+        .get(`/api/foglalasok/szabad-idopontok/${szolgaltatas.szolgaltatas_id}`)
+        .then((response) => {
+          this.szabadIdopontok = response.data;
+          this.modalVisible = true;
+        })
+        .catch((error) => {
+          console.error("Hiba a szabad időpontok lekérésekor:", error);
+          this.showAlert("Hiba történt a szabad időpontok lekérésekor.");
+        });
     },
 
     async bookAppointment() {
@@ -162,16 +144,13 @@ fetchSzolgaltatasok(vallalkozasId, category) {
         szolgaltatas_id: this.selectedSzolgaltatasId,
         ido_id: this.selectedIdo,
         felhasznalo_id: userId,
-        vallalkozas_id: this.vallalkozasId,
+        vallalkozas_id: this.vallalkozasId,  // A kiválasztott vállalkozás ID használata
         foglalo_tipus: foglaloTipus,
         email: email
       };
 
       try {
-        const response = await axios.post('/api/foglalasok/foglalas', payload, {
-          timeout: 5000
-        });
-
+        await axios.post('/api/foglalasok/foglalas', payload);
         this.showAlert("Sikeres foglalás!");
         this.modalVisible = false;
       } catch (error) {
@@ -180,16 +159,16 @@ fetchSzolgaltatasok(vallalkozasId, category) {
       }
     },
 
-    // Alert Message Setter
     showAlert(message) {
       this.alertMessage = message;
       setTimeout(() => {
-        this.alertMessage = null;  // Üzenet eltűnik 5 másodperc után
+        this.alertMessage = null;
       }, 5000);
     }
   }
 };
 </script>
+
 
 <style scoped>
 .container {
