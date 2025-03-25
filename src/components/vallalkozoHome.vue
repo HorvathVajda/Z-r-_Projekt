@@ -96,9 +96,10 @@ export default {
 
 /* Fő tartalom */
 .main-content {
+  margin-left: 7px;
   flex-grow: 1;
   padding: 20px;
-  background-color: #EDEDED;
+  background-color: white;
   margin-top: 70px;
 }
 </style>

@@ -202,13 +202,11 @@ export default {
     saveBio() {
       this.isEditingBio = false;
       if (this.editedBio.trim() !== '') {
-        // Küldjük a bio-t a backendnek
         axios.post('/api/businesses/update-bio', { email: this.user.email, bio: this.editedBio })
           .then(response => {
-            // Ha sikeres, frissítjük a userBio változót
             console.log('Bio frissítve:', response.data.userProfile);
-            this.userBio = response.data.userProfile.bio;  // Az új bio beállítása
-            this.userName = response.data.userProfile.name; // Esetleg más mezők frissítése
+            this.userBio = response.data.userProfile.bio;
+            this.userName = response.data.userProfile.name;
           })
           .catch(error => {
             console.error('Hiba történt a bio mentése közben:', error);
@@ -221,12 +219,10 @@ export default {
     toggleEditUserData() {
       this.isEditingUserData = !this.isEditingUserData;
       if (!this.isEditingUserData) {
-        // Reset the edited data to the original values if canceling
         this.editedUserName = '';
         this.editedUserEmail = '';
         this.editedUserPhone = '';
       } else {
-        // Populate fields with current values for editing
         this.editedUserName = this.userName;
         this.editedUserEmail = this.user.email;
         this.editedUserPhone = this.user.phone;
@@ -235,14 +231,12 @@ export default {
     saveUserData() {
   this.isEditingUserData = false;
   if (this.editedUserName.trim() && this.editedUserPhone.trim()) {
-    // Frissített adatok küldése a backendnek
     axios.post('/api/businesses/update-user', {
-      email: this.user.email, // Az eredeti emailt küldjük
-      nev: this.editedUserName, // A backend "nev"-et várja
-      telefonszam: this.editedUserPhone, // A backend "telefonszam"-ot várja
+      email: this.user.email,
+      nev: this.editedUserName,
+      telefonszam: this.editedUserPhone,
     })
       .then(response => {
-        // Sikeres frissítés után frissítjük a felhasználó nevét és telefonszámát
         this.userName = this.editedUserName;
         this.user.phone = this.editedUserPhone;
       })
