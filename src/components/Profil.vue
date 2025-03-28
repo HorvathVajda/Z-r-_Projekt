@@ -199,7 +199,7 @@ export default {
         return;
       }
 
-      axios.post(`/api/teszt/teljesit`, null, {
+      axios.post(`/api/businesses/teljesit`, null, {
         params: { ido_id }  // A paraméter a query string-ben kerül átadásra
       })
         .then(response => {
