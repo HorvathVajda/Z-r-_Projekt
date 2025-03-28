@@ -252,41 +252,59 @@ router.get('/bookings', async (req, res) => {
 });
 
 router.get('/idopontok', (req, res) => {
-  const vallalkozoId = req.query.vallalkozo_id; // A vállalkozó ID-ját kérdezzük le
+  const vallalkozoId = req.query.vallalkozo_id;
+  console.log("A lekérdezett vallalkozo_id:", vallalkozoId);
 
   if (!vallalkozoId) {
-    return res.status(400).json({ message: 'Vállalkozó ID nem található!' });
+    return res.status(400).json({ message: 'Hiányzik a vallalkozo_id.' });
   }
 
-  const query = `
-    SELECT i.ido_id, i.idopont, i.statusz, f.foglalas_id, u.nev as foglalo_nev
-    FROM idopontok i
-    LEFT JOIN foglalasok f ON i.ido_id = f.ido_id
-    LEFT JOIN felhasznalo u ON f.felhasznalo_id = u.felhasznalo_id
-    WHERE i.vallalkozas_id = ?
-    ORDER BY i.idopont
+  const queryVallalkozas = `
+    SELECT id FROM vallalkozas WHERE vallalkozo_id = ?;
+  `;
+  console.log('Vallalkozas lekérdezés:', queryVallalkozas);
+
+  // Első lekérdezés: A vallalkozas_id-k lekérése a vallalkozo_id alapján
+db.query('SELECT id FROM vallalkozas WHERE vallalkozo_id = ?', [vallalkozoId], (err, vallalkozasResults) => {
+  if (err) {
+    console.error('Hiba történt a vallalkozas_id lekérése során:', err);
+    return res.status(500).json({ message: 'Hiba történt a vallalkozas_id lekérése során' });
+  }
+
+  console.log('Vallalkozas id-k:', vallalkozasResults); // Kiírás a lekérdezés eredményéről
+
+  if (vallalkozasResults.length === 0) {
+    console.log('Nincs ilyen vállalkozás.');
+    return res.status(404).json({ message: 'Nincs ilyen vállalkozás.' });
+  }
+
+  // Az első lekérdezés eredményét elmentjük
+  const vallalkozasIds = vallalkozasResults.map(item => item.id);
+  console.log('Vallalkozas id-k azonosítók:', vallalkozasIds); // Kiírás a kapott vallalkozas_id-król
+
+  // Második lekérdezés: Foglalások lekérése a kapott vallalkozas_id-k alapján
+  const foglalasQuery = `
+    SELECT * FROM foglalasok WHERE vallalkozas_id IN (?);
   `;
 
-  db.query(query, [vallalkozoId], (err, results) => {
+  // Az első lekérdezés után elindítjuk a másodikat
+  db.query(foglalasQuery, [vallalkozasIds], (err, foglalasResults) => {
     if (err) {
-      console.error('Hiba történt az időpontok lekérése során:', err);
-      return res.status(500).json({ message: 'Hiba történt az időpontok lekérése során' });
+      console.error('Hiba történt a foglalasok lekérése során:', err);
+      return res.status(500).json({ message: 'Hiba történt a foglalasok lekérése során' });
     }
 
-    if (results.length > 0) {
-      const idopontok = results.map(idopont => ({
-        ido_id: idopont.ido_id,
-        idopont: idopont.idopont,
-        statusz: idopont.statusz,
-        foglalas_id: idopont.foglalas_id,
-        foglalo_nev: idopont.foglalo_nev || 'Szabad'
-      }));
+    console.log('Foglalasok:', foglalasResults); // Kiírás a foglalások eredményéről
 
-      return res.json({ idopontok });
+    if (foglalasResults.length > 0) {
+      return res.json({ foglalasok: foglalasResults });
     } else {
-      return res.json({ message: 'Nincs időpont ezen a vállalkozáson.' });
+      console.log('Nincs foglalás ezen a vállalkozáson.');
+      return res.json({ message: 'Nincs foglalás ezen a vállalkozáson.' });
     }
   });
+});
+
 });
 
 

@@ -74,18 +74,19 @@
           </div>
         </div>
 
-      <!-- Időpontok -->
-      <div class="idopontok">
-        <h3>Időpontok</h3>
-        <div v-if="idopontok.length > 0">
-          <div v-for="(idopont) in idopontok" :key="idopont.ido_id" class="foglalas-item">
-            <p><strong>Időpont:</strong> {{ idopont.idopont }}</p>
-            <p v-if="idopont.statusz === 'foglalt'"><strong>Foglalt:</strong> {{ idopont.foglalo_nev }}</p>
-            <p v-else><strong>Szabad</strong></p>
+          <!-- Időpontok megjelenítése -->
+          <div class="idopontok">
+            <h3>Időpontok</h3>
+            <div v-if="idopontok.length > 0">
+              <div v-for="(idopont, index) in idopontok" :key="index" class="foglalas-item">
+                <p><strong>Időpont:</strong> {{ idopont.datum }}</p> <!-- Dátum megjelenítése -->
+                <p>
+                  <strong>Foglaló:</strong> {{ idopont.foglalo_nev }}
+                </p>
+              </div>
+            </div>
+            <p v-else>Nincs időpont ezen a vállalkozáson.</p>
           </div>
-        </div>
-        <p v-else>Nincs időpont ezen a vállalkozáson.</p>
-      </div>
 
       </div>
     </div>
@@ -142,15 +143,6 @@ export default {
       this.getIdopontok(authData.id);
     }
   },
-  mounted() {
-  const authData = JSON.parse(localStorage.getItem('authData'));
-  const email = authData.email;
-  if (authData && authData.email) {
-    // Fetch business profile and bookings based on the email
-    this.getBusinessProfile(authData.email);
-    this.getBookings(authData.id); // Fetch bookings
-  }
-},
   methods: {
     getBookings(vallalkozo_id) {
       if (!vallalkozo_id) {
@@ -182,19 +174,21 @@ export default {
         });
     },
 
-    getIdopontok(vallalkozoId) {
-    axios.get(`/api/businesses/idopontok?vallalkozo_id=${vallalkozoId}`)
-      .then(response => {
-        if (response.data.idopontok) {
-          this.idopontok = response.data.idopontok;
-        } else {
-          console.log('Nincs időpont ezen a vállalkozáson');
-        }
-      })
-      .catch(error => {
-        console.error('Hiba történt az időpontok lekérése során:', error);
-      });
-  },
+    getIdopontok(vallalkozo_id) {
+      axios.get(`/api/teszt/idopontok?vallalkozo_id=${vallalkozo_id}`)
+        .then(response => {
+          // Frissítsük az adatokat a válasz alapján
+          this.idopontok = response.data.idopontok.map(idopont => ({
+            datum: idopont,  // A dátum már szerepel az idopontok tömbben
+            foglalo_nev: response.data.nev || 'N/A',  // Foglaló neve, amit a válaszban kaptál
+            foglalo_tipus: 'vallalkozo'  // Lehet, hogy ezt dinamikusan kell majd változtatni
+          }));
+        })
+        .catch(error => {
+          console.error('Hiba történt az időpontok lekérésekor:', error);
+        });
+    },
+
     toggleEditBio() {
       this.isEditingBio = true;
       this.editedBio = this.userBio;

@@ -8,6 +8,7 @@ const db = require("./db");
 const nodemailer = require("nodemailer");
 const UserRoutes = require("../routes/UserRoutes");
 const UserprofileRoutes = require("../routes/UserprofileRoutes");
+const teszt = require("../routes/teszt");
 
 
 dotenv.config();
@@ -29,7 +30,8 @@ app.use(express.json());
 app.use("/api/auth", authRoutes);
 app.use('/api/businesses', businessRoutes);
 app.use("/api/foglalasok", bookingRoutes);
-app.use('/api/felhasznalo', UserRoutes); 
+app.use('/api/felhasznalo', UserRoutes);
+app.use("/api/teszt", teszt)
 
 app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
