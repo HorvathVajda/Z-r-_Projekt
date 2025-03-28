@@ -69,24 +69,32 @@
         <!-- Statisztikák -->
         <div class="stats">
           <h3>Statisztikák</h3>
-          <div class="stat-item" v-for="(stat, index) in stats" :key="index">
-            <span>{{ stat.label }}</span>
+          <div class="stat-item">
+            <div><span>Teljesített munkák: </span></div>
+            <div><span>Eddigi bevétel (br): </span></div>
+            <div><span>Összes foglalás: </span></div>
           </div>
         </div>
 
-          <!-- Időpontok megjelenítése -->
-          <div class="idopontok">
-            <h3>Időpontok</h3>
-            <div v-if="idopontok.length > 0">
-              <div v-for="(idopont, index) in idopontok" :key="index" class="foglalas-item">
-                <p><strong>Időpont:</strong> {{ idopont.datum }}</p> <!-- Dátum megjelenítése -->
-                <p>
-                  <strong>Foglaló:</strong> {{ idopont.foglalo_nev }}
-                </p>
-              </div>
+
+        <!-- Időpontok megjelenítése -->
+        <div class="idopontok">
+          <h3>Időpontok</h3>
+          <div v-if="idopontok.length > 0">
+            <div v-for="(idopont, index) in idopontok" :key="index" class="foglalas-item">
+              <p><strong>Időpont:</strong> {{ idopont.datum }}</p> <!-- Dátum megjelenítése -->
+              <p><strong>Foglaló:</strong> {{ idopont.foglalo_nev }}</p>
+
+              <!-- Gomb a teljesítéshez -->
+              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id)" class="complete-btn">
+                Teljesítés
+              </button>
+
+              <p v-else>Ez az időpont teljesítve lett.</p>
             </div>
-            <p v-else>Nincs időpont ezen a vállalkozáson.</p>
           </div>
+          <p v-else>Nincs időpont ezen a vállalkozáson.</p>
+        </div>
 
       </div>
     </div>
@@ -114,11 +122,6 @@ export default {
         phone: '+36 30 123 4567',
       },
       bookings: [], // Add this line to define bookings
-      stats: [
-        { label: 'Projekt sikeresség', value: 80 },
-        { label: 'Ügyfél elégedettség', value: 90 },
-        { label: 'Teljesítési arány', value: 75 },
-      ],
       selectedBookingIndex: null,
       idopontok: []
     };
@@ -175,17 +178,36 @@ export default {
     },
 
     getIdopontok(vallalkozo_id) {
-      axios.get(`/api/teszt/idopontok?vallalkozo_id=${vallalkozo_id}`)
+      axios.get(`/api/businesses/idopontok?vallalkozo_id=${vallalkozo_id}`)
         .then(response => {
-          // Frissítsük az adatokat a válasz alapján
+          console.log(response.data);  // Ellenőrizzük, hogy valóban van-e ido_id
           this.idopontok = response.data.idopontok.map(idopont => ({
-            datum: idopont,  // A dátum már szerepel az idopontok tömbben
-            foglalo_nev: response.data.nev || 'N/A',  // Foglaló neve, amit a válaszban kaptál
-            foglalo_tipus: 'vallalkozo'  // Lehet, hogy ezt dinamikusan kell majd változtatni
+            ido_id: idopont.ido_id,  // Ha van ido_id, akkor azt is átadjuk
+            datum: idopont.datum,    // Az időpont dátuma
+            foglalo_nev: response.data.nev || 'N/A',  // A válaszban kapott foglaló neve
+            statusz: 'foglalt' // Ez a státusz (esetleg dinamikusan is beállítható)
           }));
         })
         .catch(error => {
           console.error('Hiba történt az időpontok lekérésekor:', error);
+        });
+    },
+
+    completeAppointment(ido_id) {
+      if (!ido_id) {
+        console.error('Nincs érvényes ido_id!');
+        return;
+      }
+
+      axios.post(`/api/teszt/teljesit`, null, {
+        params: { ido_id }  // A paraméter a query string-ben kerül átadásra
+      })
+        .then(response => {
+          console.log('Időpont teljesítve:', response.data);
+          // Itt frissítheted az időpontok állapotát, például a "statusz" módosításával
+        })
+        .catch(error => {
+          console.error('Hiba történt az időpont teljesítésekor:', error);
         });
     },
 
@@ -272,6 +294,20 @@ export default {
 
 
 <style scoped>
+
+.complete-btn {
+  background-color: #28a745; /* Zöld gomb */
+  color: white;
+  padding: 10px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.complete-btn:hover {
+  background-color: #218838;
+}
+
 /* Alap elrendezés */
 .container, .content {
   display: unset;
@@ -341,6 +377,7 @@ button {
   right: 5%;
   top: 30%;
 }
+
 .follow-btn:hover, .edit-btn:hover{
   transform: translateY(-3px);
   font-size: 20px;
@@ -350,10 +387,6 @@ button {
   cursor: pointer;
 }
 
-.follow-btn {
-  background: #6bb6ea;
-  color: black;
-}
 
 .edit-btn:hover {
   transform: translateY(-3px);
@@ -370,6 +403,11 @@ button {
   flex-direction: column;
   align-items: flex-start;
   position: relative;
+}
+
+
+.stat-item div {
+  margin-bottom: 10px; /* Ha szeretnél távolságot a sorok között */
 }
 
 /* Bio szakasz */
