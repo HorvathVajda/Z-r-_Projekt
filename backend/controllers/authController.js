@@ -102,22 +102,32 @@ exports.registerBusiness = async (req, res) => {
   }
 
   try {
+    // Ellenőrizzük, hogy az e-mail már létezik-e
     const [existingUsers] = await db.query(`SELECT * FROM vallalkozo WHERE email = ?`, [email]);
 
     if (existingUsers.length > 0) {
       return res.status(400).json({ error: "Ez az e-mail cím már regisztrálva van vállalkozóként." });
     }
 
+    // Jelszó titkosítása
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
+    // Új vállalkozó beszúrása
     const query = `INSERT INTO vallalkozo (nev, email, jelszo, telefonszam) VALUES (?, ?, ?, ?)`;
     const [result] = await db.execute(query, [name, email, hashedPassword, phone]);
 
-    res.status(201).json({ message: "Sikeres vállalkozói regisztráció.", businessId: result.insertId });
+    const businessId = result.insertId;
+
+    // Statisztikai rekord létrehozása az új vállalkozóhoz
+    const statQuery = `INSERT INTO statisztika (vallalkozo_id, teljesitett_munkak, bevetel, foglalasok) VALUES (?, 0, 0, 0)`;
+    await db.execute(statQuery, [businessId]);
+
+    res.status(201).json({ message: "Sikeres vállalkozói regisztráció.", businessId });
   } catch (err) {
     console.error('Hiba a vállalkozói regisztráció során:', err);
     res.status(500).json({ error: 'Regisztrációs hiba.' });
   }
 };
+
 
 

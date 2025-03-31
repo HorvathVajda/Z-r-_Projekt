@@ -86,7 +86,7 @@
               <p><strong>Foglaló:</strong> {{ idopont.foglalo_nev }}</p>
 
               <!-- Gomb a teljesítéshez -->
-              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id)" class="complete-btn">
+              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id, getVallalkozoId())" class="complete-btn">
                 Teljesítés
               </button>
 
@@ -147,6 +147,11 @@ export default {
     }
   },
   methods: {
+    getVallalkozoId() {
+      const authData = JSON.parse(localStorage.getItem('authData'));
+      return authData ? authData.id : null;
+    },
+
     getBookings(vallalkozo_id) {
       if (!vallalkozo_id) {
         console.error('Vállalkozó ID nem található!');
@@ -193,18 +198,17 @@ export default {
         });
     },
 
-    completeAppointment(ido_id) {
-      if (!ido_id) {
-        console.error('Nincs érvényes ido_id!');
+    completeAppointment(ido_id, vallalkozo_id) {
+      if (!ido_id || !vallalkozo_id) {
+        console.error('Nincs érvényes ido_id vagy vallalkozo_id!');
         return;
       }
 
-      axios.post(`/api/businesses/teljesit`, null, {
-        params: { ido_id }  // A paraméter a query string-ben kerül átadásra
-      })
+      // POST kérés a backendhez
+      axios.post('/api/businesses/teljesit', { ido_id, vallalkozo_id })
         .then(response => {
           console.log('Időpont teljesítve:', response.data);
-          // Itt frissítheted az időpontok állapotát, például a "statusz" módosításával
+          // Frissíthetjük az időpontok állapotát itt
         })
         .catch(error => {
           console.error('Hiba történt az időpont teljesítésekor:', error);

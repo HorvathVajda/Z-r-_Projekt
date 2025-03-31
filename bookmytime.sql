@@ -197,6 +197,18 @@ INSERT INTO `vallalkozo` (`vallalkozo_id`, `nev`, `email`, `jelszo`, `telefonsza
 (3, 'Gábor Nagy', 'gabor.nagy@example.com', 'password456', '06301234567', 'Mindenféle festést vállalok, legyen szó belső vagy külső munkálatokról.'),
 (4, 'pista', 'p@g.c', '$2b$10$rpq9D3wlsr7O14qjK8I6pOCDrYL7HQRYgWu6ISqNo/o8mo.GJZ1Nm', '06044444', NULL);
 
+
+CREATE TABLE statisztika (
+  `id` INT NOT NULL AUTO_INCREMENT,
+  `teljesitett_munkak` INT DEFAULT NULL,
+  `bevetel` INT DEFAULT NULL,
+  `foglalasok` INT DEFAULT NULL,
+  `vallalkozo_id` INT NOT NULL,
+  PRIMARY KEY (`id`),
+  FOREIGN KEY (`vallalkozo_id`) REFERENCES vallalkozo(`vallalkozo_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_hungarian_ci;
+
+
 --
 -- Indexek a kiírt táblákhoz
 --

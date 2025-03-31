@@ -294,12 +294,15 @@ router.get('/idopontok', async (req, res) => {
     const szolgaltatasIds = szolgaltatasRows.map(row => row.szolgaltatas_id);
     console.log(`Szolgáltatás id-k: ${szolgaltatasIds.join(', ')}`);
 
+    const placeholders = szolgaltatasIds.map(() => '?').join(', ');
+
     // 3. Lekérjük az idopontok táblából azokat az adatokat, ahol a szolgaltatas_id megegyezik és a statusz = 'foglalt'
     const [idopontokRows] = await db.execute(
-      'SELECT ido_id, szabad_ido FROM idopontok WHERE szolgaltatas_id = 10 AND statusz = "foglalt"'
+      `SELECT ido_id, szabad_ido FROM idopontok WHERE szolgaltatas_id IN (${placeholders}) AND statusz = 'foglalt'`,
+      szolgaltatasIds
     );
 
-    console.log('Foglalt időpontok (szolgáltatás 10):', idopontokRows);
+    console.log('Foglalt időpontok:', idopontokRows);
 
     // A foglalt időpontok átalakítása helyi időzónára
     idopontokRows.forEach((item) => {
@@ -358,7 +361,7 @@ router.get('/idopontok', async (req, res) => {
 });
 
 router.post('/teljesit', async (req, res) => {
-  let { ido_id } = req.query; // A frontend által küldött ido_id paraméter
+  let { ido_id, vallalkozo_id } = req.body;
 
   if (!ido_id) {
     return res.status(400).json({ error: 'Időpont azonosító szükséges' });
@@ -392,11 +395,32 @@ router.post('/teljesit', async (req, res) => {
       return res.status(404).json({ error: 'Nincs foglalás a megadott időponthoz' });
     }
 
+    // 3. Statisztika frissítése
+    const [teljesitett] = await db.execute(
+      'UPDATE statisztika SET teljesitett_munkak = teljesitett_munkak + 1 WHERE vallalkozo_id = ?',
+      [vallalkozo_id]
+    );
+
+    if(teljesitett.affectedRows === 0){
+      return res.status(404).json({ error: 'Hiba történt a statisztikai adatok frissítésekor' });
+    }
+
+    // 4. Időpont státuszának frissítése (például teljesítve)
+    const [statusUpdate] = await db.execute(
+      'UPDATE idopontok SET statusz = "teljesitett" WHERE ido_id = ?',
+      [ido_id]
+    );
+
+    if (statusUpdate.affectedRows === 0) {
+      return res.status(404).json({ error: 'Időpont státusza nem frissíthető' });
+    }
+
     res.status(200).json({ message: 'Időpont sikeresen teljesítve' });
   } catch (error) {
     console.error('Hiba történt:', error);
     res.status(500).json({ error: 'Hiba történt a törlés során' });
   }
 });
+
 
 module.exports = router;
