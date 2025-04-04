@@ -214,7 +214,6 @@ onMounted(fetchBusinessDetails);
 </script>
 
 
-
 <style scoped>
 h1, p {
   line-height: 1.6;
@@ -235,7 +234,7 @@ h1, p {
 }
 
 .cancel-button {
-  background-color: #e74c3c; /* Piros szín */
+  background-color: #e74c3c;
   color: white;
   padding: 6px 14px;
   border: none;
@@ -250,26 +249,28 @@ h1, p {
 }
 
 .edit-button:hover {
-  background-color: #9d9ff4; /* Halvány lila */
+  background-color: #9d9ff4;
 }
 
 .cancel-button:hover {
-  background-color: rgb(231, 77, 60, 0.8); /* Halvány piros */
+  background-color: rgb(231, 77, 60, 0.8);
 }
 
 .edit-form {
   margin-top: 10px;
   display: flex;
-  align-items: center;
+  flex-direction: column;
+  align-items: stretch;
   gap: 10px;
 }
 
+/* Edit input mezők szélességének optimalizálása */
 .edit-input {
   padding: 8px 12px;
   border: 1px solid #ccc;
   border-radius: 5px;
   font-size: 16px;
-  width: 250px;
+  width: 100%;  /* Teljes szélesség mobilon */
   transition: border-color 0.3s ease;
 }
 
@@ -279,7 +280,7 @@ h1, p {
 }
 
 .save-button {
-  background-color: #6327a2; /* Lila szín */
+  background-color: #6327a2;
   color: white;
   padding: 8px 14px;
   border: none;
@@ -290,15 +291,9 @@ h1, p {
 }
 
 .save-button:hover {
-  background-color: #9d9ff4; /* Halvány lila hover */
+  background-color: #9d9ff4;
   transform: scale(1.05);
 }
-
-.save-button:hover {
-  background-color: #9d9ff4; /* Halvány lila hover */
-  transform: scale(1.05);
-}
-
 
 .add-time-button {
   background-color: #6327a2;
@@ -470,5 +465,48 @@ h1, p {
 
 .delete-button button:hover {
   background-color: darkred;
+}
+
+@media screen and (max-width: 768px) {
+  h1, p {
+    font-size: 16px;
+  }
+
+  .edit-input {
+    font-size: 14px;
+    padding: 8px;
+  }
+
+  /* Edit form: Kisebb képernyőkön a mezők teljes szélességben */
+  .edit-form {
+    gap: 15px;
+  }
+
+  .service-card {
+    width: 100%;
+    margin-bottom: 15px;
+  }
+
+  .add-service-btn {
+    font-size: 25px;
+    width: 45px;
+    height: 45px;
+  }
+
+  .business-card {
+    padding: 15px;
+  }
+
+  .button-container {
+    flex-direction: column;
+    gap: 8px;
+  }
+
+  /* Gombok mobilon jobban igazodjanak */
+  .save-button, .cancel-button, .edit-button {
+    width: 100%;
+    padding: 10px;
+    font-size: 16px;
+  }
 }
 </style>

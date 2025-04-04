@@ -327,6 +327,9 @@ export default {
 /* Reszponzív beállítások */
 @media screen and (max-width: 768px) {
   /* Képernyő szélessége 768px alatt */
+  .harmadik-image {
+    display: none;
+  }
 .harmadik-container {
     flex-direction: column;
     padding: 10px;

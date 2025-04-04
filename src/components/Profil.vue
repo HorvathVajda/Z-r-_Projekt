@@ -327,15 +327,16 @@ export default {
 
 
 <style scoped>
+/* Alap stílusok és elrendezés */
 .container {
   display: contents;
   flex-direction: column;
-  align-items: center;  /* Ez biztosítja, hogy középre igazodjon */
-  justify-content: flex-start; /* A tartalom a tetején marad */
+  align-items: center;  /* Középre igazítás */
+  justify-content: flex-start;
   padding: 20px;
-  width: 100%; /* Szélesség beállítása, hogy kitöltse a szülőt */
-  max-width: 1200px; /* Maximális szélesség hozzáadása, ha szükséges */
-  margin: 0 auto; /* Középre igazítja a szülőt */
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
 }
 
 .idopontok {
@@ -346,18 +347,18 @@ export default {
   border: 2px solid #9d9ff4;
   width: 100%;
   max-width: 1200px;
-  height: 400px; /* Kezdetben fix magasság */
-  flex-grow: 1; /* Az idopontok panelje kitölti a maradék helyet */
-  overflow-y: auto; /* Görgetés engedélyezése, ha több idopont van */
-  transition: height 0.3s ease; /* Animáció a magasság váltására */
+  height: 400px;
+  flex-grow: 1;
+  overflow-y: auto;
+  transition: height 0.3s ease;
 }
 
 .idopontok.show-all {
-  height: auto; /* Ha a 'showAll' true, akkor a magasság automatikusan a tartalomhoz igazodik */
+  height: auto;
 }
 
 .show-all-btn {
-  background-color: #6327A2; /* Lila szín */
+  background-color: #6327A2;
   color: white;
   padding: 10px;
   border: none;
@@ -368,7 +369,7 @@ export default {
 }
 
 .show-all-btn:hover {
-  background-color: #9d9ff4; /* Világosabb lila hover */
+  background-color: #9d9ff4;
 }
 
 .foglalas-item {
@@ -376,7 +377,7 @@ export default {
   padding: 15px;
   border-radius: 6px;
   box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid #9d9ff4; /* Lila sáv a bal oldalon */
+  border-left: 5px solid #9d9ff4;
 }
 
 .foglalas-item p {
@@ -386,11 +387,11 @@ export default {
 }
 
 .foglalas-item strong {
-  color: #6327A2; /* Lila szín a 'strong' szövegekhez */
+  color: #6327A2;
 }
 
 .complete-btn {
-  background-color: #6327A2; /* Lila szín a gombnak */
+  background-color: #6327A2;
   color: white;
   padding: 10px 20px;
   border: none;
@@ -401,17 +402,12 @@ export default {
 }
 
 .complete-btn:hover {
-  background-color: #9d9ff4; /* Világosabb lila hover esetén */
+  background-color: #9d9ff4;
 }
 
 .complete-btn:disabled {
   background-color: #ccc;
   cursor: not-allowed;
-}
-
-.foglalas-item p:last-child {
-  font-style: italic;
-  color: #888;
 }
 
 /* Profil kártya */
@@ -423,7 +419,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   max-width: 100%;
-  border: 2px solid #9d9ff4; /* Lila szegély */
+  border: 2px solid #9d9ff4;
 }
 
 .profile-image {
@@ -440,52 +436,38 @@ button {
   cursor: pointer;
 }
 
-/* Foglalás gomb */
-.follow-btn {
-  background: #6327A2;
-  color: white;
-  width: 10%;
-  font-size: 20px;
-  font-weight: bold;
-  padding: 0.55rem 1rem;
-  border: none;
-  cursor: pointer;
-  border-radius: 100px;
-  margin: 10px;
-  transition: transform 0.3s;
-}
-
-/* Editálás gomb */
 .edit-btn {
-  position: absolute;
-  right: 10%;
-  top: 35%;
-  background-color: #6327A2; /* Lila háttér */
-  color: white; /* Fehér szöveg */
+  background-color: #6327A2;
+  color: white;
   padding: 0.55rem 1rem;
-  border-radius: 100px; /* Kerekített gomb */
+  border-radius: 100px;
   font-size: 16px;
   font-weight: bold;
   border: none;
   cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s; /* Animációk */
+  transition: background-color 0.3s, box-shadow 0.3s;
+  width: auto;
+  position: absolute; /* Pozicionálás a szülőhöz képest */
+  top: 50%; /* Függőlegesen középre igazítjuk */
+  right: 20px; /* Jobbra toljuk */
+  transform: translateY(-50%); /* Függőlegesen középre igazítjuk */
 }
 
+
 .edit-btn:hover {
-  background-color: #9d9ff4; /* Világosabb lila hover esetén */
-  box-shadow: 0 4px 8px rgba(99, 39, 162, 0.3); /* Lila árnyék a hover effektushoz */
+  background-color: #9d9ff4;
+  box-shadow: 0 4px 8px rgba(99, 39, 162, 0.3);
 }
 
 .edit-btn:active {
-  transform: translateY(1px); /* Nyomásra enyhe süllyedés */
-  box-shadow: none; /* Nincs árnyék aktiváláskor */
+  transform: translateY(1px);
+  box-shadow: none;
 }
 
 .edit-btn:focus {
-  outline: none; /* Nincs fókusz keret */
-  box-shadow: 0 0 8px rgba(99, 39, 162, 0.5); /* Erősebb lila árnyék, ha fókuszban van */
+  outline: none;
+  box-shadow: 0 0 8px rgba(99, 39, 162, 0.5);
 }
-
 
 /* Személyes adatok és foglalások */
 .user-info, .stats, .foglalasok, .idopontok {
@@ -498,27 +480,26 @@ button {
   flex-direction: column;
   align-items: flex-start;
   position: relative;
-  border: 2px solid #9d9ff4; /* Lila szegély */
-  margin-bottom: 20px; /* Margó hozzáadása az elemek közötti távolság növelésére */
+  border: 2px solid #9d9ff4;
+  margin-bottom: 20px;
 }
 
-/* Egyéb szakaszok */
 .stats {
   padding: 20px;
   border-radius: 8px;
-  height: 210px; /* Állítsd be a kívánt fix magasságot */
-  overflow-y: auto; /* Ha túl sok tartalom van, akkor görgethetővé válik */
+  height: 210px;
+  overflow-y: auto;
 }
 
 .stat-item {
-  display: block; /* Egymás alá helyezi őket */
+  display: block;
   margin-top: 10px;
 }
 
 .stat-item div {
-  font-size: 20px; /* Nagyobb betűméret */
-  font-weight: 600; /* Vastagabb betűtípus */
-  margin-bottom: 10px; /* Térköz a statisztikák között */
+  font-size: 20px;
+  font-weight: 600;
+  margin-bottom: 10px;
 }
 
 /* Bio szakasz */
@@ -585,24 +566,56 @@ button {
   box-shadow: 0 0 8px rgba(99, 39, 162, 0.3);
 }
 
-/* Alap stílusok és elrendezés */
-h2 {
-  font-size: 1.5rem;
-  font-weight: bold;
-  margin-bottom: 10px;
-}
+/* Reszponzív stílusok */
+@media screen and (max-width: 768px) {
+  .container {
+    padding: 15px;
+  }
 
-ul {
-  list-style-type: none;
-  padding: 0;
-}
+  .idopontok, .foglalas-item {
+    margin: 10px;
+    padding: 15px;
+    width: 100%;
+  }
 
-li {
-  margin: 10px 0;
-  font-size: 1.2rem;
-}
+  .follow-btn, .complete-btn, .edit-btn {
+    width: 100%;
+    font-size: 16px;
+    padding: 12px;
+  }
 
-strong {
-  font-weight: bold;
+  .profile-card {
+    padding: 15px;
+  }
+
+  .profile-image {
+    width: 80px;
+    height: 80px;
+  }
+
+  .bio-container {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .user-info, .stats, .foglalasok {
+    min-width: 100%;
+    flex: 1;
+    margin: 10px 0;
+  }
+
+  .stat-item div {
+    font-size: 16px;
+  }
+
+  .user-info-input {
+    font-size: 14px;
+  }
+
+  /* A "show-all-btn" és hasonló gombok kisebb képernyőkön */
+  .show-all-btn {
+    width: 100%;
+    padding: 12px;
+  }
 }
 </style>
