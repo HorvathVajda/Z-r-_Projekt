@@ -126,6 +126,17 @@ router.post('/foglalas', async (req, res) => {
     await db.query('UPDATE idopontok SET statusz = "foglalt" WHERE ido_id = ?', [ido_id]);
     console.log('Időpont státusz frissítve:', ido_id);
 
+    //Vállalkozó lekérése, foglalások növelése a statisztikákban
+    const [rows] = await db.query('SELECT vallalkozo_id FROM vallalkozas WHERE id = ?', [vallalkozas_id]);
+
+    if (rows.length === 0) {
+      return res.status(404).json({ message: 'Nem található vállalkozó ezzel az ID-vel' });
+    }
+
+    const vallalkozo_id = rows[0].vallalkozo_id;
+    await db.query('UPDATE statisztika SET foglalasok = foglalasok + 1 WHERE vallalkozo_id = ?', [vallalkozo_id]);
+
+
     return res.status(201).json();
 
   } catch (err) {

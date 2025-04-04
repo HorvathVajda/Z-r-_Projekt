@@ -100,6 +100,5 @@ export default {
   flex-grow: 1;
   padding: 20px;
   background-color: white;
-  margin-top: 70px;
 }
 </style>

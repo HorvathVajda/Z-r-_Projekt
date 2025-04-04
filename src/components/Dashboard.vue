@@ -62,7 +62,7 @@
             <input type="text" id="category" v-model="newBusiness.category" />
           </div>
           <div class="form-buttons">
-            <button type="submit" class="submit-button">Mentés</button>
+            <button type="submit" class="submit-button" @click="refresh()">Mentés</button>
             <button type="button" class="cancel-button" @click="showForm = false">Mégse</button>
           </div>
         </form>
@@ -196,15 +196,16 @@ const submitBusinessForm = async () => {
 
     businesses.value = [...businesses.value, businessData];
 
-    await nextTick(() => {
-      router.push('/vallalkozoHome');
-    });
 
   } catch (error) {
     console.error('Hiba a vállalkozás hozzáadásakor:', error);
     showAlert('Hiba történt a vállalkozás hozzáadása során');
   }
 };
+
+const refresh = async () => {
+  location.reload();
+}
 
 onMounted(async () => {
   await fetchBusinesses();

@@ -81,7 +81,9 @@ export default {
       }
     };
 
-
+    const refresh = () => {
+      location.reload();
+    };
 
     const filterCategories = () => {
       if (!searchQuery.value) {
@@ -117,9 +119,9 @@ export default {
 
         // Csak a category-t adjuk át, mert nem szükséges az id
         router.push({
-  name: 'Foglalas',
-  query: { category: searchQuery.value } // Kategóriát query paraméterként adjuk át
-});
+          name: 'Foglalas',
+          query: { category: searchQuery.value } // Kategóriát query paraméterként adjuk át
+        });
       } else {
         console.error('Nincs ilyen kategória.');
       }
@@ -153,7 +155,8 @@ export default {
       filteredCategories,
       filterCategories,
       selectCategory,
-      goToCategoryPage
+      goToCategoryPage,
+      refresh
     };
   },
 };

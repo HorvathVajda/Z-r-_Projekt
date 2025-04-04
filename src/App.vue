@@ -23,8 +23,19 @@ export default {
   },
   setup() {
     const route = useRoute();
-    const excludedPages = ['/registerChoose', '/login', '/register', '/vallalkozoRegister', '/vallalkozoHome', '/vallalkozoHome/profil', '/Foglalas']; // Ide add hozzá a kizárt oldalakat
-    const isExcludedPage = computed(() => excludedPages.includes(route.path));
+    const excludedPages = [
+      '/registerChoose',
+      '/login',
+      '/register',
+      '/vallalkozoRegister',
+      '/vallalkozoHome',
+      '/vallalkozoHome/profil',
+      '/Foglalas'
+    ];
+
+    const isExcludedPage = computed(() => {
+      return excludedPages.includes(route.path) || /^\/vallalkozoHome\/ceg\/\d+$/.test(route.path);
+    });
 
     return {
       isExcludedPage,

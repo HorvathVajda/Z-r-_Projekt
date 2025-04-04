@@ -19,7 +19,7 @@
       <div class="row">
         <!-- Személyes adatok -->
         <div class="user-info">
-          <h3>Személyes adatok</h3>
+          <h2>Személyes adatok</h2>
           <ul>
             <li>
               <strong>Teljes név: </strong>
@@ -44,7 +44,7 @@
 
         <!-- Foglalások -->
         <div class="foglalasok">
-          <h3>Közelgő foglalások</h3>
+          <h2>Közelgő foglalások</h2>
           <div v-if="bookings.length > 0">
             <!-- Show first 3 bookings -->
             <div v-for="(booking, index) in displayedBookings" :key="index" class="foglalas-item">
@@ -68,28 +68,26 @@
       <div class="row">
         <!-- Statisztikák -->
         <div class="stats">
-          <h3>Statisztikák</h3>
+          <h2>Statisztikák</h2>
           <div class="stat-item">
-            <div><span>Teljesített munkák: </span></div>
-            <div><span>Eddigi bevétel (br): </span></div>
-            <div><span>Összes foglalás: </span></div>
+            <div><span>Teljesített munkák: </span><span style="color: #6327A2;">{{ teljesitett_munkak }}</span></div>
+            <div><span>Eddigi bevétel (br): </span><span style="color: #6327A2;">{{ bevetel }}</span></div>
+            <div><span>Összes foglalás: </span><span style="color: #6327A2;">{{ foglalasok }}</span></div>
           </div>
         </div>
 
-
         <!-- Időpontok megjelenítése -->
         <div class="idopontok">
-          <h3>Időpontok</h3>
+          <h2>Időpontok</h2>
           <div v-if="idopontok.length > 0">
             <div v-for="(idopont, index) in idopontok" :key="index" class="foglalas-item">
               <p><strong>Időpont:</strong> {{ idopont.datum }}</p> <!-- Dátum megjelenítése -->
               <p><strong>Foglaló:</strong> {{ idopont.foglalo_nev }}</p>
 
               <!-- Gomb a teljesítéshez -->
-              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id, getVallalkozoId())" class="complete-btn">
+              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id, getVallalkozoId()); refresh()" class="complete-btn">
                 Teljesítés
               </button>
-
               <p v-else>Ez az időpont teljesítve lett.</p>
             </div>
           </div>
@@ -123,7 +121,11 @@ export default {
       },
       bookings: [], // Add this line to define bookings
       selectedBookingIndex: null,
-      idopontok: []
+      idopontok: [],
+      showAll: false,
+      teljesitett_munkak: 0,
+      bevetel: 0,
+      foglalasok: 0
     };
   },
   computed: {
@@ -144,9 +146,16 @@ export default {
       this.getBusinessProfile(authData.email);
       this.getBookings(authData.id); // Fetch bookings
       this.getIdopontok(authData.id);
+      this.fetchStatisztika(authData.id);
     }
   },
   methods: {
+    refresh(){
+      location.reload();
+    },
+    toggleShowAll() {
+      this.showAll = !this.showAll;
+    },
     getVallalkozoId() {
       const authData = JSON.parse(localStorage.getItem('authData'));
       return authData ? authData.id : null;
@@ -197,21 +206,41 @@ export default {
           console.error('Hiba történt az időpontok lekérésekor:', error);
         });
     },
-
     completeAppointment(ido_id, vallalkozo_id) {
       if (!ido_id || !vallalkozo_id) {
         console.error('Nincs érvényes ido_id vagy vallalkozo_id!');
         return;
       }
 
-      // POST kérés a backendhez
-      axios.post('/api/businesses/teljesit', { ido_id, vallalkozo_id })
+      // Először lekérdezzük az adatokat a /adatok végpontról
+      axios.get(`/api/businesses/adatok?ido_id=${ido_id}&vallalkozo_id=${vallalkozo_id}`)
         .then(response => {
-          console.log('Időpont teljesítve:', response.data);
-          // Frissíthetjük az időpontok állapotát itt
+          console.log('Lekért adatok:', response.data);
+
+          // Ha az adatok sikeresen megvannak, végrehajtjuk az időpont teljesítését
+          axios.post(`/api/businesses/teljesit?ido_id=${ido_id}&vallalkozo_id=${vallalkozo_id}`)
+            .then(response => {
+              console.log('Időpont teljesítve:', response.data);
+            })
+            .catch(error => {
+              console.error('Hiba történt az időpont teljesítésekor:', error);
+            });
         })
         .catch(error => {
-          console.error('Hiba történt az időpont teljesítésekor:', error);
+          console.error('Hiba történt az adatok lekérésekor:', error);
+        });
+    },
+
+    fetchStatisztika(vallalkozo_id) {
+      axios.get('/api/businesses/statisztika', { params: { vallalkozo_id } })
+        .then(response => {
+          // Feldolgozzuk a válasz adatokat
+          this.bevetel = response.data.bevetel;
+          this.teljesitett_munkak = response.data.teljesitett_munkak;
+          this.foglalasok = response.data.foglalasok;
+        })
+        .catch(error => {
+          console.error('Hiba történt a statisztikák betöltésekor:', error);
         });
     },
 
@@ -298,36 +327,91 @@ export default {
 
 
 <style scoped>
+.container {
+  display: contents;
+  flex-direction: column;
+  align-items: center;  /* Ez biztosítja, hogy középre igazodjon */
+  justify-content: flex-start; /* A tartalom a tetején marad */
+  padding: 20px;
+  width: 100%; /* Szélesség beállítása, hogy kitöltse a szülőt */
+  max-width: 1200px; /* Maximális szélesség hozzáadása, ha szükséges */
+  margin: 0 auto; /* Középre igazítja a szülőt */
+}
 
-.complete-btn {
-  background-color: #28a745; /* Zöld gomb */
+.idopontok {
+  margin: 20px;
+  padding: 20px;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border: 2px solid #9d9ff4;
+  width: 100%;
+  max-width: 1200px;
+  height: 400px; /* Kezdetben fix magasság */
+  flex-grow: 1; /* Az idopontok panelje kitölti a maradék helyet */
+  overflow-y: auto; /* Görgetés engedélyezése, ha több idopont van */
+  transition: height 0.3s ease; /* Animáció a magasság váltására */
+}
+
+.idopontok.show-all {
+  height: auto; /* Ha a 'showAll' true, akkor a magasság automatikusan a tartalomhoz igazodik */
+}
+
+.show-all-btn {
+  background-color: #6327A2; /* Lila szín */
   color: white;
   padding: 10px;
   border: none;
-  border-radius: 5px;
+  border-radius: 4px;
   cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
+}
+
+.show-all-btn:hover {
+  background-color: #9d9ff4; /* Világosabb lila hover */
+}
+
+.foglalas-item {
+  margin-bottom: 15px;
+  padding: 15px;
+  border-radius: 6px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+  border-left: 5px solid #9d9ff4; /* Lila sáv a bal oldalon */
+}
+
+.foglalas-item p {
+  margin: 5px 0;
+  color: #555;
+  font-size: 16px;
+}
+
+.foglalas-item strong {
+  color: #6327A2; /* Lila szín a 'strong' szövegekhez */
+}
+
+.complete-btn {
+  background-color: #6327A2; /* Lila szín a gombnak */
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 16px;
+  transition: background-color 0.3s;
 }
 
 .complete-btn:hover {
-  background-color: #218838;
+  background-color: #9d9ff4; /* Világosabb lila hover esetén */
 }
 
-/* Alap elrendezés */
-.container, .content {
-  display: unset;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
-  width: 100%;
+.complete-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
 }
 
-.row {
-  display: flex;
-  justify-content: space-between;
-  gap: 20px;
-  margin-bottom: 20px;
-  width: 100%;
-  padding: 10px;
+.foglalas-item p:last-child {
+  font-style: italic;
+  color: #888;
 }
 
 /* Profil kártya */
@@ -339,6 +423,7 @@ export default {
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
   max-width: 100%;
+  border: 2px solid #9d9ff4; /* Lila szegély */
 }
 
 .profile-image {
@@ -360,7 +445,6 @@ button {
   background: #6327A2;
   color: white;
   width: 10%;
-  font-size: 18px;
   font-size: 20px;
   font-weight: bold;
   padding: 0.55rem 1rem;
@@ -371,47 +455,70 @@ button {
   transition: transform 0.3s;
 }
 
-.follow-btn:hover {
-  transform: translateY(-3px);
-}
-
 /* Editálás gomb */
 .edit-btn {
   position: absolute;
-  right: 5%;
-  top: 30%;
-}
-
-.follow-btn:hover, .edit-btn:hover{
-  transform: translateY(-3px);
-  font-size: 20px;
-  font-weight: bold;
+  right: 10%;
+  top: 35%;
+  background-color: #6327A2; /* Lila háttér */
+  color: white; /* Fehér szöveg */
   padding: 0.55rem 1rem;
-  border-radius: 100px;
+  border-radius: 100px; /* Kerekített gomb */
+  font-size: 16px;
+  font-weight: bold;
+  border: none;
   cursor: pointer;
+  transition: background-color 0.3s, box-shadow 0.3s; /* Animációk */
 }
-
 
 .edit-btn:hover {
-  transform: translateY(-3px);
+  background-color: #9d9ff4; /* Világosabb lila hover esetén */
+  box-shadow: 0 4px 8px rgba(99, 39, 162, 0.3); /* Lila árnyék a hover effektushoz */
 }
+
+.edit-btn:active {
+  transform: translateY(1px); /* Nyomásra enyhe süllyedés */
+  box-shadow: none; /* Nincs árnyék aktiváláskor */
+}
+
+.edit-btn:focus {
+  outline: none; /* Nincs fókusz keret */
+  box-shadow: 0 0 8px rgba(99, 39, 162, 0.5); /* Erősebb lila árnyék, ha fókuszban van */
+}
+
 
 /* Személyes adatok és foglalások */
 .user-info, .stats, .foglalasok, .idopontok {
   flex: 1;
-  background: #fff;
   padding: 20px;
+  margin: 10px;
   border-radius: 10px;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   min-width: 45%;
   flex-direction: column;
   align-items: flex-start;
   position: relative;
+  border: 2px solid #9d9ff4; /* Lila szegély */
+  margin-bottom: 20px; /* Margó hozzáadása az elemek közötti távolság növelésére */
 }
 
+/* Egyéb szakaszok */
+.stats {
+  padding: 20px;
+  border-radius: 8px;
+  height: 210px; /* Állítsd be a kívánt fix magasságot */
+  overflow-y: auto; /* Ha túl sok tartalom van, akkor görgethetővé válik */
+}
+
+.stat-item {
+  display: block; /* Egymás alá helyezi őket */
+  margin-top: 10px;
+}
 
 .stat-item div {
-  margin-bottom: 10px; /* Ha szeretnél távolságot a sorok között */
+  font-size: 20px; /* Nagyobb betűméret */
+  font-weight: 600; /* Vastagabb betűtípus */
+  margin-bottom: 10px; /* Térköz a statisztikák között */
 }
 
 /* Bio szakasz */
@@ -452,7 +559,6 @@ button {
 }
 
 .save-btn {
-  background: #007bff;
   background: #9d9ff4;
   color: white;
 }
@@ -480,7 +586,7 @@ button {
 }
 
 /* Alap stílusok és elrendezés */
-h3 {
+h2 {
   font-size: 1.5rem;
   font-weight: bold;
   margin-bottom: 10px;

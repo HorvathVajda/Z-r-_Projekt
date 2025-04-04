@@ -2,6 +2,8 @@ const express = require("express");
 const router = express.Router();
 const db = require("../config/db");
 
+let globalAr = null; // Globális változó az ár tárolására
+
 router.get('/vallalkozasok', async (req, res) => {
   // A query paraméterekből kiolvassuk a vallalkozo_id-t
   const { vallalkozo_id } = req.query;
@@ -360,10 +362,50 @@ router.get('/idopontok', async (req, res) => {
   }
 });
 
-router.post('/teljesit', async (req, res) => {
-  let { ido_id, vallalkozo_id } = req.body;
+router.get('/adatok', async (req, res) => {
+  let { ido_id, vallalkozo_id } = req.query;
 
-  if (!ido_id) {
+  if (!ido_id || !vallalkozo_id) {
+    return res.status(400).json({ error: 'Időpont azonosító és vállalkozó azonosító szükséges' });
+  }
+
+  try {
+    // Szolgáltatás ID lekérése az időponthoz
+    const [szolgaltatasRows] = await db.execute(
+      'SELECT szolgaltatas_id FROM idopontok WHERE ido_id = ?',
+      [ido_id]
+    );
+
+    if (szolgaltatasRows.length === 0) {
+      return res.status(404).json({ error: 'Nincs ilyen szolgáltatás az adott időponthoz' });
+    }
+
+    const szolgaltatas_id = szolgaltatasRows[0].szolgaltatas_id;
+
+    // Szolgáltatás ára lekérése
+    const [arRows] = await db.execute(
+      'SELECT ar FROM szolgaltatas WHERE szolgaltatas_id = ?',
+      [szolgaltatas_id]
+    );
+
+    if (arRows.length === 0) {
+      return res.status(404).json({ error: 'Nincs ilyen ár a szolgáltatáshoz' });
+    }
+
+    // Az árat globális változóba mentjük
+    globalAr = arRows[0].ar;
+
+    res.status(200).json({ message: 'Adatok sikeresen lekérve', ar: globalAr });
+  } catch (error) {
+    console.error('Hiba történt az adatok lekérésekor:', error);
+    res.status(500).json({ error: 'Hiba történt az adatok lekérésekor' });
+  }
+});
+
+router.post('/teljesit', async (req, res) => {
+  let { ido_id, vallalkozo_id } = req.query;
+
+  if (!ido_id || !vallalkozo_id) {
     return res.status(400).json({ error: 'Időpont azonosító szükséges' });
   }
 
@@ -373,9 +415,14 @@ router.post('/teljesit', async (req, res) => {
   }
 
   try {
-    console.log(`Időpont teljesítése, ido_id = ${ido_id}`);
+    // Először ellenőrizzük, hogy van-e lekért ár
+    if (globalAr === null) {
+      return res.status(400).json({ error: 'Nincs elérhető ár' });
+    }
 
-    // 1. Töröljük az időpontot az idopontok táblából
+    console.log(`Időpont teljesítése, ido_id = ${ido_id}, vallalkozo_id = ${vallalkozo_id}, ár = ${globalAr}`);
+
+    // 1. Töröljük az időpontot
     const [idopontTorlendo] = await db.execute(
       'DELETE FROM idopontok WHERE ido_id = ?',
       [ido_id]
@@ -385,15 +432,11 @@ router.post('/teljesit', async (req, res) => {
       return res.status(404).json({ error: 'Nincs ilyen időpont' });
     }
 
-    // 2. Töröljük a foglalásokat is, ahol az ido_id szerepel
+    // 2. Töröljük a foglalásokat is
     const [foglalasTorlendo] = await db.execute(
       'DELETE FROM foglalasok WHERE ido_id = ?',
       [ido_id]
     );
-
-    if (foglalasTorlendo.affectedRows === 0) {
-      return res.status(404).json({ error: 'Nincs foglalás a megadott időponthoz' });
-    }
 
     // 3. Statisztika frissítése
     const [teljesitett] = await db.execute(
@@ -401,24 +444,51 @@ router.post('/teljesit', async (req, res) => {
       [vallalkozo_id]
     );
 
-    if(teljesitett.affectedRows === 0){
-      return res.status(404).json({ error: 'Hiba történt a statisztikai adatok frissítésekor' });
-    }
-
-    // 4. Időpont státuszának frissítése (például teljesítve)
-    const [statusUpdate] = await db.execute(
-      'UPDATE idopontok SET statusz = "teljesitett" WHERE ido_id = ?',
-      [ido_id]
+    // 4. Bevétel hozzáadása a statisztikához
+    const [bevetel] = await db.execute(
+      'UPDATE statisztika SET bevetel = bevetel + ? WHERE vallalkozo_id = ?',
+      [globalAr, vallalkozo_id]
     );
-
-    if (statusUpdate.affectedRows === 0) {
-      return res.status(404).json({ error: 'Időpont státusza nem frissíthető' });
-    }
 
     res.status(200).json({ message: 'Időpont sikeresen teljesítve' });
   } catch (error) {
     console.error('Hiba történt:', error);
     res.status(500).json({ error: 'Hiba történt a törlés során' });
+  }
+});
+
+router.get('/statisztika', async (req, res) => {
+  let { vallalkozo_id } = req.query;
+
+  if (!vallalkozo_id) {
+    return res.status(400).json({ error: 'Vállalkozó azonosító szükséges' });
+  }
+
+  try {
+    // Bevétel lekérdezése
+    const [bevetelRows] = await db.execute('SELECT bevetel FROM statisztika WHERE vallalkozo_id = ?', [vallalkozo_id]);
+    const [teljesitettMunkakRows] = await db.execute('SELECT teljesitett_munkak FROM statisztika WHERE vallalkozo_id = ?', [vallalkozo_id]);
+    const [foglalasokRows] = await db.execute('SELECT foglalasok FROM statisztika WHERE vallalkozo_id = ?', [vallalkozo_id]);
+
+    // Ellenőrizzük, hogy van-e találat a lekérdezésekre
+    if (bevetelRows.length === 0 || teljesitettMunkakRows.length === 0 || foglalasokRows.length === 0) {
+      return res.status(404).json({ error: 'Nincs statisztika az adott vállalkozóhoz' });
+    }
+
+    // Kiolvassuk az adatokat
+    const bevetel = bevetelRows[0].bevetel;
+    const teljesitettMunkak = teljesitettMunkakRows[0].teljesitett_munkak;
+    const foglalasok = foglalasokRows[0].foglalasok;
+
+    // Válasz küldése
+    res.status(200).json({
+      bevetel,
+      teljesitett_munkak: teljesitettMunkak,
+      foglalasok
+    });
+  } catch (error) {
+    console.error('Hiba történt a statisztika lekérdezésekor:', error);
+    res.status(500).json({ error: 'Hiba történt a statisztika lekérdezésekor' });
   }
 });
 
