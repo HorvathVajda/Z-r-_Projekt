@@ -29,8 +29,6 @@ const routes = [
   { path: '/registerChoose', name: 'registerChoose', component: registerChoose },
   { path: '/vallalkozoRegister', name: 'vallalkozoRegister', component: vallalkozoRegister },
   { path: '/foglalas/:vallalkozas_id?/:category?', name: 'Foglalas', component: Foglalas, props: true },
-  { path: '/felhasznaloHome', name: 'felhasznaloHome', component: felhasznaloHome },
-  {path: '/felhasznaloProfil', name: 'felhasznaloProfil', component: felhasznaloProfil},
 
   {
     path: '/',
@@ -49,6 +47,14 @@ const routes = [
       { path: 'ertesitesek', name: 'Ertesitesek', component: Notifications },
       { path: 'profil', name: 'Profil', component: Profil },
       { path: 'ceg/:id', name: 'CegProfil', component: BusinessDetails, props: true},
+    ]
+  },
+
+  {
+    path: '/felhasznaloHome',
+    component: felhasznaloHome,
+    children: [
+      { path: 'Profil', name: 'Profil', component: felhasznaloProfil },
     ]
   }
 ];

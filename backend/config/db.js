@@ -6,7 +6,7 @@ dotenv.config();
 const db = mysql.createPool({
   host: 'localhost',
   user: 'root',
-  password: '' || '',
+  password: 'mysql' || '',
   database: 'bookmytime',
 });
 

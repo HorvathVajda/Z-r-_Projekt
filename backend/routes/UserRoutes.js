@@ -72,7 +72,7 @@ router.get("/statisztikak", async (req, res) => {
       "SELECT foglalas_datum FROM foglalasok ORDER BY foglalas_datum DESC LIMIT 1"
     );
     const [aktivitas] = await db.execute(
-      `SELECT COUNT(*) AS count FROM foglalasok 
+      `SELECT COUNT(*) AS count FROM foglalasok
        WHERE foglalas_datum >= DATE_SUB(CURDATE(), INTERVAL 7 DAY)`
     );
 
