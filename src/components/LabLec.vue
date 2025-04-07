@@ -4,7 +4,7 @@
       <div class="footer-main">
         <div class="footer-brand">
           <router-link to="/" class="footer-logo">
-            BookMyTime<span class="logo-dot">.</span>
+            bookyourtime<span class="logo-dot">.</span>
           </router-link>
           <p class="footer-tagline">Egyszerű időpontfoglalás, profi szolgáltatások</p>
           <div class="social-links">
@@ -51,7 +51,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="copyright">&copy; 2024 BookMyTime. Minden jog fenntartva.</p>
+        <p class="copyright">&copy; 2024 bookyourtime. Minden jog fenntartva.</p>
         <div class="legal-links">
           <router-link to="/adatvedelem" class="legal-link">Adatvédelem</router-link>
           <span class="divider">|</span>

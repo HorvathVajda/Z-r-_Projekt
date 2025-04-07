@@ -283,6 +283,7 @@ onMounted(() => {
 .nav-text {
   position: relative;
   z-index: 1;
+  font-weight: bold;
 }
 
 .nav-hover {
