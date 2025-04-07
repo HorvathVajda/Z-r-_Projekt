@@ -30,7 +30,9 @@ export default {
       '/vallalkozoRegister',
       '/vallalkozoHome',
       '/vallalkozoHome/profil',
-      '/Foglalas'
+      '/Foglalas',
+      '/felhasznaloHome',
+      '/felhasznaloHome/Profil',
     ];
 
     const isExcludedPage = computed(() => {

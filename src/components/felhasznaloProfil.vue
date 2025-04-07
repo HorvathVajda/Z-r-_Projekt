@@ -1,106 +1,91 @@
 <template>
-  <div class="container">
-    <div class="max-w-lg mx-auto mt-10 p-6 bg-white rounded-lg shadow-md">
-      <h2 class="text-2xl font-semibold mb-4">Profil</h2>
-
-      <div v-if="!isEditing">
-        <img v-if="user.profileImage" :src="user.profileImage" alt="Profilkép" class="w-24 h-24 rounded-full mx-auto mb-4">
-        <p><strong>Név:</strong> {{ user.name }}</p>
-        <p><strong>Email:</strong> {{ user.email }}</p>
-        <p><strong>Telefonszám:</strong> {{ user.phone }}</p>
-        <button @click="isEditing = true" class="mt-4 w-full bg-blue-500 text-white py-2 rounded hover:bg-blue-600">Szerkesztés</button>
-        <button @click="deleteProfile" class="mt-2 w-full bg-red-500 text-white py-2 rounded hover:bg-red-600">Profil törlése</button>
+  <div class="profile-wrapper">
+    <div class="card">
+      <div class="profile-summary">
+        <div class="avatar-wrapper">
+          <img v-if="user.profileImage" :src="user.profileImage" alt="Profilkép" class="avatar" />
+          <div class="avatar-placeholder" v-else>👤</div>
+        </div>
+        <div class="user-info">
+          <h2>{{ user.name }}</h2>
+          <p>{{ user.email }}</p>
+        </div>
       </div>
 
-      <form v-else @submit.prevent="updateProfile">
-        <div class="mb-4">
-          <label class="block text-gray-700">Név</label>
-          <input v-model="user.name" type="text" class="w-full p-2 border rounded">
-        </div>
+      <h2>Személyes adatok</h2>
 
-        <div class="mb-4">
-          <label class="block text-gray-700">E-mail</label>
-          <input v-model="user.email" type="email" class="w-full p-2 border rounded">
-        </div>
+      <div class="field">
+        <label>Név</label>
+        <input v-model="user.name" type="text" />
+      </div>
+      <div class="field">
+        <label>Email</label>
+        <input v-model="user.email" type="email" />
+      </div>
+      <div class="field">
+        <label>Telefonszám</label>
+        <input v-model="user.phone" type="text" />
+      </div>
+    </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700">Telefonszám</label>
-          <input v-model="user.phone" type="text" class="w-full p-2 border rounded">
-        </div>
+    <div class="card">
+      <h2>Biztonság</h2>
+      <div class="field">
+        <label>Jelenlegi jelszó</label>
+        <input v-model="user.password" type="password" />
+        <label>Új jelszó</label>
+        <input v-model="user.password" type="password" />
+        <label>Új jelszó</label>
+        <input v-model="user.password" type="password" />
+      </div>
+    </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700">Új jelszó</label>
-          <input v-model="user.password" type="password" class="w-full p-2 border rounded">
-        </div>
+    <div class="card">
+      <h2>Profilkép</h2>
+      <div class="field">
+        <input type="file" @change="onFileChange" />
+      </div>
+    </div>
 
-        <div class="mb-4">
-          <label class="block text-gray-700">Profilkép</label>
-          <input type="file" @change="onFileChange" class="w-full p-2 border rounded">
-        </div>
-
-        <button type="submit" class="w-full bg-green-500 text-white py-2 rounded hover:bg-green-600">Mentés</button>
-        <button @click="isEditing = false" type="button" class="mt-2 w-full bg-gray-400 text-white py-2 rounded hover:bg-gray-500">Mégse</button>
-      </form>
+    <div class="action-bar">
+      <button class="btn cancel" @click="reset">Mégse</button>
+      <button class="btn save" @click="updateProfile">Mentés</button>
+      <button class="btn delete" @click="deleteProfile">Profil törlése</button>
     </div>
   </div>
 </template>
 
 <script>
-import axios from 'axios';
-
 export default {
   data() {
     return {
-      isEditing: false,
       user: {
-        name: 'Minta Felhasználó',
-        email: 'minta@example.com',
-        phone: '123-456-7890',
-        profileImage: 'https://via.placeholder.com/100',
-        password: ''
-      }
+        name: 'Teszt Elek',
+        email: 'teszt@pelda.hu',
+        phone: '123456789',
+        password: '',
+        profileImage: ''
+      },
+      originalUser: {}
     };
   },
+  mounted() {
+    this.originalUser = JSON.parse(JSON.stringify(this.user));
+  },
   methods: {
-    onFileChange(event) {
-      const file = event.target.files[0];
-      this.user.profileImage = URL.createObjectURL(file);
+    updateProfile() {
+      alert('Profil frissítve!');
     },
-    async updateProfile() {
-      const formData = new FormData();
-      formData.append('name', this.user.name);
-      formData.append('email', this.user.email);
-      formData.append('phone', this.user.phone);
-      if (this.user.password) {
-        formData.append('password', this.user.password);
-      }
-      if (this.user.profileImage) {
-        formData.append('profileImage', this.user.profileImage);
-      }
-
-      try {
-        await axios.post('http://localhost:5000/api/update-profile', formData, {
-          headers: { 'Content-Type': 'multipart/form-data' }
-        });
-        alert('Profil sikeresen frissítve!');
-        this.isEditing = false;
-      } catch (error) {
-        console.error('Hiba történt:', error);
-        alert('Hiba történt a profil frissítésekor.');
-      }
+    deleteProfile() {
+      alert('Profil törölve!');
     },
-    async deleteProfile() {
-      if (confirm('Biztos törli a profilját?')) {
-        try {
-          await axios.delete('http://localhost:5000/api/delete-profile', {
-            data: { email: this.user.email }
-          });
-          alert('A profil törölve lett.');
-          this.$router.push('/');
-        } catch (error) {
-          console.error('Hiba történt a profil törlésekor:', error);
-          alert('Hiba történt a profil törlésekor.');
-        }
+    reset() {
+      this.user = JSON.parse(JSON.stringify(this.originalUser));
+    },
+    onFileChange(e) {
+      const file = e.target.files[0];
+      if (file) {
+        this.user.profileImage = URL.createObjectURL(file);
       }
     }
   }
@@ -108,38 +93,153 @@ export default {
 </script>
 
 <style scoped>
-.container {
+body {
+  margin: 0;
+  background: #f5f7fa;
+}
+
+.profile-wrapper {
+  max-width: 700px;
+  margin: 40px auto;
+  padding: 0 20px;
+  font-family: "Segoe UI", sans-serif;
+  color: #333;
+}
+
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.card h2 {
+  font-size: 18px;
+  color: #6327a2;
+  margin-bottom: 18px;
+}
+
+.profile-summary {
   display: flex;
-  justify-content: center;
   align-items: center;
-  height: 100vh;
+  gap: 16px;
+  padding-bottom: 18px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 20px;
 }
 
-button {
-  background-color: #6327a2 !important;
-  color: white !important;
-  padding: 12px 16px;
-  border-radius: 6px;
-  border: none;
-  font-size: 16px;
-  font-weight: bold;
-  cursor: pointer;
-  display: block;
+.profile-summary .avatar-wrapper {
+  width: 70px;
+  height: 70px;
+  border-radius: 50%;
+  background-color: #e1d5f2;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 30px;
+  overflow: hidden;
+}
+
+.profile-summary .avatar {
   width: 100%;
-  text-align: center;
-  margin-top: 10px;
-  box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.2);
+  height: 100%;
+  object-fit: cover;
 }
 
-button:hover {
-  background-color: #7a36c1 !important;
+.profile-summary .user-info h2 {
+  font-size: 20px;
+  margin: 0;
 }
 
-.cancel-button {
-  background-color: #777 !important;
+.profile-summary .user-info p {
+  font-size: 14px;
+  color: #666;
+  margin-top: 4px;
 }
 
-.cancel-button:hover {
-  background-color: #999 !important;
+.field {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 14px;
+}
+
+.field label {
+  font-weight: 600;
+  margin-bottom: 6px;
+}
+
+.field input {
+  padding: 10px 14px;
+  border: 1px solid #ddd;
+  border-radius: 10px;
+  font-size: 15px;
+  transition: 0.3s;
+}
+
+.field input:focus {
+  outline: none;
+  border-color: #a271d2;
+  background-color: #faf8ff;
+}
+
+.action-bar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 30px;
+}
+
+.btn {
+  padding: 12px 20px;
+  border: none;
+  border-radius: 12px;
+  font-weight: bold;
+  font-size: 15px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.btn.save {
+  background-color: #6327a2;
+  color: white;
+}
+
+.btn.save:hover {
+  background-color: #7a3ec7;
+}
+
+.btn.cancel {
+  background-color: #e0e0e0;
+}
+
+.btn.cancel:hover {
+  background-color: #cfcfcf;
+}
+
+.btn.delete {
+  background-color: #e74c3c;
+  color: white;
+}
+
+.btn.delete:hover {
+  background-color: #c0392b;
+}
+
+@media (max-width: 600px) {
+  .profile-summary {
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+  }
+
+  .card {
+    padding: 20px;
+  }
+
+  .user-info h2 {
+    font-size: 18px;
+  }
 }
 </style>

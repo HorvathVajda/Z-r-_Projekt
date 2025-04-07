@@ -54,7 +54,7 @@ const routes = [
     path: '/felhasznaloHome',
     component: felhasznaloHome,
     children: [
-      { path: 'Profil', name: 'Profil', component: felhasznaloProfil },
+      { path: 'Profil', name: 'felhasznaloProfil', component: felhasznaloProfil },
     ]
   }
 ];

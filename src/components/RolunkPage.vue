@@ -1,96 +1,139 @@
 <template>
-  <div class="about-container">
+  <section class="about-section">
     <div class="about-card">
-      <h2>Rólunk</h2>
+      <h1>Rólunk</h1>
       <p>
-        Üdvözöljük a <strong>BookMyTime</strong> oldalán, a vállalkozások számára készült korszerű időpontfoglaló rendszerben!
-        Mi azon dolgozunk, hogy segítsünk a vállalkozásoknak egyszerűsíteni az ügyfeleik időpontfoglalását és kezelését.
+        A <strong>BookMyTime</strong> célja, hogy megkönnyítse a vállalkozások számára az időpontfoglalások kezelését,
+        miközben kényelmes és átlátható élményt nyújt az ügyfeleknek is. Hiszünk abban, hogy egy jól működő időpontfoglaló rendszer
+        nem csupán időt takarít meg, hanem hozzájárul az üzleti növekedéshez is.
       </p>
+
+      <h2>Kik vagyunk?</h2>
       <p>
-        A célunk, hogy a foglalási folyamat gyors, egyszerű és zökkenőmentes legyen, miközben Ön a vállalkozásának növekedésére koncentrálhat.
+        Egy lelkes fejlesztői és üzleti csapat, akik szenvedélyesen dolgoznak azon, hogy a digitális időpontfoglalás mindenki számára elérhető, egyszerű és hatékony legyen.
+        Minden nap azon vagyunk, hogy új funkciókkal, jobb felhasználói élménnyel és megbízható szolgáltatással segítsünk ügyfeleinknek.
       </p>
-      <h3>Miért válasszon minket?</h3>
-      <ul>
-        <li>Egyszerű és intuitív kezelőfelület</li>
-        <li>Automatikus értesítések az ügyfeleknek</li>
-        <li>Teljesen testreszabható időpontfoglalás</li>
+
+      <h2>Miért válassz minket?</h2>
+      <ul class="features">
+        <li>✅ Intuitív kezelőfelület: könnyű eligazodni, egyszerű használat</li>
+        <li>📆 Foglalási naptár valós idejű frissítésekkel</li>
+        <li>📩 Automatikus e-mail és SMS értesítések</li>
+        <li>🎯 Teljesen testreszabható időintervallumok</li>
+        <li>🔐 Biztonságos adatkezelés, GDPR kompatibilis működés</li>
+        <li>📱 Mobilbarát és reszponzív felület</li>
       </ul>
-      <h3>Mi a célunk?</h3>
+
+      <h2>Értékeink</h2>
+      <div class="values">
+        <div class="value-box">
+          <h3>Felhasználóközpontúság</h3>
+          <p>Minden fejlesztésünknél az első a felhasználó. Az egyszerűség és gyorsaság kulcsfontosságú számunkra.</p>
+        </div>
+        <div class="value-box">
+          <h3>Megbízhatóság</h3>
+          <p>Stabil rendszerünk 99.9%-os rendelkezésre állással működik, hogy te mindig számíthass ránk.</p>
+        </div>
+        <div class="value-box">
+          <h3>Innováció</h3>
+          <p>Folyamatosan fejlesztjük platformunkat a legújabb technológiák segítségével, hogy mindig egy lépéssel előrébb járjunk.</p>
+        </div>
+      </div>
+
+      <h2>Küldetésünk</h2>
       <p>
-        A megbízhatóság és a könnyű használhatóság biztosítása, miközben folyamatosan alkalmazkodunk az új igényekhez és technológiákhoz.
+        Egy olyan platformot biztosítani, amely nemcsak technikailag megbízható, hanem valóban segíti a vállalkozások növekedését.
+        Legyen szó fodrászatról, masszőrről vagy autószervizről, mi egy olyan digitális asszisztenst nyújtunk,
+        amely leveszi a szervezés terhét a válladról.
+      </p>
+
+      <h2>Lépj kapcsolatba velünk!</h2>
+      <p>
+        Kérdésed van? Ötleted, amit szívesen látnál a rendszerben? Vedd fel velünk a kapcsolatot az <strong>bookmytime884@gmail.com</strong> címen!
       </p>
     </div>
-  </div>
+  </section>
 </template>
 
 <style scoped>
-.about-container {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  min-height: 100vh;
-  background: url('/aboutus.jpg') no-repeat center center/cover; /* Lokális kép */
-  font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
-  padding: 20px;
-  position: relative;
-  overflow: hidden;
+.about-section {
+  padding: 40px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  background-color: #f9f9f9;
+  color: #333;
+  border-radius: 10px;
+  margin: auto;
+  max-width: 960px;
+  animation: fadeIn 0.8s ease-in-out;
 }
 
 .about-card {
-  position: relative;
-  z-index: 2;
-  background: rgba(255, 255, 255, 0.3); /* Áttetsző háttér */
-  backdrop-filter: blur(10px); /* Homályosítás */
-  padding: 2rem;
-  border-radius: 20px; /* Lekerekített sarkok */
-  box-shadow: 0 8px 24px rgba(255, 255, 255, 0.2),
-              0 4px 10px rgba(0, 0, 0, 0.2); /* Fényes árnyék */
-  max-width: 800px;
-  width: 100%;
-  animation: fadeIn 1s ease-in-out;
+  background-color: #fff;
+  padding: 40px;
+  border-radius: 20px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
 }
 
-.about-card h2 {
-  font-size: 2.5rem;
-  color: #000000;
-  margin-bottom: 1.5rem;
+h1 {
+  font-size: 2.5em;
   text-align: center;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.6); /* Szöveg árnyék */
+  color: #6B00D0;
+  margin-bottom: 30px;
 }
 
-.about-card h3 {
-  font-size: 1.8rem;
-  color: #000000;
-  margin-top: 2rem;
-  margin-bottom: 1rem;
-  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.5); /* Szöveg árnyék */
+h2 {
+  font-size: 1.8em;
+  color: #6B00D0;
+  margin-top: 30px;
+  margin-bottom: 15px;
+  border-bottom: 2px solid #b8860b;
+  padding-bottom: 6px;
 }
 
-.about-card p {
-  font-size: 1.2rem;
+h3 {
+  font-size: 1.4em;
+  color: #444;
+  margin-bottom: 10px;
+}
+
+p {
+  font-size: 1.15em;
   line-height: 1.8;
-  color: #000000;
-  margin-bottom: 1rem;
+  margin-bottom: 15px;
+  text-align: justify;
 }
 
-.about-card ul {
+.features {
   list-style: none;
   padding: 0;
   margin: 0;
 }
 
-.about-card ul li {
-  font-size: 1.2rem;
-  margin: 0.5rem 0;
-  padding: 0.5rem 1rem;
-  background: rgba(255, 255, 255, 0.15); /* Enyhén áttetsző elem */
-  border-radius: 10px;
-  transition: background-color 0.3s ease;
-  color: #000000;
+.features li {
+  font-size: 1.1em;
+  margin: 10px 0;
+  padding: 10px;
+  background-color: #f1ecfb;
+  border-left: 4px solid #6B00D0;
+  border-radius: 8px;
 }
 
-.about-card ul li:hover {
-  background: rgba(255, 255, 255, 0.25); /* Világosabb hover */
+.values {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 20px;
+  margin-top: 20px;
+}
+
+.value-box {
+  flex: 1;
+  min-width: 260px;
+  background-color: #f7f5ff;
+  border: 1px solid #ddd;
+  border-left: 4px solid #6B00D0;
+  padding: 20px;
+  border-radius: 12px;
+  box-shadow: 0 2px 8px rgba(0,0,0,0.05);
 }
 
 @keyframes fadeIn {
@@ -101,6 +144,28 @@
   to {
     opacity: 1;
     transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .about-card {
+    padding: 25px;
+  }
+
+  h1 {
+    font-size: 2em;
+  }
+
+  h2 {
+    font-size: 1.5em;
+  }
+
+  p, .features li {
+    font-size: 1em;
+  }
+
+  .values {
+    flex-direction: column;
   }
 }
 </style>
