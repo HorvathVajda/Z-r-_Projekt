@@ -34,11 +34,12 @@
 
     <!-- Lapozó gombok -->
     <button class="carousel-control-prev" type="button" @click="prevSlide">
-      <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-    </button>
-    <button class="carousel-control-next" type="button" @click="nextSlide">
-      <span class="carousel-control-next-icon" aria-hidden="true"></span>
-    </button>
+  <span class="material-symbols-outlined">arrow_back_ios</span>
+</button>
+<button class="carousel-control-next" type="button" @click="nextSlide">
+  <span class="material-symbols-outlined">arrow_forward_ios</span>
+</button>
+
   </div>
 </template>
 
@@ -150,8 +151,8 @@ export default {
 
 .card {
   width: 100%;
+  border-radius:15px;
   margin: 10px;
-  box-shadow: 0px 4px 6px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s;
 }
 
@@ -174,8 +175,9 @@ export default {
 .btn {
   width: 100%;
   font-size: 1rem;
-  background-color: #6B00D0;
+  background-color: #333333;
   border: none;
+  border-radius: 15px;
   color: white;
   padding: 10px;
   margin-top: 10px;
@@ -185,14 +187,14 @@ export default {
 
 /* Hover állapot */
 .btn:hover {
-  background-color: #6B00D0;
+  background-color: #1B1212	;
   box-shadow: none;  /* Eltávolítja a hover árnyékot */
   color: white;
 }
 
 /* Focus állapot */
 .btn:focus {
-  background-color: #6B00D0;
+  background-color: #1B1212;
   box-shadow: none;  /* Eltávolítja a fókusz árnyékot */
   outline: none;  /* Eltávolítja a fókusz körvonalat */
   color: white;

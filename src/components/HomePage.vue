@@ -1,39 +1,39 @@
 <template>
-  <div class="harmadik-container">
-    <img src="/s2.png" alt="Vállalkozóknak" class="harmadik-image" />
-    <div class="harmadik-info-box">
-      <h2>Foglaljon most időpontot</h2>
-      <p>Lorem ipsum dolor sit amet consectetur adipisicing elit. Nulla alias, ad quae nisi recusandae officiis sapiente fuga, similique incidunt fugiat ducimus dolores iure nesciunt quam facilis. Quam tempora temporibus possimus!</p>
-      <div class="gombok">
-        <a @click="goToBooking" class="home-button">Foglaljon most</a>
-        <a v-if="!isLoggedIn" @click="goToRegister" class="home-button-register">Regisztráció</a>
+  <div class="hero-container">
+    <div class="hero-content">
+      <div class="hero-text">
+        <h1>Foglaljon most időpontot</h1>
+        <p>Fedezze fel szolgáltatásainkat és foglaljon időpontot néhány kattintással. Professzionális partnereink várják Önt!</p>
+        <div class="action-buttons">
+          <button @click="goToBooking" class="primary-btn">Foglaljon most</button>
+          <button v-if="!isLoggedIn" @click="goToRegister" class="secondary-btn">Regisztráció</button>
+        </div>
       </div>
     </div>
-  </div>
 
-  <router-view></router-view>
-
-  <div class="search-container">
-    <div class="search-input-container">
-      <input
-        type="text"
-        v-model="searchQuery"
-        placeholder="Keresés kategóriák között..."
-        @input="filterCategories"
-        class="search-input"
-      />
-      <img
-        src="/kereses_logo.png"
-        alt="Search"
-        class="search-icon"
-        @click="goToCategoryPage"
-      />
+    <div class="search-section">
+      <div class="search-wrapper">
+        <div class="search-box">
+          <input
+            type="text"
+            v-model="searchQuery"
+            placeholder="Keresés kategóriák között..."
+            @input="filterCategories"
+            class="search-input"
+          />
+        </div>
+        <ul v-if="filteredCategories.length" class="suggestions-list">
+          <li v-for="(category, index) in filteredCategories" :key="index" @click="selectCategory(category)">
+            {{ category }}
+            <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+              <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+          </li>
+        </ul>
+      </div>
     </div>
-    <ul v-if="filteredCategories.length" class="suggestions">
-      <li v-for="(category, index) in filteredCategories" :key="index" @click="selectCategory(category)">
-        {{ category }}
-      </li>
-    </ul>
+
+    <router-view></router-view>
   </div>
 </template>
 
@@ -56,19 +56,19 @@ export default {
       try {
         const response = await fetch("/api/foglalasok/business-categories");
         const data = await response.json();
-        categories.value = data.map(item => item.category); // Csak a kategória mezőket vesszük ki
+        categories.value = data.map(item => item.category);
       } catch (error) {
         console.error("Hiba a kategóriák lekérésekor:", error);
       }
     };
 
     const fetchServicesByCategory = async () => {
-      console.log("Keresett kategória a frontendről:", searchQuery.value); // Debug üzenet
+      console.log("Keresett kategória a frontendről:", searchQuery.value);
 
       try {
         const response = await axios.get(`/api/foglalasok/vallalkozasok`, {
           params: {
-            category: searchQuery.value // Add át a keresett kategóriát
+            category: searchQuery.value
           }
         });
         businesses.value = response.data.map(business => ({
@@ -79,10 +79,6 @@ export default {
       } catch (error) {
         console.error("Hiba történt a szolgáltatások lekérésekor:", error);
       }
-    };
-
-    const refresh = () => {
-      location.reload();
     };
 
     const filterCategories = () => {
@@ -98,37 +94,23 @@ export default {
 
     const selectCategory = (category) => {
       searchQuery.value = category;
-      filteredCategories.value = []; // Eltünteti a javaslatokat
-      fetchServicesByCategory(); // Szolgáltatások lekérése
+      filteredCategories.value = [];
+      fetchServicesByCategory();
     };
 
     const goToCategoryPage = () => {
-      console.log("searchQuery:", searchQuery.value);
-      console.log("Businesses:", businesses.value);
-
       const selectedBusiness = businesses.value.find(b => {
-        console.log("business category:", b.category);
-        console.log("searchQuery:", searchQuery.value);
-
-        // Ellenőrizzük, hogy a category nem undefined vagy null
         return b.category && searchQuery.value && b.category.toLowerCase() === searchQuery.value.toLowerCase();
       });
 
       if (selectedBusiness) {
-        console.log("Selected business:", selectedBusiness);
-
-        // Csak a category-t adjuk át, mert nem szükséges az id
         router.push({
           name: 'Foglalas',
-          query: { category: searchQuery.value } // Kategóriát query paraméterként adjuk át
+          query: { category: searchQuery.value }
         });
       } else {
         console.error('Nincs ilyen kategória.');
       }
-    };
-
-    const goToLogin = () => {
-      router.push("/login");
     };
 
     const goToRegister = () => {
@@ -147,7 +129,6 @@ export default {
 
     return {
       isLoggedIn,
-      goToLogin,
       goToRegister,
       goToBooking,
       businesses,
@@ -155,270 +136,281 @@ export default {
       filteredCategories,
       filterCategories,
       selectCategory,
-      goToCategoryPage,
-      refresh
+      goToCategoryPage
     };
   },
 };
 </script>
 
 <style scoped>
-/* Alap stílusok */
-.gombok {
+/* Base styles */
+:root {
+  --primary-color: #6B00D0;
+  --primary-hover: #5A00B0;
+  --secondary-color: #FFFFFF;
+  --text-color: #333333;
+  --light-text: #666666;
+  --border-radius: 15px;
+  --box-shadow: 0 8px 24px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+.hero-container {
+  min-height: 80vh;
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background: linear-gradient(135deg, #ffffff 0%, #e3d1ff 50%, #c7aaff 100%);
+  padding-bottom: 80px;
+}
+
+.hero-content {
+  padding: 100px 5% 60px;
+  max-width: 1200px;
+  margin: 0 auto;
   width: 100%;
   display: flex;
   justify-content: center;
-  gap: 20px;
 }
 
+.hero-text {
+  max-width: 700px;
+  text-align: center;
+}
 
-.home-button, .home-button-register {
-  font-size: 20px;
-  font-weight: bold;
-  padding: 0.55rem 1rem;
+.hero-text h1 {
+  font-size: 3.5rem;
+  font-weight: 700;
+  color: var(--primary-color);
+  margin-bottom: 24px;
+  line-height: 1.2;
+}
+
+.hero-text p {
+  font-size: 1.25rem;
+  color: var(--light-text);
+  margin-bottom: 40px;
+  line-height: 1.6;
+}
+
+.action-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.primary-btn {
+  background-color: #333333;
+  color: white;
+  padding: 14px 32px;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
   border: none;
   cursor: pointer;
-  border-radius: 25px;
-  text-decoration: none;
+  transition: var(--transition);
 }
 
-.home-button {
-  background-color: #6B00D0;
-  color: white;
+.primary-btn:hover {
+  background-color: #1B1212	;
 }
 
-.home-button-register {
-  background: transparent;
-  color: black;
-  text-decoration: none;
+.secondary-btn {
+  background-color: transparent;
+  color: var(--primary-color);
+  padding: 14px 32px;
+  border-radius: 15px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  border: 2px solid var(--primary-color);
+  cursor: pointer;
+  transition: var(--transition);
 }
 
+.secondary-btn:hover {
+  background-color: rgba(107, 0, 208, 0.05);
+}
 
-/* Konténerek és képek */
-.harmadik-container {
+.search-section {
   display: flex;
-  flex-direction: column;
-  justify-content: flex-start;
-  min-height: 100vh;
+  justify-content: center;
+  padding: 0 5%;
+  margin-top: 40px;
+}
+
+.search-wrapper {
+  max-width: 800px;
+  width: 100%;
   position: relative;
 }
 
-.harmadik-container {
-  flex: 1;
-}
-
-.harmadik-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.harmadik-info-box{
-  position: absolute;
-  padding: 20px;
-  border-radius: 10px;
-  text-align: center;
-}
-
-
-.info-box {
-  top: 45%;
-  right: 20%;
-  transform: translate(-50%, -50%);
-  color: white;
-  max-width: 500px;
-}
-
-.harmadik-info-box h2 {
-  font-size: 40px;
-}
-
-.harmadik-info-box p {
-  font-size: 20px;
-}
-
-/* Harmadik konténer speciális stílusai */
-.harmadik-info-box {
-  top: 50%;
-  left: 20%;
-  transform: translate(-50%, -50%);
-  color: #6B00D0;
-  text-align: left;
-  max-width: 550px;
-  margin-left: 60px;
-}
-
-.harmadik-info-box h2 {
-  font-size: 70px;
-  margin-bottom: 35px;
-}
-
-.harmadik-info-box p {
-  font-size: 22px;
-  color: black;
-  text-align: center;
-}
-
-/* Keresőmező középre igazítása */
-.search-container {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  width: 100%;
-  margin-top: 20px;
-  margin-bottom: 50px;
-}
-
-/* Keresőmező stílus */
-.search-input-container {
+.search-box {
   display: flex;
   align-items: center;
+  background: white;
+  box-shadow: var(--box-shadow);
+  padding: 8px;
+  border-radius:15px;
+  transition: var(--transition);
+}
+
+.search-box:focus-within {
+  box-shadow: 0 8px 24px rgba(107, 0, 208, 0.2);
 }
 
 .search-input {
-  width: 400px;
-  padding: 10px;
-  font-size: 18px;
-  border: 2px solid #6B00D0;
-  border-radius: 25px;
-  text-align: center;
+  flex: 1;
+  padding: 16px 24px;
+  font-size: 1.1rem;
+  border: none;
   outline: none;
-  transition: all 0.3s ease;
+  background: transparent;
+  color: var(--text-color);
 }
 
-.search-input:focus {
-  border-color: #9A32CD;
-  box-shadow: 0 0 10px rgba(155, 50, 205, 0.5);
+.search-input::placeholder {
+  color: #AAA;
 }
 
-.search-icon {
-  width: 30px;
-  height: 30px;
-  margin-left: 10px;
+.search-btn {
+  background: var(--primary-color);
+  border: none;
+  border-radius: calc(var(--border-radius) - 4px);
+  padding: 12px 20px;
   cursor: pointer;
+  transition: var(--transition);
+  display: flex;
+  align-items: center;
+  justify-content: center;
 }
 
-.suggestions {
-  width: 50%;
+.search-btn:hover {
+  background: var(--primary-hover);
+}
+
+.search-btn svg {
+  color: white;
+  width: 20px;
+  height: 20px;
+}
+
+.suggestions-list {
+  position: absolute;
+  width: 100%;
   background: white;
-  border: 1px solid #ccc;
-  border-radius: 10px;
-  margin-top: 10px;
+  border-radius: 0 0 var(--border-radius) var(--border-radius);
+  box-shadow: var(--box-shadow);
+  margin-top: 4px;
+  max-height: 300px;
+  overflow-y: auto;
+  z-index: 10;
   list-style: none;
   padding: 0;
-  max-height: 200px;
-  overflow-y: auto;
-  text-align: center;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.suggestions li {
-  padding: 12px;
+.suggestions-list li {
+  padding: 16px 24px;
+  font-size: 1rem;
+  color: var(--text-color);
   cursor: pointer;
-  font-size: 18px;
-  transition: background 0.3s ease;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: var(--transition);
+  border-top: 1px solid #F0F0F0;
 }
 
-.suggestions li:hover {
-  background-color: #6B00D0;
-  color: white;
-  border-radius: 10px;
+.suggestions-list li:hover {
+  background: rgba(107, 0, 208, 0.05);
+  color: var(--primary-color);
 }
-/* Reszponzív beállítások */
+
+.suggestions-list li svg {
+  opacity: 0;
+  transition: var(--transition);
+}
+
+.suggestions-list li:hover svg {
+  opacity: 1;
+}
+
+/* Responsive styles */
+@media screen and (max-width: 992px) {
+  .hero-text h1 {
+    font-size: 2.8rem;
+  }
+
+  .hero-text p {
+    font-size: 1.1rem;
+  }
+}
+
 @media screen and (max-width: 768px) {
-  /* Képernyő szélessége 768px alatt */
-  .harmadik-image {
-    display: none;
-  }
-.harmadik-container {
-    flex-direction: column;
-    padding: 10px;
+  .hero-content {
+    padding: 80px 5% 40px;
   }
 
-.harmadik-info-box {
-    position: relative;
-    top: 0;
-    left: 0;
-    transform: none;
+  .hero-text h1 {
+    font-size: 2.4rem;
+  }
+
+  .hero-text p {
+    font-size: 1rem;
+    margin-bottom: 30px;
+  }
+
+  .primary-btn, .secondary-btn {
+    padding: 12px 24px;
+    font-size: 1rem;
+  }
+
+  .search-input {
+    padding: 14px 20px;
+    font-size: 1rem;
+  }
+}
+
+@media screen and (max-width: 576px) {
+  .hero-content {
+    padding: 60px 5% 30px;
+  }
+
+  .hero-text h1 {
+    font-size: 2rem;
+  }
+
+  .action-buttons {
+    flex-direction: column;
+    gap: 12px;
+  }
+
+  .primary-btn, .secondary-btn {
     width: 100%;
-    max-width: none;
-    margin: 0;
   }
 
- .harmadik-info-box h2 {
-    font-size: 28px;
-  }
-
-.harmadik-info-box p {
-    font-size: 16px;
-  }
-
-  .gombok {
+  .search-box {
     flex-direction: column;
-    gap: 10px;
-  }
-
-  .home-button, .home-button-register {
-    font-size: 18px;
-    padding: 0.45rem 1rem;
-  }
-
-  .harmadik-info-box {
-    margin-left: 0;
-    text-align: center;
-  }
-
-  .harmadik-info-box h2 {
-    font-size: 50px;
-  }
-
-  .harmadik-info-box p {
-    font-size: 18px;
+    background: transparent;
+    box-shadow: none;
+    padding: 0;
   }
 
   .search-input {
-    width: 80%;
-    font-size: 16px;
+    width: 100%;
+    margin-bottom: 12px;
+    box-shadow: var(--box-shadow);
+    background-color: white;
+    border-radius: 15px;
   }
 
-  .suggestions {
-    width: 80%;
+  .search-btn {
+    width: 100%;
+    padding: 14px;
   }
 
-  .suggestions li {
-    font-size: 16px;
-    padding: 10px;
-  }
-}
-
-@media screen and (max-width: 480px) {
-  /* Képernyő szélessége 480px alatt (mobil) */
-.harmadik-info-box h2 {
-    font-size: 24px;
-  }
-
-.harmadik-info-box p {
-    font-size: 14px;
-  }
-
-  .home-button, .home-button-register {
-    font-size: 16px;
-    padding: 0.35rem 0.8rem;
-  }
-
-  .search-input {
-    width: 90%;
-    font-size: 14px;
-  }
-
-  .suggestions {
-    width: 90%;
-  }
-
-  .suggestions li {
-    font-size: 14px;
-    padding: 8px;
+  .suggestions-list {
+    position: relative;
   }
 }
-
 </style>

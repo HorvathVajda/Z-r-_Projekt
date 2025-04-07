@@ -1,64 +1,70 @@
 <template>
   <header>
-    <nav class="navbar navbar-expand-lg" :class="navbarClass">
-      <div class="container-fluid">
-        <a
-          class="navbar-brand logo"
-          href="/">BookMyTime
-        </a>
+    <nav class="navbar" :class="navbarClass">
+      <div class="navbar-container">
+        <!-- Logo/Brand -->
+        <div class="navbar-brand">
+          <router-link to="/" class="logo-link">
+            <span class="logo-text">bookyourtime.</span>
+          </router-link>
+        </div>
 
-        <!-- Hamburger menü gomb -->
+        <!-- Mobile menu button -->
         <button
-          class="navbar-toggler"
-          type="button"
-          aria-controls="navbarNav"
-          aria-expanded="false"
-          aria-label="Toggle navigation"
+          class="mobile-menu-button"
           @click="toggleMenu"
+          aria-label="Toggle navigation"
         >
-          <span class="navbar-toggler-icon"></span>
+          <div class="menu-icon" :class="{ 'open': menuOpen }">
+            <span></span>
+            <span></span>
+            <span></span>
+          </div>
         </button>
 
-        <!-- Navigációs menü -->
-        <div class="collapse navbar-collapse" id="navbarNav">
-          <ul class="navbar-nav ms-auto">
-            <li class="nav-item">
-              <a
-                v-if="vallalkozo"
-                class="nav-link login-link"
-                href="/vallalkozoHome"
-                @click="toggleMenu"
-              >
-                Vállalkozásaim
-              </a>
-              <a
-                v-if="felhasznalo"
-                class="nav-link login-link"
-                href="/felhasznaloHome"
-                @click="toggleMenu"
-              >
-                Profil
-              </a>
-            </li>
-            <li class="nav-item">
-              <a
-                v-if="!isLoggedIn"
-                class="nav-link login-link"
-                href="/login"
-                @click="toggleMenu"
-              >
-                Bejelentkezés
-              </a>
-              <a
-                v-if="isLoggedIn"
-                class="nav-link login-link"
-                href="/login"
-                @click="handleLogout"
-              >
-                Kijelentkezés
-              </a>
-            </li>
-          </ul>
+        <!-- Navigation Links -->
+        <div class="nav-links" :class="{ 'active': menuOpen }">
+          <div class="nav-items">
+            <router-link
+              v-if="vallalkozo"
+              to="/vallalkozoHome"
+              class="nav-item"
+              @click="closeMenu"
+            >
+              <span class="nav-text">Vállalkozásaim</span>
+              <span class="nav-hover"></span>
+            </router-link>
+
+            <router-link
+              v-if="felhasznalo"
+              to="/felhasznaloHome"
+              class="nav-item"
+              @click="closeMenu"
+            >
+              <span class="nav-text">Profil</span>
+              <span class="nav-hover"></span>
+            </router-link>
+
+            <router-link
+              v-if="!isLoggedIn"
+              to="/login"
+              class="nav-item"
+              @click="closeMenu"
+            >
+              <span class="nav-text">Bejelentkezés</span>
+              <span class="nav-hover"></span>
+            </router-link>
+
+            <a
+              v-if="isLoggedIn"
+              href="#"
+              class="nav-item"
+              @click="handleLogout"
+            >
+              <span class="nav-text">Kijelentkezés</span>
+              <span class="nav-hover"></span>
+            </a>
+          </div>
         </div>
       </div>
     </nav>
@@ -75,20 +81,22 @@ const isLoggedIn = computed(() => store.isLoggedIn);
 const vallalkozo = computed(() => store.vallalkozo);
 const felhasznalo = computed(() => store.felhasznalo);
 const navbarClass = ref("normal-navbar");
+const menuOpen = ref(false);
 
 function handleLogout() {
   store.clearAuthData();
   router.push("/login");
+  closeMenu();
 }
 
 function toggleMenu() {
-  const navbar = document.querySelector("#navbarNav");
-  if (navbar) {
-    navbar.classList.toggle("show");
-  }
+  menuOpen.value = !menuOpen.value;
 }
 
-// Scroll event handler to add margin-top to the navbar
+function closeMenu() {
+  menuOpen.value = false;
+}
+
 onMounted(() => {
   const handleScroll = () => {
     if (window.scrollY > 5) {
@@ -100,7 +108,6 @@ onMounted(() => {
 
   window.addEventListener("scroll", handleScroll);
 
-  // Cleanup event listener when the component is destroyed
   onBeforeUnmount(() => {
     window.removeEventListener("scroll", handleScroll);
   });
@@ -108,165 +115,243 @@ onMounted(() => {
 </script>
 
 <style scoped>
-html, body {
-  margin: 0;
-  padding: 0;
-  height: 100%;
-  width: 100%;
+:root {
+  --primary-color: #6B00D0;
+  --primary-light: #9A32CD;
+  --text-dark: #2D3748;
+  --text-light: #718096;
+  --bg-white: #FFFFFF;
+  --bg-light: #F8F9FA;
+  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
 }
+@font-face {
+  font-family: 'SoraSemiBold';
+  src: url('@/assets/fonts/Sora-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
+.logo-text {
+  font-family: 'SoraSemiBold', sans-serif;
+  font-size: 30 px;
+  font-weight: normal; /* vagy hagyd ki, mert a font már félkövér */
+}
+
 .navbar {
-  background: #fff; /* Simán fehér háttér */
-  position: sticky; /* Sticky navbar, marad a képernyő tetején görgetéskor */
-  top: 0; /* A navbar mindig a képernyő tetején lesz */
+  position: fixed;
+  top: 0;
   left: 0;
   right: 0;
   width: 100%;
   z-index: 1000;
-  padding: 0 20px;
+  box-shadow: var(--shadow-sm);
+  height: 80px;
   display: flex;
   align-items: center;
+}
+
+.navbar.scrolled-navbar {
+  box-shadow: var(--shadow-md);
+  height: 70px;
+  backdrop-filter: blur(5px);
+}
+
+.navbar-container {
+  width: 100%;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 0 2rem;
+  display: flex;
   justify-content: space-between;
-  font-family: 'Franklin Gothic Medium';
-  height: 70px; /* Fix magasság */
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2); /* Alsó árnyék */
-  border-radius: 0; /* Nincs lekerekített sarkak */
-}
-
-.navbar-nav {
-  display: flex;
-  flex-direction: row;
   align-items: center;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
 }
 
-/* További stílusok maradnak ugyanazok, ahogyan korábban */
-
-.navbar.normal-navbar {
-  top: 0;
+.navbar-brand {
+  display: flex;
+  align-items: center;
 }
 
-.navbar-brand.logo {
-  font-size: 40px;
-  font-weight: bold;
+.logo-link {
+  display: flex;
+  align-items: center;
   text-decoration: none;
-  color: black;
-  margin: 0;
-  padding: 0;
-  line-height: 60px;
-  transition: color 0.3s;
-  background: transparent;
+  font-weight: 700;
+  font-size: 1.8rem;
+  color: var(--text-dark);
+  transition: var(--transition);
 }
 
-.navbar-brand.logo:hover {
-  color: #6B00D0;
+.logo-text {
+  transition: var(--transition);
 }
 
-.navbar-nav {
-  display: flex;
-  flex-direction: row;
-  align-items: center;
-  gap: 20px;
-  margin: 0;
-  padding: 0;
-  list-style: none;
+.logo-dot {
+  color: var(--primary-color);
+  transition: var(--transition);
 }
 
-.navbar-toggler {
-  padding: 8px 12px;
-  background: transparent;
+.logo-link:hover .logo-text {
+  color: var(--primary-color);
+}
+
+.logo-link:hover .logo-dot {
+  transform: scale(1.2);
+}
+
+.mobile-menu-button {
+  display: none;
+  background: none;
   border: none;
-  font-size: 24px;
   cursor: pointer;
-  transition: background-color 0.3s;
+  padding: 0.5rem;
+  z-index: 1001;
 }
 
-.navbar-toggler:hover {
-  background: #6B00D0;
-  color: white;
-}
-
-.navbar-toggler-icon {
+.menu-icon {
   width: 24px;
-  height: 2px;
-  background-color: black;
+  height: 24px;
   position: relative;
+  transform: rotate(0deg);
+  transition: var(--transition);
 }
 
-.navbar-toggler-icon::before,
-.navbar-toggler-icon::after {
-  content: "";
+.menu-icon span {
+  display: block;
   position: absolute;
-  left: 0;
-  width: 24px;
   height: 2px;
-  background-color: black;
+  width: 100%;
+  background: var(--text-dark);
+  border-radius: 2px;
+  opacity: 1;
+  left: 0;
+  transform: rotate(0deg);
+  transition: var(--transition);
 }
 
-.nav-link {
-  color: black;
-  text-decoration: none;
-  font-size: 23px;
-  padding: 0 15px;
+.menu-icon span:nth-child(1) {
+  top: 4px;
+}
+
+.menu-icon span:nth-child(2) {
+  top: 11px;
+}
+
+.menu-icon span:nth-child(3) {
+  top: 18px;
+}
+
+.menu-icon.open span:nth-child(1) {
+  top: 11px;
+  transform: rotate(135deg);
+}
+
+.menu-icon.open span:nth-child(2) {
+  opacity: 0;
+  left: -24px;
+}
+
+.menu-icon.open span:nth-child(3) {
+  top: 11px;
+  transform: rotate(-135deg);
+}
+
+.nav-links {
+  display: flex;
+  align-items: center;
+}
+
+.nav-items {
+  display: flex;
+  gap: 1.5rem;
+  align-items: center;
+}
+
+.nav-item {
   position: relative;
-  transition: color 0.3s;
+  text-decoration: none;
+  color: var(--text-dark);
+  font-weight: 500;
+  font-size: 1.1rem;
+  padding: 0.5rem 0;
+  transition: var(--transition);
+  overflow: hidden;
 }
 
-.nav-link:hover {
-  color: #6B00D0;
-  background: transparent;
+.nav-text {
+  position: relative;
+  z-index: 1;
 }
 
-.nav-link.active {
-  background-color: #00CED1;
-  color: black;
-  border-radius: 5px;
-  padding: 5px 10px;
-}
-
-.nav-link::after {
-  content: "";
+.nav-hover {
   position: absolute;
   bottom: 0;
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: #6B00D0;
+  background-color: var(--primary-color);
   transform: scaleX(0);
-  transition: transform 0.3s ease-in-out;
+  transform-origin: right;
+  transition: transform 0.3s ease;
 }
 
-.nav-link:hover::after {
+.nav-item:hover .nav-hover {
   transform: scaleX(1);
+  transform-origin: left;
 }
 
-/* Mobilnézet */
+.nav-item:hover {
+  color: var(--primary-color);
+}
+
+/* Mobile styles */
 @media (max-width: 768px) {
-  .navbar-nav {
+  .navbar {
+    height: 70px;
+  }
+
+  .navbar-container {
+    padding: 0 1.5rem;
+  }
+
+  .mobile-menu-button {
+    display: block;
+  }
+
+  .nav-links {
+    position: fixed;
+    top: 0;
+    right: 0;
+    width: 100%;
+    max-width: 300px;
+    height: 100vh;
+    background-color: var(--bg-white);
+    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    transform: translateX(100%);
+    transition: transform 0.3s ease-in-out;
+    padding: 6rem 2rem 2rem;
+    z-index: 1000;
+  }
+
+  .nav-links.active {
+    transform: translateX(0);
+  }
+
+  .nav-items {
     flex-direction: column;
-    align-items: center;
-    width: 100%;
-    padding: 10px 0;
+    align-items: flex-start;
+    gap: 1.5rem;
   }
 
-  .navbar-toggler {
-    display: block;
+  .nav-item {
+    font-size: 1.2rem;
+    padding: 0.5rem 0;
   }
 
-  .navbar-toggler-icon::before,
-  .navbar-toggler-icon::after {
-    width: 24px;
-  }
-
-  .collapse.navbar-collapse {
-    display: none;
-    width: 100%;
-  }
-
-  .collapse.navbar-collapse.show {
-    display: block;
+  .scrolled-navbar {
+    height: 70px;
   }
 }
 </style>

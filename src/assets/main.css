@@ -13,6 +13,13 @@ html, body {
   
 }
 
+@font-face {
+  font-family: 'SoraSemiBold';
+  src: url('@/assets/Sora-SemiBold.ttf') format('truetype');
+  font-weight: 600;
+  font-style: normal;
+}
+
 #app {
   width: 100%;  /* Az alkalmazás kitölti a teljes szélességet */
   margin: 0;
