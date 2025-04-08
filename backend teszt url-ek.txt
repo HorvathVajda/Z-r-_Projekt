@@ -1,0 +1,159 @@
+1.Felhasználó regisztráció: 
+POST http://localhost:5000/api/auth/register
+
+2.Vállalkozó regisztráció:
+POST http://localhost:5000/api/auth/register-vallalkozo
+
+3 Bejelentkezés:
+POST http://localhost:5000/api/auth/login
+
+4. Szolgáltatások lekérdezése (vállalkozás ID vagy kategória alapján - query paraméterekkel):
+GET http://localhost:5000/api/booking/szolgaltatasok?vallalkozas_id=1&category=Fodrászat
+
+5 Vállalkozások lekérdezése (opcionálisan kategória alapján):
+GET http://localhost:5000/api/booking/vallalkozasok?category=Kozmetika
+
+6.Kategóriák lekérése:
+GET http://localhost:5000/api/booking/business-categories
+
+7. Szabad időpontok lekérése adott szolgáltatáshoz
+GET http://localhost:5000/api/booking/szabad-idopontok/5
+
+8. Foglalás létrehozása
+POST http://localhost:5000/api/booking/foglalas
+
+Body (példa JSON):
+
+{
+  "szolgaltatas_id": 5,
+  "ido_id": 12,
+  "felhasznalo_id": 3,
+  "vallalkozas_id": 2,
+  "foglalo_tipus": "ugyfel",
+  "email": "valaki@email.hu"
+}
+
+9. Szolgáltatások lekérdezése kategória alapján (URL paraméterrel):
+GET http://localhost:5000/api/booking/szolgaltatasok/Fodrászat
+
+10.Vállalkozások lekérdezése (GET)
+GET http://localhost:5000/vallalkozasok?vallalkozo_id=1
+
+11  Új vállalkozás hozzáadása (POST)
+POST http://localhost:5000/vallalkozasokHozzaadasa
+
+Body (JSON):
+{
+  "vallalkozas_neve": "Teszt Szalon",
+  "helyszin": "Budapest",
+  "nyitva_tartas": "H-P 8:00-16:00",
+  "category": "fodrász",
+  "vallalkozo_id": 1
+}
+
+
+12 Vállalkozás részletei lekérdezése (GET)
+GET http://localhost:5000/vallalkozasok/1/details
+
+13  Szolgáltatás hozzáadása egy vállalkozáshoz (POST)
+POST http://localhost:5000/vallalkozasok/1/szolgaltatasok
+
+Body (JSON):
+{
+  "szolgaltatas_neve": "Hajvágás",
+  "idotartam": "30",
+  "ar": 5000
+}
+
+14 Szolgáltatások lekérdezése egy vállalkozáshoz (GET)
+GET http://localhost:5000/vallalkozasok/1/szolgaltatasok
+
+15  Vállalkozás törlése (POST)
+POST http://localhost:5000/delete/1
+
+16. Új időpont hozzáadása (POST)
+POST http://localhost:5000/1/add-idopont
+Body (JSON):
+{
+  "szabad_ido": "2025-04-10 15:30",
+  "szolgaltatas_id": 2
+}
+
+
+17 Vállalkozó profil lekérdezése email alapján (GET)
+GET http://localhost:5000/vallalkozo-profile?email=teszt@valami.hu
+
+	
+18 Bio frissítése (POST)
+POST http://localhost:5000/update-bio
+Body (JSON):
+{
+  "email": "teszt@valami.hu",
+  "bio": "Ez egy új bemutatkozás szöveg."
+}
+
+
+19 Felhasználói adatok frissítése (POST)
+POST http://localhost:5000/update-user
+Body (JSON):
+{
+  "email": "teszt@valami.hu",
+  "nev": "Kiss Béla",
+  "telefonszam": "+36201234567"
+}
+
+
+20  Foglalások lekérdezése felhasználó ID alapján (GET)
+GET http://localhost:5000/bookings?felhasznalo_id=1
+
+
+21 Új kategória hozzáadása (POST)
+POST http://localhost:5000/categories
+body: 
+{
+  "name": "fodrászat"
+}
+
+
+22.Kapcsolatfelvételi űrlap beküldése (POST)
+POST http://localhost:5000/contact
+body:
+{
+  "name": "Kiss Péter",
+  "email": "peter.kiss@example.com",
+  "message": "Érdeklődöm a szolgáltatások iránt."
+}
+
+23. Profil frissítése (POST)
+POST http://localhost:5000/update-profile
+body: 
+{
+  "name": "Nagy Anna",
+  "email": "anna@example.com",
+  "phone": "+36201234567"
+}
+
+24. Profil törlése (DELETE)
+DELETE http://localhost:5000/delete-profile
+body:
+{
+  "email": "anna@example.com"
+}
+
+25 Felhasználói profil lekérése (GET)
+GET http://localhost:5000/felhasznalo-profile
+
+26 Felhasználó foglalásainak lekérése (GET)
+GET http://localhost:5000/foglalasok
+
+27 Foglalás statisztikák lekérése (GET)
+GET http://localhost:5000/statisztikak
+
+28 Bejelentkezés
+http://localhost:5000/api/auth/loginű
+
+29 Regisztráció – Felhasználó vagy vállalkozó
+http://localhost:5000/api/auth/register
+
+30 Regisztráció – Vállalkozás
+http://localhost:5000/api/auth/register-business
