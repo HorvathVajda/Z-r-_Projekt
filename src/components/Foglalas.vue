@@ -220,6 +220,8 @@ export default {
   position: relative;
   overflow: hidden;
   background-color: #fafafa;
+  margin-top: 50px;
+  background: transparent;
 }
 
 .floating-dots {
@@ -274,7 +276,7 @@ export default {
 
 .services-content {
   width: 100%;
- 
+
   display: flex;
   align-items: center;
   justify-content: center;
@@ -283,7 +285,7 @@ export default {
   backdrop-filter: blur(5px);
   z-index: 1;
   margin: 0 auto;
- 
+
 }
 
 .services-card {
@@ -580,20 +582,20 @@ export default {
   .services-content {
     padding: 1rem;
   }
-  
+
   .dot {
     display: none;
   }
-  
+
   .cards {
     grid-template-columns: 1fr;
   }
-  
+
   .modal-content {
     width: 95%;
     padding: 1.5rem;
   }
-  
+
   .alert-box {
     bottom: 1rem;
     left: 1rem;

@@ -45,62 +45,62 @@
             <i class="fas fa-times"></i>
           </button>
         </div>
-        
+
         <form @submit.prevent="submitBusinessForm" class="business-form">
           <div class="form-group">
             <label for="businessName">Vállalkozás neve</label>
-            <input type="text" id="businessName" v-model="newBusiness.vallalkozas_neve" required 
+            <input type="text" id="businessName" v-model="newBusiness.vallalkozas_neve" required
                    placeholder="Add meg a vállalkozás nevét" />
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="postalCode">Irányítószám</label>
-              <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" 
-                     @input="validatePostalCode(); findCity()" required 
+              <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam"
+                     @input="validatePostalCode(); findCity()" required
                      placeholder="1234" maxlength="4" />
             </div>
-            
+
             <div class="form-group">
               <label for="city">Város</label>
-              <input type="text" id="city" v-model="newBusiness.varos" readonly 
+              <input type="text" id="city" v-model="newBusiness.varos" readonly
                      placeholder="Automatikusan kitöltődik" />
             </div>
           </div>
-          
+
           <div class="form-row">
             <div class="form-group">
               <label for="street">Utca</label>
-              <input type="text" id="street" v-model="newBusiness.utca" required 
+              <input type="text" id="street" v-model="newBusiness.utca" required
                      placeholder="Példa utca" />
             </div>
-            
+
             <div class="form-group">
               <label for="houseNumber">Házszám</label>
-              <input type="text" id="houseNumber" v-model="newBusiness.hazszam" required 
+              <input type="text" id="houseNumber" v-model="newBusiness.hazszam" required
                      placeholder="12" />
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="openingHours">Nyitvatartás</label>
             <div class="input-with-icon">
               <i class="fas fa-clock"></i>
-              <input type="text" id="openingHours" v-model="newBusiness.nyitva_tartas" 
-                     required placeholder="08:00-16:00" maxlength="11" 
+              <input type="text" id="openingHours" v-model="newBusiness.nyitva_tartas"
+                     required placeholder="08:00-16:00" maxlength="11"
                      @input="formatOpeningHours" />
             </div>
           </div>
-          
+
           <div class="form-group">
             <label for="category">Kategória</label>
             <div class="input-with-icon">
               <i class="fas fa-tag"></i>
-              <input type="text" id="category" v-model="newBusiness.category" 
+              <input type="text" id="category" v-model="newBusiness.category"
                      placeholder="Pl. étterem, fodrász" />
             </div>
           </div>
-          
+
           <div class="form-actions">
             <button type="button" class="action-button secondary" @click="showForm = false">
               Mégse
@@ -265,9 +265,10 @@ onMounted(async () => {
   max-width: 1200px;
   margin: 0 auto;
   padding: 2rem;
-  color: var(--text-color);
-  background-color: var(--bg-color);
+  color: black;
+  background-color: transparent;
   min-height: 100vh;
+  margin-top: 50px;
 }
 
 .header-section {
@@ -380,6 +381,7 @@ onMounted(async () => {
   display: inline-flex;
   align-items: center;
   gap: 0.5rem;
+
 }
 
 .action-button i {
@@ -388,7 +390,7 @@ onMounted(async () => {
 
 .action-button.primary {
   background-color: var(--primary-color);
-  color: white;
+  color: black;
   width: 100%;
   justify-content: center;
 }
@@ -546,20 +548,20 @@ onMounted(async () => {
   .dashboard-container {
     padding: 1.5rem;
   }
-  
+
   .page-title {
     font-size: 2rem;
   }
-  
+
   .business-grid {
     grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
   }
-  
+
   .form-row {
     flex-direction: column;
     gap: 0;
   }
-  
+
   .modal-container {
     width: 95%;
   }
