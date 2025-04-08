@@ -184,7 +184,7 @@ onMounted(() => {
 
 .login-content {
   width: 100%;
-  max-width: 500px;
+  max-width: 800px;
   display: flex;
   align-items: center;
   justify-content: center;

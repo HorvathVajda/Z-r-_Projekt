@@ -115,31 +115,6 @@ onMounted(() => {
 </script>
 
 <style scoped>
-:root {
-  --primary-color: #6B00D0;
-  --primary-light: #9A32CD;
-  --text-dark: #2D3748;
-  --text-light: #718096;
-  --bg-white: #FFFFFF;
-  --bg-light: #F8F9FA;
-  --transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.1);
-  --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
-  --shadow-lg: 0 10px 15px rgba(0, 0, 0, 0.1);
-}
-@font-face {
-  font-family: 'SoraSemiBold';
-  src: url('@/assets/fonts/Sora-SemiBold.ttf') format('truetype');
-  font-weight: 600;
-  font-style: normal;
-}
-
-.logo-text {
-  font-family: 'SoraSemiBold', sans-serif;
-  font-size: 30 px;
-  font-weight: normal; /* vagy hagyd ki, mert a font már félkövér */
-}
-
 .navbar {
   position: fixed;
   top: 0;
@@ -147,16 +122,20 @@ onMounted(() => {
   right: 0;
   width: 100%;
   z-index: 1000;
-  box-shadow: var(--shadow-sm);
   height: 80px;
   display: flex;
   align-items: center;
+  background-color: transparent;
+  backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
 }
 
 .navbar.scrolled-navbar {
-  box-shadow: var(--shadow-md);
   height: 70px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  background-color: white;
   backdrop-filter: blur(5px);
+  transition: all 0.3s ease;
 }
 
 .navbar-container {
@@ -178,27 +157,14 @@ onMounted(() => {
   display: flex;
   align-items: center;
   text-decoration: none;
-  font-weight: 700;
-  font-size: 1.8rem;
-  color: var(--text-dark);
-  transition: var(--transition);
+  color: black;
+  transition: all 0.3s ease;
 }
 
 .logo-text {
-  transition: var(--transition);
-}
-
-.logo-dot {
-  color: var(--primary-color);
-  transition: var(--transition);
-}
-
-.logo-link:hover .logo-text {
-  color: var(--primary-color);
-}
-
-.logo-link:hover .logo-dot {
-  transform: scale(1.2);
+  font-family: 'SoraSemiBold', sans-serif;
+  font-size: 1.8rem;
+  transition: all 0.3s ease;
 }
 
 .mobile-menu-button {
@@ -215,7 +181,7 @@ onMounted(() => {
   height: 24px;
   position: relative;
   transform: rotate(0deg);
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .menu-icon span {
@@ -223,12 +189,12 @@ onMounted(() => {
   position: absolute;
   height: 2px;
   width: 100%;
-  background: var(--text-dark);
+  background: black;
   border-radius: 2px;
   opacity: 1;
   left: 0;
   transform: rotate(0deg);
-  transition: var(--transition);
+  transition: all 0.3s ease;
 }
 
 .menu-icon span:nth-child(1) {
@@ -265,25 +231,25 @@ onMounted(() => {
 
 .nav-items {
   display: flex;
-  gap: 1.5rem;
+  gap: 2rem;
   align-items: center;
 }
 
 .nav-item {
   position: relative;
   text-decoration: none;
-  color: var(--text-dark);
+  color: black;
   font-weight: 500;
-  font-size: 1.1rem;
+  font-size: 1rem;
   padding: 0.5rem 0;
-  transition: var(--transition);
+  transition: all 0.3s ease;
   overflow: hidden;
 }
 
 .nav-text {
   position: relative;
   z-index: 1;
-  font-weight: bold;
+  font-weight: 600;
 }
 
 .nav-hover {
@@ -292,7 +258,7 @@ onMounted(() => {
   left: 0;
   width: 100%;
   height: 2px;
-  background-color: var(--primary-color);
+  background-color: black;
   transform: scaleX(0);
   transform-origin: right;
   transition: transform 0.3s ease;
@@ -304,17 +270,18 @@ onMounted(() => {
 }
 
 .nav-item:hover {
-  color: var(--primary-color);
+  color: black;
 }
 
 /* Mobile styles */
 @media (max-width: 768px) {
   .navbar {
     height: 70px;
+    padding: 0 1rem;
   }
 
   .navbar-container {
-    padding: 0 1.5rem;
+    padding: 0 1rem;
   }
 
   .mobile-menu-button {
@@ -328,8 +295,8 @@ onMounted(() => {
     width: 100%;
     max-width: 300px;
     height: 100vh;
-    background-color: var(--bg-white);
-    box-shadow: -5px 0 15px rgba(0, 0, 0, 0.1);
+    background-color: white;
+    box-shadow: -5px 0 25px rgba(0, 0, 0, 0.1);
     transform: translateX(100%);
     transition: transform 0.3s ease-in-out;
     padding: 6rem 2rem 2rem;
@@ -343,7 +310,7 @@ onMounted(() => {
   .nav-items {
     flex-direction: column;
     align-items: flex-start;
-    gap: 1.5rem;
+    gap: 2rem;
   }
 
   .nav-item {
@@ -354,5 +321,37 @@ onMounted(() => {
   .scrolled-navbar {
     height: 70px;
   }
+}
+
+/* Animation for mobile menu */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.nav-links.active .nav-item {
+  animation: fadeIn 0.3s ease forwards;
+}
+
+.nav-links.active .nav-item:nth-child(1) {
+  animation-delay: 0.1s;
+}
+
+.nav-links.active .nav-item:nth-child(2) {
+  animation-delay: 0.2s;
+}
+
+.nav-links.active .nav-item:nth-child(3) {
+  animation-delay: 0.3s;
+}
+
+.nav-links.active .nav-item:nth-child(4) {
+  animation-delay: 0.4s;
 }
 </style>

@@ -117,7 +117,7 @@ function redirectToClientRegistration() {
 
 .register-content {
   width: 100%;
-  max-width: 600px;
+  max-width: 800px;
   display: flex;
   align-items: center;
   justify-content: center;
