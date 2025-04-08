@@ -26,6 +26,15 @@
         <div class="nav-links" :class="{ 'active': menuOpen }">
           <div class="nav-items">
             <router-link
+              v-if="isLoggedIn"
+              to="/Foglalas"
+              class="nav-item"
+              @click="closeMenu"
+            >
+              <span class="nav-text">Foglalás</span>
+              <span class="nav-hover"></span>
+            </router-link>
+            <router-link
               v-if="vallalkozo"
               to="/vallalkozoHome"
               class="nav-item"
@@ -37,7 +46,17 @@
 
             <router-link
               v-if="felhasznalo"
-              to="/felhasznaloHome"
+              to="/felhasznaloHome/Profil"
+              class="nav-item"
+              @click="closeMenu"
+            >
+              <span class="nav-text">Profil</span>
+              <span class="nav-hover"></span>
+            </router-link>
+
+            <router-link
+              v-if="vallalkozo"
+              to="/vallalkozoHome/Profil"
               class="nav-item"
               @click="closeMenu"
             >

@@ -7,7 +7,7 @@
           <div class="avatar-placeholder" v-else>👤</div>
         </div>
         <div class="user-info">
-          <h2>{{ user.name }}</h2>
+          <h2>{{ user.nev }}</h2>
           <p>{{ user.email }}</p>
         </div>
       </div>
@@ -16,7 +16,7 @@
 
       <div class="field">
         <label>Név</label>
-        <input v-model="user.name" type="text" />
+        <input v-model="user.nev" type="text" />
       </div>
       <div class="field">
         <label>Email</label>
@@ -24,7 +24,7 @@
       </div>
       <div class="field">
         <label>Telefonszám</label>
-        <input v-model="user.phone" type="text" />
+        <input v-model="user.telefonszam" type="text" />
       </div>
     </div>
 
@@ -32,11 +32,14 @@
       <h2>Biztonság</h2>
       <div class="field">
         <label>Jelenlegi jelszó</label>
-        <input v-model="user.password" type="password" />
+        <input v-model="currentPassword" type="password" />
+
         <label>Új jelszó</label>
-        <input v-model="user.password" type="password" />
-        <label>Új jelszó</label>
-        <input v-model="user.password" type="password" />
+        <input v-model="newPassword" type="password" />
+
+        <label>Új jelszó megerősítése</label>
+        <input v-model="confirmPassword" type="password" />
+
       </div>
     </div>
 
@@ -56,30 +59,54 @@
 </template>
 
 <script>
+import axios from 'axios';
 export default {
   data() {
     return {
       user: {
-        name: 'Teszt Elek',
-        email: 'teszt@pelda.hu',
-        phone: '123456789',
-        password: '',
+        nev: '',
+        email: '',
+        telefonszam: '',
         profileImage: ''
       },
-      originalUser: {}
+      originalUser: {},
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+      id: null,
     };
   },
   mounted() {
-    this.originalUser = JSON.parse(JSON.stringify(this.user));
+    const authData = JSON.parse(localStorage.getItem('authData'));
+    console.log('AuthData from localStorage:', authData); // 🚨 Ellenőrizd
+    this.id = authData?.id;
+    console.log('Felhasználó ID:', this.id); // 🚨 Naplózd az ID-t
+    this.fetchProfile();
   },
   methods: {
-    updateProfile() {
+    async fetchProfile() {
+      if (!this.id) {
+        console.error('Nincs ID megadva!');
+        return;
+      }
+      try {
+        const response = await axios.get(`/api/felhasznalo/profil/${this.id}`);
+        if (!response.data) {
+          throw new Error('Üres válasz');
+        }
+        this.user = response.data;
+      } catch (error) {
+        console.error('Hiba:', error);
+        alert('Nem töltődtek be az adatok!');
+      }
+    },
+    async updateProfile() {
       alert('Profil frissítve!');
     },
-    deleteProfile() {
+    async deleteProfile() {
       alert('Profil törölve!');
     },
-    reset() {
+    async reset() {
       this.user = JSON.parse(JSON.stringify(this.originalUser));
     },
     onFileChange(e) {
@@ -88,7 +115,7 @@ export default {
         this.user.profileImage = URL.createObjectURL(file);
       }
     }
-  }
+  },
 };
 </script>
 
