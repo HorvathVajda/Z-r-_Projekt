@@ -101,7 +101,41 @@ export default {
       }
     },
     async updateProfile() {
-      alert('Profil frissítve!');
+      if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
+        alert('Kérlek, töltsd ki az összes mezőt!');
+        return;
+      }
+
+      if (this.newPassword !== this.confirmPassword) {
+        alert('Az új jelszavak nem egyeznek!');
+        return;
+      }
+
+      try {
+        const response = await fetch(`/api/felhasznalo/jelszo-valtoztatas/${this.id}`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+          },
+          body: JSON.stringify({
+            jelszo: this.currentPassword,
+            ujJelszo: this.newPassword,
+          }),
+        });
+
+        const data = await response.json();
+
+        if (!response.ok) {
+          throw new Error(data.error || 'Hiba történt');
+        }
+
+        alert('Jelszó sikeresen megváltoztatva!');
+        this.currentPassword = '';
+        this.newPassword = '';
+        this.confirmPassword = '';
+      } catch (error) {
+        alert(`Hiba: ${error.message}`);
+      }
     },
     async deleteProfile() {
       alert('Profil törölve!');
