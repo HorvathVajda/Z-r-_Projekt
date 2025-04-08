@@ -212,6 +212,7 @@ export default {
 </script>
 
 <style scoped>
+
 .services-container {
   display: flex;
   min-height: 100vh;
@@ -273,19 +274,20 @@ export default {
 
 .services-content {
   width: 100%;
-  max-width: 1200px;
+ 
   display: flex;
   align-items: center;
   justify-content: center;
   padding: 2rem;
-  background-color: rgba(255, 255, 255, 0.9);
+
   backdrop-filter: blur(5px);
   z-index: 1;
   margin: 0 auto;
+ 
 }
 
 .services-card {
-  width: 100%;
+  width: 1000px;
   padding: 1.5rem;
 }
 

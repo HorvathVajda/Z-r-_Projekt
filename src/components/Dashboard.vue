@@ -1,69 +1,113 @@
 <template>
-  <div class="dashboard-content">
-    <div>
-      <h1>Vállalkozásaim</h1>
-      <div class="business-cards">
-        <!-- Display businesses as cards -->
-        <div v-for="business in businesses" :key="business.id" class="business-card">
-          <h3>{{ business.vallalkozas_neve }}</h3>
-          <p>{{ business.helyszin }}</p>
-          <router-link :to="'/vallalkozoHome/ceg/' + business.id" class="business-link">
-            <button class="go-to-business-btn">Tovább a vállalkozásra</button>
-          </router-link>
-        </div>
+  <div class="dashboard-container">
+    <div class="header-section">
+      <h1 class="page-title">Vállalkozásaim</h1>
+      <p class="page-subtitle">Itt kezelheted vállalkozásaidat és adhatsz hozzá újat</p>
+    </div>
 
-        <!-- Plus card to add a new business -->
-        <div class="add-business-card" @click="showForm = true">
-          <span class="plus-icon">+</span>
-          <p>Új vállalkozás hozzáadása</p>
+    <div class="business-grid">
+      <!-- Business cards -->
+      <div v-for="business in businesses" :key="business.id" class="business-card">
+        <div class="card-content">
+          <div class="business-icon">
+            <i class="fas fa-store"></i>
+          </div>
+          <h3 class="business-name">{{ business.vallalkozas_neve }}</h3>
+          <p class="business-location">{{ business.helyszin }}</p>
+          <div class="card-footer">
+            <router-link :to="'/vallalkozoHome/ceg/' + business.id" class="business-link">
+              <button class="action-button primary">
+                <i class="fas fa-arrow-right"></i> Megnyitás
+              </button>
+            </router-link>
+          </div>
+        </div>
+      </div>
+
+      <!-- Add new business card -->
+      <div class="business-card add-new" @click="showForm = true">
+        <div class="card-content">
+          <div class="add-icon">
+            <i class="fas fa-plus"></i>
+          </div>
+          <h3>Új vállalkozás</h3>
+          <p>Kattints ide egy új vállalkozás hozzáadásához</p>
         </div>
       </div>
     </div>
 
-    <!-- Form modal for adding a new business -->
-    <div v-if="showForm" class="form-overlay">
-      <div class="form-container">
-        <h2>Új Vállalkozás</h2>
-        <form @submit.prevent="submitBusinessForm">
+    <!-- Add Business Modal -->
+    <div v-if="showForm" class="modal-overlay" @click.self="showForm = false">
+      <div class="modal-container">
+        <div class="modal-header">
+          <h2>Új Vállalkozás</h2>
+          <button class="close-button" @click="showForm = false">
+            <i class="fas fa-times"></i>
+          </button>
+        </div>
+        
+        <form @submit.prevent="submitBusinessForm" class="business-form">
           <div class="form-group">
             <label for="businessName">Vállalkozás neve</label>
-            <input type="text" id="businessName" v-model="newBusiness.vallalkozas_neve" required />
+            <input type="text" id="businessName" v-model="newBusiness.vallalkozas_neve" required 
+                   placeholder="Add meg a vállalkozás nevét" />
           </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="postalCode">Irányítószám</label>
+              <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" 
+                     @input="validatePostalCode(); findCity()" required 
+                     placeholder="1234" maxlength="4" />
+            </div>
+            
+            <div class="form-group">
+              <label for="city">Város</label>
+              <input type="text" id="city" v-model="newBusiness.varos" readonly 
+                     placeholder="Automatikusan kitöltődik" />
+            </div>
+          </div>
+          
+          <div class="form-row">
+            <div class="form-group">
+              <label for="street">Utca</label>
+              <input type="text" id="street" v-model="newBusiness.utca" required 
+                     placeholder="Példa utca" />
+            </div>
+            
+            <div class="form-group">
+              <label for="houseNumber">Házszám</label>
+              <input type="text" id="houseNumber" v-model="newBusiness.hazszam" required 
+                     placeholder="12" />
+            </div>
+          </div>
+          
           <div class="form-group">
-            <label for="postalCode">Irányítószám</label>
-            <input type="text" id="postalCode" v-model="newBusiness.iranyitoszam" @input="validatePostalCode(); findCity()" required />
+            <label for="openingHours">Nyitvatartás</label>
+            <div class="input-with-icon">
+              <i class="fas fa-clock"></i>
+              <input type="text" id="openingHours" v-model="newBusiness.nyitva_tartas" 
+                     required placeholder="08:00-16:00" maxlength="11" 
+                     @input="formatOpeningHours" />
+            </div>
           </div>
-          <div class="form-group">
-            <label for="city">Város</label>
-            <input type="text" id="city" v-model="newBusiness.varos" readonly />
-          </div>
-          <div class="form-group">
-            <label for="street">Utca</label>
-            <input type="text" id="street" v-model="newBusiness.utca" required />
-          </div>
-          <div class="form-group">
-            <label for="houseNumber">Házszám</label>
-            <input type="text" id="houseNumber" v-model="newBusiness.hazszam" required />
-          </div>
-          <div class="form-group">
-            <label for="openingHours">Nyitvatartás (HH:MM-HH:MM)</label>
-            <input
-              type="text"
-              id="openingHours"
-              v-model="newBusiness.nyitva_tartas"
-              required
-              placeholder="00:00-00:00"
-              maxlength="11"
-              @input="formatOpeningHours"
-            />
-          </div>
+          
           <div class="form-group">
             <label for="category">Kategória</label>
-            <input type="text" id="category" v-model="newBusiness.category" />
+            <div class="input-with-icon">
+              <i class="fas fa-tag"></i>
+              <input type="text" id="category" v-model="newBusiness.category" 
+                     placeholder="Pl. étterem, fodrász" />
+            </div>
           </div>
-          <div class="form-buttons">
-            <button type="submit" class="submit-button" @click="refresh()">Mentés</button>
-            <button type="button" class="cancel-button" @click="showForm = false">Mégse</button>
+          
+          <div class="form-actions">
+            <button type="button" class="action-button secondary" @click="showForm = false">
+              Mégse
+            </button>
+            <button type="submit" class="action-button primary">
+              <i class="fas fa-save"></i> Mentés
+            </button>
           </div>
         </form>
       </div>
@@ -108,19 +152,19 @@ const fetchBusinesses = async () => {
     console.error('Hiba a vállalkozások betöltésekor:', error);
   }
 };
+
 const loadLocations = async () => {
   try {
     await Papa.parse('/data/IrszHnk.csv', {
       download: true,
       complete: (result) => {
         locations.value = result.data.map(item => {
-        const postalCode = item[1]?.trim(); // Csak akkor alkalmazzuk a trim-et, ha létezik az érték
-        const city = item[0]?.trim(); // Csak akkor alkalmazzuk a trim-et, ha létezik az érték
-
-        if (postalCode && city) {
-          return { postalCode, city };
-        }
-      }).filter(location => location); // Eltávolítjuk a nem érvényes rekordokat
+          const postalCode = item[1]?.trim();
+          const city = item[0]?.trim();
+          if (postalCode && city) {
+            return { postalCode, city };
+          }
+        }).filter(location => location);
       }
     });
   } catch (error) {
@@ -128,7 +172,6 @@ const loadLocations = async () => {
   }
 };
 
-// Irányítószám validálása
 const validatePostalCode = () => {
   if (newBusiness.value.iranyitoszam) {
     newBusiness.value.iranyitoszam = newBusiness.value.iranyitoszam.replace(/[^0-9]/g, '');
@@ -140,16 +183,9 @@ const validatePostalCode = () => {
 
 const findCity = () => {
   const foundLocation = locations.value.find(location => location.postalCode === newBusiness.value.iranyitoszam);
-
-  if (foundLocation) {
-    newBusiness.value.varos = foundLocation.city;
-  } else {
-    newBusiness.value.varos = '';
-  }
+  newBusiness.value.varos = foundLocation ? foundLocation.city : '';
 };
 
-
-// Nyitvatartás formázása
 const formatOpeningHours = () => {
   let value = newBusiness.value.nyitva_tartas.replace(/[^0-9:-]/g, '');
   if (/^\d{2}$/.test(value)) value += ':';
@@ -161,7 +197,6 @@ const formatOpeningHours = () => {
   newBusiness.value.nyitva_tartas = value;
 };
 
-// Vállalkozás hozzáadása
 const submitBusinessForm = async () => {
   try {
     const authData = JSON.parse(localStorage.getItem('authData'));
@@ -178,11 +213,7 @@ const submitBusinessForm = async () => {
       vallalkozo_id: authData.id
     };
 
-    // Vállalkozás hozzáadása
     await axios.post('/api/businesses/vallalkozasokHozzaadasa', businessData);
-
-    showAlert('A vállalkozás sikeresen hozzáadva!');
-
     showForm.value = false;
     newBusiness.value = {
       vallalkozas_neve: '',
@@ -193,19 +224,11 @@ const submitBusinessForm = async () => {
       nyitva_tartas: '',
       category: ''
     };
-
-    businesses.value = [...businesses.value, businessData];
-
-
+    await fetchBusinesses();
   } catch (error) {
     console.error('Hiba a vállalkozás hozzáadásakor:', error);
-    showAlert('Hiba történt a vállalkozás hozzáadása során');
   }
 };
-
-const refresh = async () => {
-  location.reload();
-}
 
 onMounted(async () => {
   await fetchBusinesses();
@@ -214,144 +237,331 @@ onMounted(async () => {
 </script>
 
 <style scoped>
-.go-to-business-btn {
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-  margin-top: 10px;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+:root {
+  --primary-color: #6c5ce7;
+  --primary-hover: #5649c0;
+  --secondary-color: #a29bfe;
+  --accent-color: #00cec9;
+  --text-color: #2d3436;
+  --light-text: #636e72;
+  --bg-color: #f5f6fa;
+  --card-bg: #ffffff;
+  --border-color: #dfe6e9;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
 }
 
-.go-to-business-btn:hover {
-  background-color: #5a3472;
-}
-html, body {
-  height: 100%;
+* {
   margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+.dashboard-container {
+  font-family: 'Poppins', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem;
+  color: var(--text-color);
+  background-color: var(--bg-color);
+  min-height: 100vh;
+}
+
+.header-section {
+  margin-bottom: 2.5rem;
+  text-align: center;
+}
+
+.page-title {
+  font-size: 2.5rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  margin-bottom: 0.5rem;
+}
+
+.page-subtitle {
+  font-size: 1.1rem;
+  color: var(--light-text);
+  font-weight: 400;
+}
+
+.business-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-top: 2rem;
+}
+
+.business-card {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.business-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.business-card.add-new {
+  background-color: rgba(108, 92, 231, 0.05);
+  border: 2px dashed var(--primary-color);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+
+.business-card.add-new:hover {
+  background-color: rgba(108, 92, 231, 0.1);
+}
+
+.card-content {
+  padding: 1.5rem;
+  height: 100%;
   display: flex;
   flex-direction: column;
 }
 
-.dashboard-content {
-  padding: 20px;
+.business-icon {
+  width: 60px;
+  height: 60px;
+  background-color: rgba(108, 92, 231, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 1.5rem;
+  color: var(--primary-color);
+  font-size: 1.5rem;
+}
+
+.add-icon {
+  width: 60px;
+  height: 60px;
+  margin: 0 auto 1.5rem;
+  color: var(--primary-color);
+  font-size: 2rem;
+}
+
+.business-name {
+  font-size: 1.3rem;
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+  color: var(--text-color);
+}
+
+.business-location {
+  font-size: 0.95rem;
+  color: var(--light-text);
+  margin-bottom: 1.5rem;
   flex-grow: 1;
-  overflow: auto;
 }
 
-.business-cards {
-  display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
-  gap: 20px;
-  margin-top: 20px;
+.card-footer {
+  margin-top: auto;
 }
 
-.business-card, .add-business-card{
-  background-color: #fff;
-  border: 1px solid #ddd;
+.action-button {
+  padding: 0.75rem 1.5rem;
   border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  text-align: center;
-}
-
-.business-card h3 {
-  font-size: 18px;
-  color: #6327a2;
-  margin-bottom: 10px;
-}
-
-.business-card p {
-  font-size: 14px;
-  color: #666;
-}
-
-.add-business-btn {
-  display: block;
-  width: 100%;
-  background: #6327a2;
-  color: white;
-  padding: 12px;
-  border: none;
-  border-radius: 5px;
+  font-weight: 500;
+  font-size: 0.95rem;
   cursor: pointer;
-  font-size: 16px;
-  text-align: center;
-  margin-top: 20px;
+  transition: var(--transition);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.plus-icon {
-  font-size: 40px;
-  margin-bottom: 10px;
+.action-button i {
+  font-size: 0.9rem;
 }
 
-.form-overlay {
+.action-button.primary {
+  background-color: var(--primary-color);
+  color: white;
+  width: 100%;
+  justify-content: center;
+}
+
+.action-button.primary:hover {
+  background-color: var(--primary-hover);
+}
+
+.action-button.secondary {
+  background-color: white;
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.action-button.secondary:hover {
+  background-color: rgba(108, 92, 231, 0.05);
+}
+
+.business-link {
+  text-decoration: none;
+}
+
+/* Modal styles */
+.modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
-  width: 100%;
-  height: 100%;
-  background: rgba(0, 0, 0, 0.5);
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
   display: flex;
-  justify-content: center;
   align-items: center;
+  justify-content: center;
   z-index: 1000;
+  backdrop-filter: blur(5px);
 }
 
-.form-container {
-  background-color: #fff;
-  padding: 20px;
-  border-radius: 8px;
-  width: 400px;
+.modal-container {
+  background-color: white;
+  border-radius: 12px;
+  width: 100%;
+  max-width: 500px;
+  max-height: 90vh;
+  overflow-y: auto;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+  animation: modalFadeIn 0.3s ease;
+}
+
+@keyframes modalFadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.modal-header {
+  padding: 1.5rem;
+  border-bottom: 1px solid var(--border-color);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.modal-header h2 {
+  font-size: 1.5rem;
+  color: var(--text-color);
+}
+
+.close-button {
+  background: none;
+  border: none;
+  font-size: 1.25rem;
+  color: var(--light-text);
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.close-button:hover {
+  color: var(--text-color);
+}
+
+.business-form {
+  padding: 1.5rem;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  margin-bottom: 1.25rem;
 }
 
 .form-group label {
   display: block;
-  font-size: 14px;
-  margin-bottom: 5px;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--text-color);
 }
 
 .form-group input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  padding: 0.75rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  transition: var(--transition);
 }
 
-.form-buttons {
+.form-group input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.2);
+}
+
+.form-group input[readonly] {
+  background-color: #f8f9fa;
+  cursor: not-allowed;
+}
+
+.input-with-icon {
+  position: relative;
+}
+
+.input-with-icon i {
+  position: absolute;
+  left: 1rem;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--light-text);
+}
+
+.input-with-icon input {
+  padding-left: 2.5rem;
+}
+
+.form-row {
   display: flex;
-  justify-content: space-between;
+  gap: 1rem;
 }
 
-.submit-button,
-.cancel-button {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
+.form-row .form-group {
+  flex: 1;
 }
 
-.submit-button {
-  background-color: #6327a2;
-  color: white;
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 1rem;
+  margin-top: 2rem;
 }
 
-.cancel-button {
-  background-color: #ddd;
-}
-
-.submit-button:hover {
-  background-color: #5a3472;
-}
-
-.cancel-button:hover {
-  background-color: #bbb;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .dashboard-container {
+    padding: 1.5rem;
+  }
+  
+  .page-title {
+    font-size: 2rem;
+  }
+  
+  .business-grid {
+    grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  }
+  
+  .form-row {
+    flex-direction: column;
+    gap: 0;
+  }
+  
+  .modal-container {
+    width: 95%;
+  }
 }
 </style>
