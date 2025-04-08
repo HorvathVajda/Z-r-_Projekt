@@ -206,7 +206,7 @@ CREATE TABLE statisztika (
   `vallalkozo_id` INT NOT NULL,
   PRIMARY KEY (`id`),
   FOREIGN KEY (`vallalkozo_id`) REFERENCES vallalkozo(`vallalkozo_id`)
-) ENGINE=InnoDB DEFAULT CHARSET=utf8mb3 COLLATE=utf8mb3_hungarian_ci;
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_hungarian_ci;
 
 
 --

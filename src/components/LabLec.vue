@@ -51,7 +51,7 @@
       </div>
 
       <div class="footer-bottom">
-        <p class="copyright">&copy; 2024 bookyourtime. Minden jog fenntartva.</p>
+        <p class="copyright">&copy; 2025 bookyourtime. Minden jog fenntartva.</p>
         <div class="legal-links">
           <router-link to="/adatvedelem" class="legal-link">Adatvédelem</router-link>
           <span class="divider">|</span>
