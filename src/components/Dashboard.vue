@@ -10,14 +10,14 @@
       <div v-for="business in businesses" :key="business.id" class="business-card">
         <div class="card-content">
           <div class="business-icon">
-            <i class="fas fa-store"></i>
+            <i class="fas fa-building"></i>
           </div>
           <h3 class="business-name">{{ business.vallalkozas_neve }}</h3>
           <p class="business-location">{{ business.helyszin }}</p>
           <div class="card-footer">
             <router-link :to="'/vallalkozoHome/ceg/' + business.id" class="business-link">
               <button class="action-button primary">
-                <i class="fas fa-arrow-right"></i> Megnyitás
+                <i class="bi bi-arrow-right-circle"></i> Megnyitás
               </button>
             </router-link>
           </div>
@@ -42,7 +42,7 @@
         <div class="modal-header">
           <h2>Új Vállalkozás</h2>
           <button class="close-button" @click="showForm = false">
-            <i class="fas fa-times"></i>
+            <i class="fas fa-times-circle"></i>
           </button>
         </div>
 
@@ -95,7 +95,7 @@
           <div class="form-group">
             <label for="category">Kategória</label>
             <div class="input-with-icon">
-              <i class="fas fa-tag"></i>
+              <i class="fas fa-building"></i>
               <input type="text" id="category" v-model="newBusiness.category"
                      placeholder="Pl. étterem, fodrász" />
             </div>
@@ -300,14 +300,14 @@ onMounted(async () => {
   background-color: var(--card-bg);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: var(--shadow);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1); /* Állandó árnyék hozzáadása */
   transition: var(--transition);
   border: 1px solid var(--border-color);
 }
 
 .business-card:hover {
   transform: translateY(-5px);
-  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.15); /* Ugyanaz az árnyék hover állapotban */
 }
 
 .business-card.add-new {
@@ -323,6 +323,7 @@ onMounted(async () => {
 .business-card.add-new:hover {
   background-color: rgba(108, 92, 231, 0.1);
 }
+
 
 .card-content {
   padding: 1.5rem;

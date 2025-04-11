@@ -5,7 +5,7 @@
         <!-- Logo/Brand -->
         <div class="navbar-brand">
           <router-link to="/" class="logo-link">
-            <span class="logo-text">bookyourtime.</span>
+            <span class="logo-text">bookmytime.</span>
           </router-link>
         </div>
 

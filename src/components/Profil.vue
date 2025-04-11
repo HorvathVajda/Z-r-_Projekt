@@ -1,104 +1,189 @@
 <template>
   <div class="container">
-    <!-- Profil rész -->
-    <div class="profile-card">
-      <img :src="profileImage" alt="Profilkép" class="profile-image" />
-      <h2>{{ userName }}</h2>
-      <div class="bio-container">
-        <p v-if="!isEditingBio">{{ userBio }}</p>
-        <div v-else class="edit-bio-container">
-          <input v-model="editedBio" class="bio-input" />
-          <button @click="saveBio" class="save-btn">Mentés</button>
-          <button @click="cancelEdit" class="cancel-btn">Mégse</button>
+    <!-- Main Profile Section -->
+    <div class="profile-section">
+      <!-- Profile Card -->
+      <div class="profile-card">
+        <div class="profile-header">
+          <img :src="profileImage" alt="Profilkép" class="profile-image" />
+          <h2>{{ userName }}</h2>
+          <div class="profile-actions">
+            <button @click="logout" class="logout-btn">
+              <i class="fas fa-sign-out-alt"></i> Kijelentkezés
+            </button>
+          </div>
         </div>
-        <button v-if="!isEditingBio" @click="toggleEditBio" class="edit-icon">✏️</button>
+
+        <div class="bio-container">
+          <p v-if="!isEditingBio" class="bio-text">{{ userBio || 'Nincs megadott bemutatkozás' }}</p>
+          <div v-else class="edit-bio-container">
+            <textarea v-model="editedBio" class="bio-input" rows="3"></textarea>
+            <div class="bio-actions">
+              <button @click="saveBio" class="btn save-btn">
+                <i class="fas fa-check"></i> Mentés
+              </button>
+              <button @click="cancelEdit" class="btn cancel-btn">
+                <i class="fas fa-times"></i> Mégse
+              </button>
+            </div>
+          </div>
+          <button v-if="!isEditingBio" @click="toggleEditBio" class="btn edit-btn">
+            <i class="fas fa-edit"></i> Szerkesztés
+          </button>
+        </div>
+      </div>
+
+      <!-- Stats Overview -->
+      <div class="stats-overview">
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-check-circle"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ teljesitett_munkak }}</h3>
+            <p>Teljesített munkák</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-money-bill-wave"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ bevetel }} Ft</h3>
+            <p>Összbevétel</p>
+          </div>
+        </div>
+
+        <div class="stat-card">
+          <div class="stat-icon">
+            <i class="fas fa-calendar-check"></i>
+          </div>
+          <div class="stat-info">
+            <h3>{{ foglalasok }}</h3>
+            <p>Összes foglalás</p>
+          </div>
+        </div>
       </div>
     </div>
 
-    <div class="content">
-      <div class="row">
-        <!-- Személyes adatok -->
-        <div class="user-info">
-          <h2>Személyes adatok</h2>
-          <ul>
-            <li>
-              <strong>Teljes név: </strong>
-              <span v-if="!isEditingUserData">{{ userName }}</span>
-              <input v-else v-model="editedUserName" class="user-info-input" />
-            </li>
-            <li>
-              <strong>Email: </strong>
-              <span v-if="!isEditingUserData">{{ user.email }}</span>
-              <input v-else v-model="editedUserEmail" class="user-info-input" disabled/>
-            </li>
-            <li>
-              <strong>Telefon: </strong>
-              <span v-if="!isEditingUserData">{{ user.phone }}</span>
-              <input v-else v-model="editedUserPhone" class="user-info-input" />
-            </li>
-            <button class="edit-btn" @click="toggleEditUserData" v-if="!isEditingUserData">Szerkesztés</button>
-            <button class="save-btn" @click="saveUserData" v-if="isEditingUserData">Mentés</button>
-            <button class="cancel-btn" @click="cancelEditUserData" v-if="isEditingUserData">Mégse</button>
-          </ul>
+    <!-- Main Content Area -->
+    <div class="content-area">
+      <!-- Personal Info Section -->
+      <div class="info-section">
+        <div class="section-header">
+          <h2><i class="fas fa-user"></i> Személyes adatok</h2>
+          <button class="btn edit-btn" @click="toggleEditUserData" v-if="!isEditingUserData">
+            <i class="fas fa-edit"></i> Szerkesztés
+          </button>
         </div>
 
-        <!-- Foglalások -->
-        <div class="foglalasok">
-          <h2>Közelgő foglalások</h2>
-          <div v-if="bookings.length > 0">
-            <!-- Show first 3 bookings -->
-            <div v-for="(booking, index) in displayedBookings" :key="index" class="foglalas-item">
-              <p><strong>Időpont:</strong> {{ booking.date }} - {{ booking.time }}</p>
-              <p><strong>Ügyfél:</strong> {{ booking.clientName }}</p>
-            </div>
-            <!-- Show dropdown if there are more than 3 bookings -->
-            <div v-if="bookings.length > 3">
-              <select v-model="selectedBookingIndex">
-                <option disabled value="">További foglalások...</option>
-                <option v-for="(booking, index) in additionalBookings" :key="index" :value="index + 3">
-                  {{ booking.date }} - {{ booking.time }} (Ügyfél: {{ booking.clientName }})
-                </option>
-              </select>
-            </div>
+        <div class="info-grid">
+          <div class="info-item">
+            <label>Teljes név</label>
+            <span v-if="!isEditingUserData">{{ userName }}</span>
+            <input v-else v-model="editedUserName" class="form-input" />
           </div>
-          <p v-else>Nincs még foglalás.</p>
+
+          <div class="info-item">
+            <label>Email cím</label>
+            <span v-if="!isEditingUserData">{{ user.email }}</span>
+            <input v-else v-model="editedUserEmail" class="form-input" disabled />
+          </div>
+
+          <div class="info-item">
+            <label>Telefonszám</label>
+            <span v-if="!isEditingUserData">{{ user.phone }}</span>
+            <input v-else v-model="editedUserPhone" class="form-input" />
+          </div>
+        </div>
+
+        <div v-if="isEditingUserData" class="form-actions">
+          <button @click="saveUserData" class="btn save-btn">
+            <i class="fas fa-save"></i> Mentés
+          </button>
+          <button @click="cancelEditUserData" class="btn cancel-btn">
+            <i class="fas fa-times"></i> Mégse
+          </button>
         </div>
       </div>
 
-      <div class="row">
-        <!-- Statisztikák -->
-        <div class="stats">
-          <h2>Statisztikák</h2>
-          <div class="stat-item">
-            <div><span>Teljesített munkák: </span><span style="color: #6327A2;">{{ teljesitett_munkak }}</span></div>
-            <div><span>Eddigi bevétel (br): </span><span style="color: #6327A2;">{{ bevetel }}</span></div>
-            <div><span>Összes foglalás: </span><span style="color: #6327A2;">{{ foglalasok }}</span></div>
-          </div>
+      <!-- Upcoming Appointments -->
+      <div class="info-section">
+        <div class="section-header">
+          <h2><i class="fas fa-calendar-alt"></i> Közelgő foglalások</h2>
         </div>
 
-        <!-- Időpontok megjelenítése -->
-        <div class="idopontok">
-          <h2>Időpontok</h2>
-          <div v-if="idopontok.length > 0">
-            <div v-for="(idopont, index) in idopontok" :key="index" class="foglalas-item">
-              <p><strong>Időpont:</strong> {{ idopont.datum }}</p> <!-- Dátum megjelenítése -->
-              <p><strong>Foglaló:</strong> {{ idopont.foglalo_nev }}</p>
-
-              <!-- Gomb a teljesítéshez -->
-              <button v-if="idopont.statusz !== 'teljesitett'" @click="completeAppointment(idopont.ido_id, getVallalkozoId()); refresh()" class="complete-btn">
-                Teljesítés
+        <div v-if="bookings.length > 0" class="appointments-list">
+          <!-- Show first 3 bookings -->
+          <div v-for="(booking, index) in displayedBookings" :key="index" class="appointment-card">
+            <div class="appointment-time">
+              <i class="fas fa-clock"></i>
+              <span>{{ booking.date }} - {{ booking.time }}</span>
+            </div>
+            <div class="appointment-client">
+              <i class="fas fa-user"></i>
+              <span>{{ booking.clientName }}</span>
+            </div>
+            <div class="appointment-actions">
+              <button class="btn complete-btn">
+                <i class="fas fa-check"></i> Teljesítés
               </button>
-              <p v-else>Ez az időpont teljesítve lett.</p>
             </div>
           </div>
-          <p v-else>Nincs időpont ezen a vállalkozáson.</p>
+
+          <!-- Show dropdown if there are more than 3 bookings -->
+          <div v-if="bookings.length > 3" class="more-appointments">
+            <select v-model="selectedBookingIndex" class="form-select">
+              <option disabled value="">További foglalások...</option>
+              <option v-for="(booking, index) in additionalBookings" :key="index" :value="index + 3">
+                {{ booking.date }} - {{ booking.time }} (Ügyfél: {{ booking.clientName }})
+              </option>
+            </select>
+          </div>
         </div>
 
+        <div v-else class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <p>Nincs még foglalás</p>
+        </div>
+      </div>
+
+      <!-- All Appointments -->
+      <div class="info-section">
+        <div class="section-header">
+          <h2><i class="fas fa-list"></i> Összes időpont</h2>
+        </div>
+
+        <div v-if="idopontok.length > 0" class="appointments-list">
+          <div v-for="(idopont, index) in idopontok" :key="index" class="appointment-card">
+            <div class="appointment-time">
+              <i class="fas fa-clock"></i>
+              <span>{{ idopont.datum }}</span>
+            </div>
+            <div class="appointment-client">
+              <i class="fas fa-user"></i>
+              <span>{{ idopont.foglalo_nev }}</span>
+            </div>
+            <div class="appointment-status">
+              <span v-if="idopont.statusz === 'teljesitett'" class="status-badge completed">
+                <i class="fas fa-check-circle"></i> Teljesítve
+              </span>
+              <button v-else @click="completeAppointment(idopont.ido_id, getVallalkozoId())" class="btn complete-btn">
+                <i class="fas fa-check"></i> Teljesítés
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div v-else class="empty-state">
+          <i class="fas fa-calendar-times"></i>
+          <p>Nincs időpont ezen a vállalkozáson</p>
+        </div>
       </div>
     </div>
   </div>
 </template>
-
 
 <script>
 import axios from 'axios';
@@ -221,16 +306,19 @@ export default {
           axios.post(`/api/businesses/teljesit?ido_id=${ido_id}&vallalkozo_id=${vallalkozo_id}`)
             .then(response => {
               console.log('Időpont teljesítve:', response.data);
+              // Frissíthetjük a UI-t, ha sikeres a teljesítés
+              this.refresh();
             })
             .catch(error => {
               console.error('Hiba történt az időpont teljesítésekor:', error);
+              showAlert('Hiba történt az időpont teljesítésekor!');
             });
         })
         .catch(error => {
           console.error('Hiba történt az adatok lekérésekor:', error);
+          showAlert('Hiba történt az adatok lekérésekor!');
         });
     },
-
     fetchStatisztika(vallalkozo_id) {
       axios.get('/api/businesses/statisztika', { params: { vallalkozo_id } })
         .then(response => {
@@ -243,7 +331,9 @@ export default {
           console.error('Hiba történt a statisztikák betöltésekor:', error);
         });
     },
-
+    refresh() {
+      console.log('Frissítve!');
+    },
     toggleEditBio() {
       this.isEditingBio = true;
       this.editedBio = this.userBio;
@@ -278,23 +368,22 @@ export default {
       }
     },
     saveUserData() {
-  this.isEditingUserData = false;
-  if (this.editedUserName.trim() && this.editedUserPhone.trim()) {
-    axios.post('/api/businesses/update-user', {
-      email: this.user.email,
-      nev: this.editedUserName,
-      telefonszam: this.editedUserPhone,
-    })
-      .then(response => {
-        this.userName = this.editedUserName;
-        this.user.phone = this.editedUserPhone;
-      })
-      .catch(error => {
-        console.error('Hiba történt a személyes adatok mentése során:', error);
-      });
-  }
-},
-
+      this.isEditingUserData = false;
+      if (this.editedUserName.trim() && this.editedUserPhone.trim()) {
+        axios.post('/api/businesses/update-user', {
+          email: this.user.email,
+          nev: this.editedUserName,
+          telefonszam: this.editedUserPhone,
+        })
+          .then(response => {
+            this.userName = this.editedUserName;
+            this.user.phone = this.editedUserPhone;
+          })
+          .catch(error => {
+            console.error('Hiba történt a személyes adatok mentése során:', error);
+          });
+      }
+    },
     cancelEditUserData() {
       this.isEditingUserData = false;
       this.editedUserName = '';
@@ -325,297 +414,516 @@ export default {
 };
 </script>
 
-
 <style scoped>
-/* Alap stílusok és elrendezés */
+/* Font and Base Styles */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+:root {
+  --primary-color: #6c5ce7;
+  --secondary-color: #a29bfe;
+  --accent-color: #00cec9;
+  --dark-color: #2d3436;
+  --light-color: #f5f6fa;
+  --success-color: #00b894;
+  --danger-color: #d63031;
+  --warning-color: #fdcb6e;
+  --border-radius: 12px;
+  --box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
+  --transition: all 0.3s ease;
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Poppins', sans-serif;
+  background-color: #f8f9fa;
+  color: var(--dark-color);
+  line-height: 1.6;
+}
+
+/* Container Layout */
 .container {
-  display: contents;
-  flex-direction: column;
-  align-items: center;  /* Középre igazítás */
-  justify-content: flex-start;
-  padding: 20px;
-  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
-}
-
-.idopontok {
-  margin: 20px;
+  margin-top: 60px;
   padding: 20px;
-  border-radius: 8px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  border: 2px solid #9d9ff4;
-  width: 100%;
-  max-width: 1200px;
-  height: 400px;
-  flex-grow: 1;
-  overflow-y: auto;
-  transition: height 0.3s ease;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 20px;
 }
 
-.idopontok.show-all {
-  height: auto;
+@media (min-width: 992px) {
+  .container {
+    grid-template-columns: 350px 1fr;
+  }
 }
 
-.show-all-btn {
-  background-color: #6327A2;
-  color: white;
-  padding: 10px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
+/* Profile Section */
+.profile-section {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
 }
 
-.show-all-btn:hover {
-  background-color: #9d9ff4;
-}
-
-.foglalas-item {
-  margin-bottom: 15px;
-  padding: 15px;
-  border-radius: 6px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-  border-left: 5px solid #9d9ff4;
-}
-
-.foglalas-item p {
-  margin: 5px 0;
-  color: #555;
-  font-size: 16px;
-}
-
-.foglalas-item strong {
-  color: #6327A2;
-}
-
-.complete-btn {
-  background-color: #6327A2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  font-size: 16px;
-  transition: background-color 0.3s;
-}
-
-.complete-btn:hover {
-  background-color: #9d9ff4;
-}
-
-.complete-btn:disabled {
-  background-color: #ccc;
-  cursor: not-allowed;
-}
-
-/* Profil kártya */
 .profile-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 25px;
+  position: relative;
+  overflow: hidden;
+}
+
+.profile-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 8px;
+  background: linear-gradient(90deg, var(--primary-color), var(--accent-color));
+}
+
+.profile-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
   text-align: center;
-  background: #fff;
-  padding: 20px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
   margin-bottom: 20px;
-  max-width: 100%;
-  border: 2px solid #9d9ff4;
 }
 
 .profile-image {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   border-radius: 50%;
   object-fit: cover;
+  border: 5px solid white;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+  margin-bottom: 15px;
 }
 
-button {
-  margin: 5px;
-  padding: 10px;
-  border: none;
-  cursor: pointer;
-}
-
-.edit-btn {
-  background-color: #6327A2;
-  color: white;
-  padding: 0.55rem 1rem;
-  border-radius: 100px;
-  font-size: 16px;
-  font-weight: bold;
-  border: none;
-  cursor: pointer;
-  transition: background-color 0.3s, box-shadow 0.3s;
-  width: auto;
-  position: absolute; /* Pozicionálás a szülőhöz képest */
-  top: 50%; /* Függőlegesen középre igazítjuk */
-  right: 20px; /* Jobbra toljuk */
-  transform: translateY(-50%); /* Függőlegesen középre igazítjuk */
-}
-
-
-.edit-btn:hover {
-  background-color: #9d9ff4;
-  box-shadow: 0 4px 8px rgba(99, 39, 162, 0.3);
-}
-
-.edit-btn:active {
-  transform: translateY(1px);
-  box-shadow: none;
-}
-
-.edit-btn:focus {
-  outline: none;
-  box-shadow: 0 0 8px rgba(99, 39, 162, 0.5);
-}
-
-/* Személyes adatok és foglalások */
-.user-info, .stats, .foglalasok, .idopontok {
-  flex: 1;
-  padding: 20px;
-  margin: 10px;
-  border-radius: 10px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-  min-width: 45%;
-  flex-direction: column;
-  align-items: flex-start;
-  position: relative;
-  border: 2px solid #9d9ff4;
-  margin-bottom: 20px;
-}
-
-.stats {
-  padding: 20px;
-  border-radius: 8px;
-  height: 210px;
-  overflow-y: auto;
-}
-
-.stat-item {
-  display: block;
-  margin-top: 10px;
-}
-
-.stat-item div {
-  font-size: 20px;
+.profile-header h2 {
+  font-size: 1.5rem;
   font-weight: 600;
-  margin-bottom: 10px;
+  color: var(--dark-color);
+  margin-bottom: 5px;
 }
 
-/* Bio szakasz */
+.profile-actions {
+  margin-top: 15px;
+}
+
+/* Bio Section */
 .bio-container {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 10px;
+  margin-top: 20px;
+}
+
+.bio-text {
+  color: #555;
+  font-size: 0.95rem;
+  line-height: 1.6;
+  margin-bottom: 15px;
+  padding: 15px;
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
 }
 
 .edit-bio-container {
   display: flex;
-  gap: 5px;
+  flex-direction: column;
+  gap: 10px;
 }
 
 .bio-input {
-  padding: 5px;
-  font-size: 14px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+  width: 100%;
+  padding: 12px 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.95rem;
+  resize: vertical;
+  min-height: 100px;
+  transition: var(--transition);
+}
+
+.bio-input:focus {
   outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
 }
 
-.edit-icon {
-  background: none;
-  border: none;
-  cursor: pointer;
-  font-size: 16px;
+.bio-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
 }
 
-/* Mentés és Mégse gombok */
-.save-btn, .cancel-btn {
+/* Stats Overview */
+.stats-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+  gap: 15px;
+}
+
+.stat-card {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 20px;
+  display: flex;
+  align-items: center;
+  gap: 15px;
+  transition: var(--transition);
+}
+
+
+.stat-icon {
+  width: 50px;
+  height: 50px;
+  border-radius: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+}
+
+.stat-info h3 {
+  font-size: 1.3rem;
+  font-weight: 700;
+  color: var(--dark-color);
+  margin-bottom: 5px;
+}
+
+.stat-info p {
+  font-size: 0.8rem;
+  color: #777;
+}
+
+/* Content Area */
+.content-area {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
+
+.info-section {
+  background: white;
+  border-radius: var(--border-radius);
+  box-shadow: var(--box-shadow);
+  padding: 25px;
+  position: relative;
+}
+
+.section-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+  padding-bottom: 15px;
+  border-bottom: 1px solid #eee;
+}
+
+.section-header h2 {
+  font-size: 1.3rem;
+  font-weight: 600;
+  color: var(--dark-color);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.section-header h2 i {
+  color: var(--primary-color);
+}
+
+/* Info Grid */
+.info-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 20px;
+}
+
+.info-item {
+  display: flex;
+  flex-direction: column;
+}
+
+.info-item label {
+  font-size: 0.85rem;
+  color: #777;
+  margin-bottom: 5px;
+}
+
+.info-item span {
+  font-size: 1rem;
+  font-weight: 500;
+  color: var(--dark-color);
+  padding: 10px 15px;
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+}
+
+.form-input {
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  transition: var(--transition);
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+.form-actions {
+  display: flex;
+  justify-content: flex-end;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+/* Appointments List */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.appointment-card {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  padding: 15px;
+  background-color: var(--light-color);
+  border-radius: var(--border-radius);
+  border-left: 4px solid var(--primary-color);
+  transition: var(--transition);
+}
+
+.appointment-time, .appointment-client {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.appointment-time i {
+  color: var(--primary-color);
+}
+
+.appointment-client i {
+  color: var(--accent-color);
+}
+
+.appointment-actions {
+  display: flex;
+  justify-content: flex-end;
+  margin-top: 10px;
+}
+
+.status-badge {
   padding: 5px 10px;
-  font-size: 14px;
-  border: none;
+  border-radius: 20px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+}
+
+.status-badge.completed {
+  background-color: rgba(0, 184, 148, 0.1);
+  color: var(--success-color);
+}
+
+.more-appointments {
+  margin-top: 15px;
+}
+
+.form-select {
+  width: 100%;
+  padding: 10px 15px;
+  border: 1px solid #ddd;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  background-color: white;
+  transition: var(--transition);
+}
+
+.form-select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.2);
+}
+
+/* Empty State */
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  text-align: center;
+  color: #777;
+}
+
+.empty-state i {
+  font-size: 2.5rem;
+  margin-bottom: 15px;
+  color: #ccc;
+}
+
+.empty-state p {
+  font-size: 1rem;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  border-radius: var(--border-radius);
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.9rem;
+  font-weight: 500;
   cursor: pointer;
-  border-radius: 5px;
+  transition: var(--transition);
+  border: none;
+}
+
+.btn i {
+  font-size: 0.9rem;
+}
+
+.edit-btn {
+  background-color: rgba(108, 92, 231, 0.7);
+  color: black;
+}
+
+.edit-btn:hover {
+  background-color: rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px);
 }
 
 .save-btn {
-  background: #9d9ff4;
-  color: white;
+  background-color: rgba(108, 92, 231, 0.7);
+  color: black;
+}
+
+.save-btn:hover {
+  background-color: rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px);
+  color: black;
 }
 
 .cancel-btn {
-  background: #dc3545;
+  background-color: rgba(108, 92, 231, 0.7);
+  color: black;
+}
+
+.cancel-btn:hover {
+  background-color: rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px);
+  color: black;
+}
+
+.complete-btn {
+  background-color: rgba(108, 92, 231, 0.7);
+  color: black;
+  padding: 8px 15px;
+  font-size: 0.85rem;
+}
+
+.complete-btn:hover {
+  background-color: rgba(108, 92, 231, 0.4);
+  transform: translateY(-2px);
+}
+
+.logout-btn {
+  background-color: black;
   color: white;
+  border: 1px solid var(--danger-color);
+  padding: 8px 15px;
+  font-size: 0.85rem;
 }
 
-.user-info-input {
-  padding: 8px 12px;
-  font-size: 16px;
-  border: 2px solid #6327A2;
-  border-radius: 8px;
-  outline: none;
-  width: 100%;
-  background: #f9f9f9;
-  transition: all 0.3s ease-in-out;
+.logout-btn:hover {
+  background-color: rgba(0, 0, 0, 0.8);
+  color: white;
+  transform: translateY(-2px);
 }
 
-.user-info-input:focus {
-  border-color: #9d9ff4;
-  background: #fff;
-  box-shadow: 0 0 8px rgba(99, 39, 162, 0.3);
-}
-
-/* Reszponzív stílusok */
-@media screen and (max-width: 768px) {
+/* Responsive Adjustments */
+@media (max-width: 768px) {
   .container {
+    grid-template-columns: 1fr;
     padding: 15px;
   }
 
-  .idopontok, .foglalas-item {
-    margin: 10px;
-    padding: 15px;
-    width: 100%;
+  .profile-section {
+    order: -1;
   }
 
-  .follow-btn, .complete-btn, .edit-btn {
-    width: 100%;
-    font-size: 16px;
-    padding: 12px;
+  .stats-overview {
+    grid-template-columns: 1fr;
   }
 
-  .profile-card {
-    padding: 15px;
+  .info-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .profile-header h2 {
+    font-size: 1.3rem;
+  }
+
+  .section-header {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 10px;
+  }
+
+  .section-header h2 {
+    font-size: 1.2rem;
+  }
+
+  .btn {
+    padding: 8px 15px;
+    font-size: 0.85rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .profile-card, .info-section {
+    padding: 20px 15px;
   }
 
   .profile-image {
-    width: 80px;
-    height: 80px;
+    width: 90px;
+    height: 90px;
   }
 
-  .bio-container {
+  .stat-card {
     flex-direction: column;
-    align-items: stretch;
+    text-align: center;
   }
 
-  .user-info, .stats, .foglalasok {
-    min-width: 100%;
-    flex: 1;
-    margin: 10px 0;
+  .form-actions {
+    flex-direction: column;
   }
 
-  .stat-item div {
-    font-size: 16px;
-  }
-
-  .user-info-input {
-    font-size: 14px;
-  }
-
-  /* A "show-all-btn" és hasonló gombok kisebb képernyőkön */
-  .show-all-btn {
+  .btn {
     width: 100%;
-    padding: 12px;
   }
 }
 </style>
