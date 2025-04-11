@@ -2,6 +2,8 @@ const express = require("express");
 const dotenv = require("dotenv");
 const { registerUser, login, registerBusiness } = require("../controllers/authController");
 
+
+
 dotenv.config();
 const router = express.Router();
 

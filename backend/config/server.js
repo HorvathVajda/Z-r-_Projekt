@@ -15,12 +15,9 @@ dotenv.config();
 
 const app = express();
 
+app.use(express.json()); 
 
-// Hibakezelő middleware
-app.use((err, req, res, next) => {
-  console.error("Globális hiba:", err);
-  res.status(500).send("Belső rendszerhiba történt.");
-});
+
 
 app.use(cors());
 
@@ -37,6 +34,12 @@ app.get("/", (req, res) => {
   res.send("BookMyTime backend működik!");
 });
 
+
+// Hibakezelő middleware
+app.use((err, req, res, next) => {
+  console.error("Globális hiba:", err);
+  res.status(500).send("Belső rendszerhiba történt.");
+});
 
 // Szerver indítása
 app.listen(5000, 'localhost', () => {
