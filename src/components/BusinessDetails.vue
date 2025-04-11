@@ -1,110 +1,139 @@
 <template>
-  <div class="business-details">
-    <div v-if="business" class="business-card">
-      <h1>{{ business.vallalkozas_neve }}
-        <button @click="toggleEdit('name')" :class="{'cancel-button': isEditing.name, 'edit-button': !isEditing.name}">
-          {{ isEditing.name ? 'Mégse' : 'Szerkesztés' }}
-        </button>
-      </h1>
-      <p><strong>Helyszín:</strong> {{ business.helyszin }}
-        <button @click="toggleEdit('location')" :class="{'cancel-button': isEditing.location, 'edit-button': !isEditing.location}">
-          {{ isEditing.location ? 'Mégse' : 'Szerkesztés' }}
-        </button>
-      </p>
-      <p><strong>Nyitvatartás:</strong> {{ business.nyitva_tartas }}
-        <button @click="toggleEdit('hours')" :class="{'cancel-button': isEditing.hours, 'edit-button': !isEditing.hours}">
-          {{ isEditing.hours ? 'Mégse' : 'Szerkesztés' }}
-        </button>
-      </p>
-      <p><strong>Kategória:</strong> {{ business.category }}
-        <button @click="toggleEdit('category')" :class="{'cancel-button': isEditing.category, 'edit-button': !isEditing.category}">
-          {{ isEditing.category ? 'Mégse' : 'Szerkesztés' }}
-        </button>
-      </p>
+  <div class="business-details-container">
+    <!-- Floating background elements -->
+    <div class="floating-dots">
+      <div class="dot dot-1"></div>
+      <div class="dot dot-2"></div>
+      <div class="dot dot-3"></div>
+    </div>
 
-      <!-- Edit form for each field -->
-      <div v-if="isEditing.name" class="edit-form">
-        <input type="text" v-model="newBusinessName" class="edit-input" />
-        <button @click="saveField('name')" class="save-button">Mentés</button>
-      </div>
-      <div v-if="isEditing.location" class="edit-form">
-        <input type="text" v-model="newBusinessLocation" class="edit-input" />
-        <button @click="saveField('location')" class="save-button">Mentés</button>
-      </div>
-      <div v-if="isEditing.hours" class="edit-form">
-        <input type="text" v-model="newBusinessHours" class="edit-input" />
-        <button @click="saveField('hours')" class="save-button">Mentés</button>
-      </div>
-      <div v-if="isEditing.category" class="edit-form">
-        <input type="text" v-model="newBusinessCategory" class="edit-input" />
-        <button @click="saveField('category')" class="save-button">Mentés</button>
-      </div>
+    <div v-if="business" class="business-card-wrapper">
+      <div class="business-header">
+        <h1 class="business-title">{{ business.vallalkozas_neve }}</h1>
+        <div class="business-meta">
+          <div class="meta-item">
+            <span class="meta-icon"><i class="fas fa-compass"></i></span>
+            <span class="meta-text">{{ business.helyszin }}</span>
+            <button @click="toggleEdit('location')" class="meta-edit-btn">
+              {{ isEditing.location ? 'Mégse' : 'Szerkesztés' }}
+            </button>
+          </div>
 
-      <!-- Szolgáltatások kártyákban -->
-      <h2>Szolgáltatások</h2>
-      <div class="service-cards">
-        <div class="service-card" v-for="service in services" :key="service.szolgaltatas_id">
-          <div class="service-card-content">
-            <h3>{{ service.szolgaltatas_neve }}</h3>
-            <p><strong>Ár:</strong> {{ service.ar }} Ft</p>
-            <p><strong>Időtartam:</strong> {{ service.idotartam }} perc</p>
+          <div class="meta-item">
+            <span class="meta-icon"><i class="fas fa-clock"></i></span>
+            <span class="meta-text">{{ business.nyitva_tartas }}</span>
+            <button @click="toggleEdit('hours')" class="meta-edit-btn">
+              {{ isEditing.hours ? 'Mégse' : 'Szerkesztés' }}
+            </button>
+          </div>
 
-            <!-- Dátum és időpont választó -->
-            <div class="available-times">
-              <label :for="'availableTime' + service.szolgaltatas_id">Szabad időpontok hozzáadása:</label>
-              <input type="datetime-local" v-model="service.selectedTime" :id="'availableTime' + service.szolgaltatas_id" />
-            </div>
-
-            <!-- Hozzáadás gomb -->
-            <button @click="addAvailableTime(service)" class="add-time-button">Hozzáadás</button>
+          <div class="meta-item">
+            <span class="meta-icon"><i class="fas fa-building"></i></span>
+            <span class="meta-text">{{ business.category }}</span>
+            <button @click="toggleEdit('category')" class="meta-edit-btn">
+              {{ isEditing.category ? 'Mégse' : 'Szerkesztés' }}
+            </button>
           </div>
         </div>
       </div>
 
-      <!-- Plusz jel a szolgáltatás hozzáadásához -->
-      <div class="add-service-btn" @click="toggleAddServiceForm">
-        <span class="plus-sign">+</span>
+      <!-- Edit forms -->
+      <div v-if="isEditing.location" class="edit-form">
+        <input type="text" v-model="newBusinessLocation" class="edit-input" placeholder="Új helyszín" />
+        <button @click="saveField('location')" class="action-btn save-btn">Mentés</button>
       </div>
 
-      <!-- Szolgáltatás hozzáadása űrlap -->
+      <div v-if="isEditing.hours" class="edit-form">
+        <input type="text" v-model="newBusinessHours" class="edit-input" placeholder="08:00-16:00" />
+        <button @click="saveField('hours')" class="action-btn save-btn">Mentés</button>
+      </div>
+
+      <div v-if="isEditing.category" class="edit-form">
+        <input type="text" v-model="newBusinessCategory" class="edit-input" placeholder="Új kategória" />
+        <button @click="saveField('category')" class="action-btn save-btn">Mentés</button>
+      </div>
+
+      <!-- Services section -->
+      <div class="services-section">
+        <h2 class="section-title">Szolgáltatások</h2>
+        <div class="services-grid">
+          <div class="service-card" v-for="service in services" :key="service.szolgaltatas_id">
+            <div class="service-icon">
+              <i class="fas fa-lightbulb"></i>
+            </div>
+            <h3 class="service-name">{{ service.szolgaltatas_neve }}</h3>
+            <div class="service-details">
+              <div class="detail-item">
+                <span class="detail-icon"><i class="fas fa-money-bill-wave"></i></span>
+                <span class="detail-value">{{ service.ar }} Ft</span>
+              </div>
+              <div class="detail-item">
+                <span class="detail-icon"><i class="fas fa-clock"></i></span>
+                <span class="detail-value">{{ service.idotartam }} perc</span>
+              </div>
+            </div>
+
+            <div class="time-selection">
+              <label :for="'availableTime' + service.szolgaltatas_id">Új időpont:</label>
+              <input type="datetime-local" v-model="service.selectedTime" :id="'availableTime' + service.szolgaltatas_id" class="time-input" />
+              <button @click="addAvailableTime(service)" class="action-btn add-time-btn">
+                <i class="fas fa-plus"></i> Hozzáadás
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <!-- Add service button -->
+        <button @click="toggleAddServiceForm" class="add-service-btn">
+          <i class="fas fa-plus"></i> Új szolgáltatás
+        </button>
+      </div>
+
+      <!-- Add service form -->
       <div v-if="isAddingService" class="add-service-form">
-        <h3>Szolgáltatás hozzáadása</h3>
-        <form @submit.prevent="addService">
+        <h3 class="form-title">Új szolgáltatás hozzáadása</h3>
+        <form @submit.prevent="addService" class="service-form">
           <div class="form-group">
             <label for="serviceName">Szolgáltatás neve</label>
-            <input type="text" id="serviceName" v-model="newService.name" required />
+            <input type="text" id="serviceName" v-model="newService.name" required class="form-input" />
           </div>
           <div class="form-group">
             <label for="serviceDuration">Időtartam (perc)</label>
-            <input type="number" id="serviceDuration" v-model="newService.duration" required />
+            <input type="number" id="serviceDuration" v-model="newService.duration" required class="form-input" />
           </div>
           <div class="form-group">
             <label for="servicePrice">Ár (Ft)</label>
-            <input type="number" id="servicePrice" v-model="newService.price" required />
+            <input type="number" id="servicePrice" v-model="newService.price" required class="form-input" />
           </div>
-          <button type="submit" class="submit-button">Hozzáadás</button>
+          <div class="form-actions">
+            <button type="button" @click="toggleAddServiceForm" class="action-btn cancel-btn">Mégse</button>
+            <button type="submit" class="action-btn submit-btn">Mentés</button>
+          </div>
         </form>
       </div>
 
-      <!-- Back and Delete buttons -->
-      <div class="button-container">
-        <div class="back-button">
-          <router-link to="/vallalkozoHome">
-            <button class="go-back-btn">Vissza a vállalkozásokhoz</button>
-          </router-link>
-        </div>
-        <div class="delete-button">
-          <button @click="deleteBusiness(); refresh()">Törlés</button>
-        </div>
+      <!-- Action buttons -->
+      <div class="action-buttons">
+        <router-link to="/vallalkozoHome" class="back-link">
+          <button class="action-btn back-btn">
+            <i class="bi bi-chevron-left"></i> Vissza
+          </button>
+        </router-link>
+        <button @click="deleteBusiness" class="action-btn delete-btn">
+          <i class="fas fa-trash-alt"></i> Vállalkozás törlése
+        </button>
       </div>
     </div>
-    <div v-else>
+
+    <div v-else class="loading-container">
+      <div class="loading-spinner"></div>
       <p>Betöltés...</p>
     </div>
 
-    <!-- Error/Info Box -->
-    <div v-if="alertMessage" class="alert-box">
+    <!-- Alert message -->
+    <div v-if="alertMessage" class="alert-box" :class="{ 'error': alertMessage.includes('Hiba') }">
       <p>{{ alertMessage }}</p>
+      <button @click="alertMessage = null" class="close-alert"><i class="fas fa-window-close"></i></button>
     </div>
   </div>
 </template>
@@ -114,61 +143,54 @@ import { ref, onMounted } from 'vue';
 import axios from 'axios';
 import { useRoute, useRouter } from 'vue-router';
 
-// Az alap adatokat tároló változók
 const business = ref(null);
 const services = ref([]);
-
-// A szerkesztéshez szükséges változók
 const isEditing = ref({
-  name: false,
   location: false,
   hours: false,
   category: false
 });
-
-const newBusinessName = ref('');
 const newBusinessLocation = ref('');
 const newBusinessHours = ref('');
 const newBusinessCategory = ref('');
+const isAddingService = ref(false);
+const newService = ref({
+  name: '',
+  duration: '',
+  price: ''
+});
+const alertMessage = ref(null);
 
-// Route és Router
 const route = useRoute();
 const router = useRouter();
-
-// Alert üzenet megjelenítése
-const alertMessage = ref(null);
 
 const fetchBusinessDetails = async () => {
   try {
     const response = await axios.get(`/api/businesses/vallalkozasok/${route.params.id}/details`);
     business.value = response.data;
-    newBusinessName.value = business.value.vallalkozas_neve;
     newBusinessLocation.value = business.value.helyszin;
     newBusinessHours.value = business.value.nyitva_tartas;
     newBusinessCategory.value = business.value.category;
 
     const servicesResponse = await axios.get(`/api/businesses/vallalkozasok/${route.params.id}/szolgaltatasok`);
-    services.value = servicesResponse.data;
+    services.value = servicesResponse.data.map(service => ({
+      ...service,
+      selectedTime: ''
+    }));
   } catch (error) {
     showAlert('Hiba a vállalkozás adatainak betöltésekor: ' + error.message);
   }
 };
 
-// Toggle the edit form visibility
-const toggleEdit = async (field) => {
+const toggleEdit = (field) => {
   isEditing.value[field] = !isEditing.value[field];
-  // Ha a felhasználó "Mégse"-re kattint, akkor visszaállítjuk a mező értékét
   if (!isEditing.value[field]) {
     cancelEdit(field);
   }
 };
 
-// Visszaállítja az eredeti értéket, ha a felhasználó nem menti a változtatásokat
 const cancelEdit = (field) => {
   switch (field) {
-    case 'name':
-      newBusinessName.value = business.value.vallalkozas_neve;
-      break;
     case 'location':
       newBusinessLocation.value = business.value.helyszin;
       break;
@@ -181,332 +203,661 @@ const cancelEdit = (field) => {
   }
 };
 
-// Az új SQL lekérdezés meghívása a backendről
 const saveField = async (field) => {
   const updatedBusiness = {
-    vallalkozas_neve: newBusinessName.value,
+    ...business.value,
     helyszin: newBusinessLocation.value,
     nyitva_tartas: newBusinessHours.value,
     category: newBusinessCategory.value
   };
 
   try {
-    // SQL lekérdezés meghívása
     const response = await axios.put(`/api/businesses/vallalkozasok/${business.value.id}`, updatedBusiness);
-
-    if (response.status === 200) {
-      // Ha a lekérdezés sikeres, frissíti az adatokat
-      business.value = response.data;
-      isEditing.value[field] = false;
-      showAlert('Sikeresen frissítve!');
-    }
+    business.value = response.data;
+    isEditing.value[field] = false;
+    showAlert('Sikeresen frissítve!');
   } catch (error) {
     showAlert('Hiba történt a frissítés során: ' + error.message);
   }
 };
 
-// Alert üzenet megjelenítése
+const toggleAddServiceForm = () => {
+  isAddingService.value = !isAddingService.value;
+  if (!isAddingService.value) {
+    newService.value = { name: '', duration: '', price: '' };
+  }
+};
+
+const addService = async () => {
+  try {
+    const response = await axios.post('/api/businesses/szolgaltatasok', {
+      ...newService.value,
+      vallalkozas_id: business.value.id
+    });
+    services.value.push({ ...response.data, selectedTime: '' });
+    toggleAddServiceForm();
+    showAlert('Szolgáltatás sikeresen hozzáadva!');
+  } catch (error) {
+    showAlert('Hiba a szolgáltatás hozzáadásakor: ' + error.message);
+  }
+};
+
+const addAvailableTime = async (service) => {
+  if (!service.selectedTime) {
+    showAlert('Válassz időpontot!');
+    return;
+  }
+
+  try {
+    // Feltételezve, hogy az üzlet ID-ja a 'service.businessId' változóban van
+    const businessId = service.businessId;
+
+    await axios.post(`/api/businesses/${businessId}/add-idopont`, {
+      szabad_ido: service.selectedTime,
+      szolgaltatas_id: service.szolgaltatas_id
+    });
+
+    showAlert('Időpont sikeresen hozzáadva!');
+    service.selectedTime = '';  // Reset selected time after successful add
+  } catch (error) {
+    showAlert('Hiba az időpont hozzáadásakor: ' + error.message);
+  }
+};
+
+const deleteBusiness = async () => {
+  if (!confirm('Biztosan törölni szeretnéd ezt a vállalkozást?')) return;
+
+  try {
+    await axios.delete(`/api/businesses/vallalkozasok/${business.value.id}`);
+    router.push('/vallalkozoHome');
+  } catch (error) {
+    showAlert('Hiba a vállalkozás törlésekor: ' + error.message);
+  }
+};
+
 const showAlert = (message) => {
   alertMessage.value = message;
+  setTimeout(() => {
+    alertMessage.value = null;
+  }, 5000);
 };
 
 onMounted(fetchBusinessDetails);
 </script>
 
-
 <style scoped>
-h1, p {
-  line-height: 1.6;
-  font-size: 18px;
-  margin-bottom: 10px;
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap');
+@import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css');
+
+:root {
+  --primary-color: #6c5ce7;
+  --primary-hover: #5649c0;
+  --secondary-color: #a29bfe;
+  --accent-color: #00cec9;
+  --text-color: #2d3436;
+  --light-text: #636e72;
+  --bg-color: #f5f6fa;
+  --card-bg: #ffffff;
+  --border-color: #dfe6e9;
+  --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  --transition: all 0.3s ease;
+  --success-color: #27ae60;
+  --error-color: #e74c3c;
+  --warning-color: #f39c12;
 }
 
-.edit-button {
-  background-color: #6327a2;
-  color: white;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
-  margin-left: 10px;
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
-.cancel-button {
-  background-color: #e74c3c;
-  color: white;
-  padding: 6px 14px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+.business-details-container {
+  font-family: 'Poppins', sans-serif;
+  max-width: 1200px;
+  margin: 0 auto;
+  margin-top: 50px;
+  padding: 2rem;
+  color: var(--text-color);
+  position: relative;
+  min-height: 100vh;
 }
 
-.edit-button:hover, .cancel-button:hover {
-  transform: scale(1.05);
+/* Floating dots background */
+.floating-dots {
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 0;
+  left: 0;
+  overflow: hidden;
+  z-index: 0;
+  pointer-events: none;
 }
 
-.edit-button:hover {
-  background-color: #9d9ff4;
+.dot {
+  position: absolute;
+  border-radius: 50%;
+  filter: blur(60px);
+  opacity: 0.4;
+  will-change: transform;
+  animation: randomFloat 30s infinite ease-in-out alternate;
 }
 
-.cancel-button:hover {
-  background-color: rgb(231, 77, 60, 0.8);
+/* Egyedi elhelyezések */
+.dot-1 {
+  width: 400px;
+  height: 400px;
+  background: radial-gradient(circle, #c7aaff 0%, rgba(255,182,193,0) 70%);
+  top: 10%;
+  left: 20%;
+  animation-duration: 35s;
 }
 
-.edit-form {
-  margin-top: 10px;
+.dot-2 {
+  width: 500px;
+  height: 500px;
+  background: radial-gradient(circle, #ffb6c1 0%, rgba(255,182,193,0) 70%);
+  top: 60%;
+  left: 10%;
+  animation-duration: 40s;
+}
+
+.dot-3 {
+  width: 450px;
+  height: 450px;
+  background: radial-gradient(circle, #dda0dd 0%, rgba(221,160,221,0) 70%);
+  top: 30%;
+  right: 15%;
+  animation-duration: 50s;
+}
+
+/* Random mozgás keyframes – akár több variáció is lehet */
+@keyframes randomFloat {
+  0% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+  20% {
+    transform: translate(60px, -40px) scale(1.1) rotate(15deg);
+  }
+  40% {
+    transform: translate(-40px, 60px) scale(0.9) rotate(-10deg);
+  }
+  60% {
+    transform: translate(50px, 50px) scale(1.05) rotate(5deg);
+  }
+  80% {
+    transform: translate(-30px, -30px) scale(0.95) rotate(-20deg);
+  }
+  100% {
+    transform: translate(0, 0) scale(1) rotate(0deg);
+  }
+}
+
+
+/* Business header */
+.business-header {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.business-title {
+  font-size: 2rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.business-meta {
   display: flex;
   flex-direction: column;
-  align-items: stretch;
-  gap: 10px;
+  gap: 1rem;
 }
 
-/* Edit input mezők szélességének optimalizálása */
+.meta-item {
+  display: flex;
+  align-items: center;
+  gap: 0.8rem;
+  font-size: 1rem;
+}
+
+.meta-icon {
+  color: var(--primary-color);
+  width: 24px;
+  text-align: center;
+}
+
+.meta-text {
+  flex: 1;
+  color: var(--light-text);
+}
+
+.meta-edit-btn {
+  background-color: black;
+  color: white;
+  border: none;
+  border-radius: 20px;
+  padding: 0.5rem 1rem;
+  font-size: 0.9rem;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.meta-edit-btn:hover {
+  background-color: black;
+  transform: translateY(-2px);
+}
+
+/* Edit forms */
+.edit-form {
+  background-color: var(--card-bg);
+  border-radius: 8px;
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow);
+  display: flex;
+  gap: 1rem;
+  align-items: center;
+}
+
 .edit-input {
-  padding: 8px 12px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
-  font-size: 16px;
-  width: 100%;  /* Teljes szélesség mobilon */
-  transition: border-color 0.3s ease;
+  flex: 1;
+  padding: 0.8rem 1rem;
+  border: 2px solid var(--primary-color);
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  transition: var(--transition);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3); /* halvány árnyék mindig */
 }
 
 .edit-input:focus {
-  border-color: #6327a2;
   outline: none;
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.4); /* erősebb fókusz árnyék */
 }
 
-.save-button {
-  background-color: #6327a2;
-  color: white;
-  padding: 8px 14px;
-  border: none;
-  border-radius: 20px;
-  font-size: 14px;
-  cursor: pointer;
-  transition: background-color 0.3s ease, transform 0.3s ease;
+
+/* Services section */
+.services-section {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
 }
 
-.save-button:hover {
-  background-color: #9d9ff4;
-  transform: scale(1.05);
+.section-title {
+  font-size: 1.5rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
 }
 
-.add-time-button {
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  margin-top: 10px;
-}
-
-.add-time-button:hover {
-  background-color: #9d9ff4;
-}
-
-.available-times {
-  margin-bottom: 10px;
-}
-
-.alert-box {
-  position: fixed;
-  bottom: 20px;
-  left: 20px;
-  background-color: #ffcc00;
-  color: black;
-  padding: 10px;
-  border-radius: 5px;
-  font-size: 16px;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  z-index: 100;
-}
-
-.business-details {
-  padding: 20px;
-}
-
-.business-card {
-  background-color: #fff;
-  border: 1px solid #ddd;
-  border-radius: 8px;
-  padding: 20px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
-  margin-bottom: 20px;
-}
-
-.business-card h1 {
-  font-size: 24px;
-  color: #6327a2;
-  margin-bottom: 10px;
-}
-
-.business-card p {
-  font-size: 16px;
-  color: #666;
-  margin: 5px 0;
-}
-
-.service-cards {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 15px;
-  margin-top: 20px;
+.services-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 1.5rem;
+  margin-bottom: 2rem;
 }
 
 .service-card {
-  background-color: #f9f9f9;
-  border: 1px solid #ddd;
+  background-color: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  box-shadow: var(--shadow);
+  transition: var(--transition);
+  border: 1px solid var(--border-color);
+}
+
+.service-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.12);
+}
+
+.service-icon {
+  width: 50px;
+  height: 50px;
+  background-color: rgba(108, 92, 231, 0.1);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--primary-color);
+  font-size: 1.2rem;
+  margin-bottom: 1rem;
+}
+
+.service-name {
+  font-size: 1.2rem;
+  font-weight: 600;
+  margin-bottom: 1rem;
+  color: var(--text-color);
+}
+
+.service-details {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.detail-item {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.95rem;
+}
+
+.detail-icon {
+  color: var(--primary-color);
+  width: 20px;
+}
+
+.detail-value {
+  color: var(--light-text);
+}
+
+.time-selection {
+  margin-top: 1.5rem;
+}
+
+.time-selection label {
+  display: block;
+  font-size: 0.9rem;
+  margin-bottom: 0.5rem;
+  color: var(--light-text);
+}
+
+.time-input {
+  width: 100%;
+  padding: 0.7rem;
+  border: 1px solid var(--border-color);
   border-radius: 8px;
-  padding: 15px;
-  width: 200px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  font-family: 'Poppins', sans-serif;
+  margin-bottom: 0.8rem;
 }
 
-.service-card h3 {
-  font-size: 18px;
-  color: #6327a2;
+/* Action buttons */
+.action-btn {
+  padding: 0.75rem 1.5rem;
+  border-radius: 8px;
+  font-weight: 500;
+  font-size: 0.95rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border: none;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.service-card p {
-  font-size: 14px;
-  color: #666;
+.action-btn i {
+  font-size: 0.9rem;
+}
+
+.save-btn {
+  background-color: var(--primary-color);
+  color: white;
+}
+
+.save-btn:hover {
+  background-color: var(--primary-hover);
+}
+
+.add-time-btn {
+  background-color: var(--accent-color);
+  color: white;
+  background-color: black;
+  width: 100%;
+  justify-content: center;
 }
 
 .add-service-btn {
-  background-color: #6327a2;
+  background-color: black;
   color: white;
-  width: 50px;
-  height: 50px;
-  border-radius: 50%;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  cursor: pointer;
-  font-size: 30px;
-  position: relative;
-  top: 20px;
-}
-
-.plus-sign {
-  font-size: 30px;
-}
-
-.add-service-form {
-  margin-top: 20px;
-  background-color: #f9f9f9;
-  padding: 20px;
+  width: 100%;
+  padding: 1rem;
   border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  font-weight: 500;
+  transition: var(--transition);
+  border: none;
+  cursor: pointer;
+}
+
+.add-service-btn:hover {
+  background-color: black;
+  transform: translateY(-2px);
+}
+
+/* Add service form */
+.add-service-form {
+  background-color: var(--card-bg);
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: var(--shadow);
+  margin-bottom: 2rem;
+}
+
+.form-title {
+  background-color: var(--primary-color);
+  font-size: 1.3rem;
+  color: var(--primary-color);
+  margin-bottom: 1.5rem;
+  font-weight: 600;
+}
+
+.service-form {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
 }
 
 .form-group {
-  margin-bottom: 15px;
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
 }
 
 .form-group label {
-  display: block;
-  font-size: 14px;
-  margin-bottom: 5px;
+  font-size: 0.95rem;
+  color: var(--light-text);
 }
 
-.form-group input {
-  width: 100%;
-  padding: 8px;
-  border: 1px solid #ccc;
-  border-radius: 5px;
+.form-input {
+  padding: 0.8rem 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: 8px;
+  font-family: 'Poppins', sans-serif;
+  transition: var(--transition);
+  box-shadow: 0 0 0 2px rgba(108, 92, 231, 0.3); /* halvány árnyék mindig */
 }
 
-.submit-button {
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
+.form-input:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(108, 92, 231, 0.4); /* halvány árnyék mindig */
 }
 
-.submit-button:hover {
-  background-color: #9d9ff4;
-}
-
-.go-back-btn {
-  background-color: #6327a2;
-  color: white;
-  padding: 10px 20px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 16px;
-}
-
-.go-back-btn:hover {
-  background-color: #9d9ff4;
-}
-
-.button-container {
+.form-actions {
   display: flex;
   justify-content: flex-end;
-  gap: 10px;
+  gap: 1rem;
+  margin-top: 1rem;
 }
 
-.delete-button button {
-  background-color: red;
+.cancel-btn {
+  background-color: var(--primary-color);
+  color: var(--primary-color);
+  border: 1px solid var(--primary-color);
+}
+
+.cancel-btn:hover {
+  background-color: rgba(108, 92, 231, 0.2);
+}
+
+.submit-btn {
+  background-color: rgba(108, 92, 231, 0.3);
+  color: black;
+}
+
+.submit-btn:hover {
+  background-color: rgba(108, 92, 231, 0.6);
+}
+
+/* Action buttons at bottom */
+.action-buttons {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 2rem;
+}
+
+.back-btn {
+  background-color: black;
   color: white;
-  padding: 10px 20px;
+  border: 1px solid var(--primary-color);
+}
+
+.back-btn:hover {
+  background-color: black;
+}
+
+.delete-btn {
+  background-color: #c0392b;
+  color: white;
+}
+
+.delete-btn:hover {
+  background-color: #c0392b;
+}
+
+/* Loading state */
+.loading-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 200px;
+}
+
+.loading-spinner {
+  width: 50px;
+  height: 50px;
+  border: 5px solid rgba(108, 92, 231, 0.2);
+  border-radius: 50%;
+  border-top-color: var(--primary-color);
+  animation: spin 1s ease-in-out infinite;
+  margin-bottom: 1rem;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Alert box */
+.alert-box {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-box.error {
+  background-color: var(--error-color);
+}
+
+.alert-box p {
+  margin: 0;
+}
+
+.close-alert {
+  background: none;
   border: none;
-  border-radius: 5px;
+  color: white;
   cursor: pointer;
+  font-size: 1rem;
+  padding: 0;
 }
 
-.delete-button button:hover {
-  background-color: darkred;
+@keyframes slideIn {
+  from {
+    opacity: 0;
+    transform: translate(-50%, 100%);
+  }
+  to {
+    opacity: 1;
+    transform: translate(-50%, 0);
+  }
 }
 
-@media screen and (max-width: 768px) {
-  h1, p {
-    font-size: 16px;
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .business-details-container {
+    padding: 1.5rem;
   }
 
-  .edit-input {
-    font-size: 14px;
-    padding: 8px;
+  .business-header, .services-section, .add-service-form {
+    padding: 1.5rem;
   }
 
-  /* Edit form: Kisebb képernyőkön a mezők teljes szélességben */
+  .business-title {
+    font-size: 1.5rem;
+  }
+
+  .services-grid {
+    grid-template-columns: 1fr;
+  }
+
   .edit-form {
-    gap: 15px;
-  }
-
-  .service-card {
-    width: 100%;
-    margin-bottom: 15px;
-  }
-
-  .add-service-btn {
-    font-size: 25px;
-    width: 45px;
-    height: 45px;
-  }
-
-  .business-card {
-    padding: 15px;
-  }
-
-  .button-container {
     flex-direction: column;
-    gap: 8px;
+    align-items: stretch;
   }
 
-  /* Gombok mobilon jobban igazodjanak */
-  .save-button, .cancel-button, .edit-button {
+  .action-buttons {
+    flex-direction: column;
+    gap: 1rem;
+  }
+
+  .back-btn, .delete-btn {
     width: 100%;
-    padding: 10px;
-    font-size: 16px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .business-details-container {
+    padding: 1rem;
+  }
+
+  .business-header, .services-section, .add-service-form {
+    padding: 1rem;
+  }
+
+  .meta-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+  }
+
+  .meta-edit-btn {
+    align-self: flex-end;
   }
 }
 </style>

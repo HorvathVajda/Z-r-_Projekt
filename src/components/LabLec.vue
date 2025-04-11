@@ -4,7 +4,7 @@
       <div class="footer-main">
         <div class="footer-brand">
           <router-link to="/" class="footer-logo">
-            bookyourtime<span class="logo-dot">.</span>
+            bookmytime<span class="logo-dot">.</span>
           </router-link>
           <p class="footer-tagline">Egyszerű időpontfoglalás, profi szolgáltatások</p>
           <div class="social-links">
@@ -31,21 +31,19 @@
             <h3 class="link-title">Navigáció</h3>
             <router-link to="/" class="footer-link">Kezdőlap</router-link>
             <router-link to="/foglalas" class="footer-link">Foglalás</router-link>
-            <router-link to="/vallalkozok" class="footer-link">Vállalkozók</router-link>
+            <router-link v-if="felhasznalo" to="/felhasznaloProfil" class="footer-link">Profil</router-link>
+            <router-link v-if="vallalkozo" to="/Profil" class="footer-link">Profil</router-link>
           </div>
 
           <div class="link-group">
             <h3 class="link-title">Információ</h3>
             <router-link to="/rolunk" class="footer-link">Rólunk</router-link>
             <router-link to="/kapcsolat" class="footer-link">Kapcsolat</router-link>
-            <router-link to="/gyik" class="footer-link">GYIK</router-link>
           </div>
 
           <div class="link-group">
             <h3 class="link-title">Jogi</h3>
             <router-link to="/adatvedelem" class="footer-link">Adatvédelem</router-link>
-            <router-link to="/felhasznalasi-feltetelek" class="footer-link">Felhasználási feltételek</router-link>
-            <router-link to="/cookie-szabalyzat" class="footer-link">Cookie szabályzat</router-link>
           </div>
         </div>
       </div>
@@ -57,10 +55,12 @@
   </footer>
 </template>
 
-<script>
-export default {
-  name: "AppFooter",
-};
+<script setup>
+import { computed } from "vue";
+import { store } from "../store";
+
+const vallalkozo = computed(() => store.vallalkozo);
+const felhasznalo = computed(() => store.felhasznalo);
 </script>
 
 <style scoped>

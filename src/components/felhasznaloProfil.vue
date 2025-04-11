@@ -30,17 +30,20 @@
 
     <div class="card">
       <h2>Biztonság</h2>
-      <div class="field">
-        <label>Jelenlegi jelszó</label>
-        <input v-model="currentPassword" type="password" />
+      <form @submit.prevent="updatePassword">
+        <div class="field">
+          <label>Jelenlegi jelszó</label>
+          <input v-model="currentPassword" type="password" />
 
-        <label>Új jelszó</label>
-        <input v-model="newPassword" type="password" />
+          <label>Új jelszó</label>
+          <input v-model="newPassword" type="password" />
 
-        <label>Új jelszó megerősítése</label>
-        <input v-model="confirmPassword" type="password" />
+          <label>Új jelszó megerősítése</label>
+          <input v-model="confirmPassword" type="password" />
+        </div>
 
-      </div>
+        <button type="submit">Jelszó frissítése</button>
+      </form>
     </div>
 
     <div class="card">
@@ -78,9 +81,7 @@ export default {
   },
   mounted() {
     const authData = JSON.parse(localStorage.getItem('authData'));
-    console.log('AuthData from localStorage:', authData); // 🚨 Ellenőrizd
     this.id = authData?.id;
-    console.log('Felhasználó ID:', this.id); // 🚨 Naplózd az ID-t
     this.fetchProfile();
   },
   methods: {
@@ -161,7 +162,7 @@ body {
 
 .profile-wrapper {
   max-width: 700px;
-  margin: 40px auto;
+  margin: 90px auto;
   padding: 0 20px;
   font-family: "Segoe UI", sans-serif;
   color: #333;
