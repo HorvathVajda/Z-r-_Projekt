@@ -181,32 +181,33 @@ export default {
   },
   methods: {
     handleRegistration() {
-  this.formSubmitted = true;
+      this.formSubmitted = true;
 
-  if (!this.isFormValid || !this.termsAccepted) {
-    this.showAlert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
-    return;
-  }
+      if (!this.isFormValid || !this.termsAccepted) {
+        this.showAlert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
+        return;
+      }
 
-  const userData = {
-    name: this.name,
-    email: this.email,
-    password: this.password,
-    phone: this.phone,
-    tipus: 'felhasznalo',
-  };
+      const userData = {
+        name: this.name,
+        email: this.email,
+        password: this.password,
+        phone: this.phone,
+        adoszam: this.adoszam,
+        tipus: 'felhasznalo',
+      };
 
-  axios.post('http://localhost:5000/api/auth/register', userData)
-    .then((response) => {
-      console.log('Regisztráció sikeres:', response.data);
-      this.showAlert(response.data.message);
-      this.$router.push('/login');
-    })
-    .catch((error) => {
-      console.error('Regisztráció hiba:', error.response?.data || error.message);
-      this.showAlert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
-    });
-},
+      axios.post('http://localhost:5000/api/auth/register', userData)
+        .then((response) => {
+          console.log('Regisztráció sikeres:', response.data);
+          this.showAlert(response.data.message);
+          this.$router.push('/login');
+        })
+        .catch((error) => {
+          console.error('Regisztráció hiba:', error.response?.data || error.message);
+          this.showAlert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
+        });
+    },
 
     showAlert(message) {
       this.alertMessage = message;

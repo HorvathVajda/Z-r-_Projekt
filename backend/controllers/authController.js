@@ -95,15 +95,16 @@ exports.registerUser = async (req, res) => {
 };
 
 exports.registerBusiness = async (req, res) => {
-  const { name, email, password, phone } = req.body;
+  const { name, email, password, phone, adoszam } = req.body;
 
-  if (!name || !email || !password || !phone) {
+  if (!name || !email || !password || !phone || !adoszam) {
     return res.status(400).json({ error: 'Minden mezőt ki kell tölteni' });
   }
 
   try {
     // Ellenőrizzük, hogy az e-mail már létezik-e
     const [existingUsers] = await db.query(`SELECT * FROM vallalkozo WHERE email = ?`, [email]);
+
 
     if (existingUsers.length > 0) {
       return res.status(400).json({ error: "Ez az e-mail cím már regisztrálva van vállalkozóként." });
@@ -113,8 +114,8 @@ exports.registerBusiness = async (req, res) => {
     const hashedPassword = await bcrypt.hash(password, saltRounds);
 
     // Új vállalkozó beszúrása
-    const query = `INSERT INTO vallalkozo (nev, email, jelszo, telefonszam) VALUES (?, ?, ?, ?)`;
-    const [result] = await db.execute(query, [name, email, hashedPassword, phone]);
+    const query = `INSERT INTO vallalkozo (nev, email, jelszo, telefonszam, adoszam) VALUES (?, ?, ?, ?, ?)`;
+    const [result] = await db.execute(query, [name, email, hashedPassword, phone, adoszam]);
 
     const businessId = result.insertId;
 
