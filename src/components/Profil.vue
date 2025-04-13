@@ -9,7 +9,7 @@
           <h2>{{ userName }}</h2>
           <div class="profile-actions">
             <button @click="logout" class="logout-btn">
-              <i class="fas fa-sign-out-alt"></i> Kijelentkezés
+              <i class="bi bi-box-arrow-right"></i> Kijelentkezés
             </button>
           </div>
         </div>
@@ -47,7 +47,7 @@
 
         <div class="stat-card">
           <div class="stat-icon">
-            <i class="fas fa-money-bill-wave"></i>
+            <i class="fas fa-dollar-sign"></i>
           </div>
           <div class="stat-info">
             <h3>{{ bevetel }} Ft</h3>
@@ -57,7 +57,7 @@
 
         <div class="stat-card">
           <div class="stat-icon">
-            <i class="fas fa-calendar-check"></i>
+            <i class="bi bi-calendar-check"></i>
           </div>
           <div class="stat-info">
             <h3>{{ foglalasok }}</h3>
@@ -119,16 +119,11 @@
           <div v-for="(booking, index) in displayedBookings" :key="index" class="appointment-card">
             <div class="appointment-time">
               <i class="fas fa-clock"></i>
-              <span>{{ booking.date }} - {{ booking.time }}</span>
+              <span>{{ booking.date }}</span>
             </div>
             <div class="appointment-client">
               <i class="fas fa-user"></i>
-              <span>{{ booking.clientName }}</span>
-            </div>
-            <div class="appointment-actions">
-              <button class="btn complete-btn">
-                <i class="fas fa-check"></i> Teljesítés
-              </button>
+              <span>{{ booking.serviceName }}</span>
             </div>
           </div>
 
@@ -152,7 +147,7 @@
       <!-- All Appointments -->
       <div class="info-section">
         <div class="section-header">
-          <h2><i class="fas fa-list"></i> Összes időpont</h2>
+          <h2><i class="fas fa-calendar-alt"></i> Összes időpont</h2>
         </div>
 
         <div v-if="idopontok.length > 0" class="appointments-list">
@@ -167,10 +162,10 @@
             </div>
             <div class="appointment-status">
               <span v-if="idopont.statusz === 'teljesitett'" class="status-badge completed">
-                <i class="fas fa-check-circle"></i> Teljesítve
+                <i class="bi bi-check"></i> Teljesítve
               </span>
               <button v-else @click="completeAppointment(idopont.ido_id, getVallalkozoId())" class="btn complete-btn">
-                <i class="fas fa-check"></i> Teljesítés
+                <i class="bi bi-check"></i> Teljesítés
               </button>
             </div>
           </div>
@@ -249,21 +244,18 @@ export default {
     getBookings(vallalkozo_id) {
       if (!vallalkozo_id) {
         console.error('Vállalkozó ID nem található!');
-        return;  // Ha nincs vállalkozó_id, ne folytasd a lekérdezést
+        return;
       }
 
-      console.log('Küldött vállalkozó_id:', vallalkozo_id);  // Logoljuk a küldött vállalkozó ID-t
+      console.log('Küldött vállalkozó_id:', vallalkozo_id);
 
-      // Küldd el a vallalkozo_id-t a backendnek
       axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}`)
         .then(response => {
-          console.log('Backend válasz:', response.data);  // Logoljuk a választ
+          console.log('Backend válasz:', response.data);
           if (response.data && Array.isArray(response.data)) {
-            // Itt már közvetlenül a foglalásokat kezeljük
             this.bookings = response.data.map(booking => ({
-              date: booking.datum || 'N/A',  // a válaszban a dátum a 'datum' kulcs alatt jön
-              time: booking.ora || 'N/A',    // az idő a 'ora' kulcs alatt jön
-              clientName: 'Ügyfél'  // itt hozzáadhatsz egy másik logikát, ha szükséges
+              date: booking.datum || 'N/A',
+              serviceName: booking.szolgaltatas || 'Ismeretlen szolgáltatás'
             }));
           } else {
             console.error('Hibás API válasz:', response.data);
@@ -306,17 +298,18 @@ export default {
           axios.post(`/api/businesses/teljesit?ido_id=${ido_id}&vallalkozo_id=${vallalkozo_id}`)
             .then(response => {
               console.log('Időpont teljesítve:', response.data);
-              // Frissíthetjük a UI-t, ha sikeres a teljesítés
-              this.refresh();
+              setTimeout(() => {
+                location.reload();
+              }, 1500);
             })
             .catch(error => {
               console.error('Hiba történt az időpont teljesítésekor:', error);
-              showAlert('Hiba történt az időpont teljesítésekor!');
+              this.showAlert('Hiba történt az időpont teljesítésekor!');
             });
         })
         .catch(error => {
           console.error('Hiba történt az adatok lekérésekor:', error);
-          showAlert('Hiba történt az adatok lekérésekor!');
+          this.showAlert('Hiba történt az adatok lekérésekor!');
         });
     },
     fetchStatisztika(vallalkozo_id) {

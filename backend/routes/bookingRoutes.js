@@ -58,8 +58,6 @@ router.get('/vallalkozasok', async (req, res) => {
   }
 });
 
-
-
 // Kategóriák lekérése
 router.get('/business-categories', async (req, res) => {
   try {
@@ -77,17 +75,21 @@ router.get("/szabad-idopontok/:szolgaltatas_id", async (req, res) => {
 
   try {
     const [rows] = await db.query(`
-      SELECT ido_id, szabad_ido, statusz
+      SELECT
+        ido_id,
+        DATE_FORMAT(szabad_ido, '%Y-%m-%d %H:%i') AS szabad_ido,
+        statusz
       FROM idopontok
       WHERE szolgaltatas_id = ? AND statusz = 'szabad'
     `, [szolgaltatas_id]);
 
-    res.json(rows);
+    res.json(rows); // <- most már a string megy vissza, nem Date objektum
   } catch (error) {
     console.error("Hiba a szabad időpontok lekérésekor:", error);
     res.status(500).json({ error: "Szerver hiba" });
   }
 });
+
 
 // Foglalás végpont
 router.post('/foglalas', async (req, res) => {
@@ -96,10 +98,26 @@ router.post('/foglalas', async (req, res) => {
   console.log('Bejövő adatok:', { szolgaltatas_id, ido_id, felhasznalo_id, vallalkozas_id, foglalo_tipus, email });
 
   try {
-    // Ellenőrizzük, hogy az időpont szabad-e
-    const [results] = await db.query('SELECT * FROM idopontok WHERE ido_id = ? AND statusz = "szabad"', [ido_id]);
+    // Ha vállalkozó próbál foglalni, ellenőrizzük, hogy a saját vállalkozásához-e
+    if (foglalo_tipus === 'vallalkozo') {
+      const [vallalkozasok] = await db.query(
+        'SELECT id FROM vallalkozas WHERE vallalkozo_id = ?',
+        [felhasznalo_id]
+      );
 
-    console.log('Szabad időpont keresés eredménye:', results);
+      const sajatVallalkozasok = vallalkozasok.map(v => v.id);
+
+      if (sajatVallalkozasok.includes(vallalkozas_id)) {
+        console.log('Nem foglalhat saját vállalkozásához!');
+        return res.status(400).json({ message: 'Nem foglalhat a saját vállalkozásához!' });
+      }
+    }
+
+    // Ellenőrizzük, hogy az időpont szabad-e
+    const [results] = await db.query(
+      'SELECT * FROM idopontok WHERE ido_id = ? AND statusz = "szabad"',
+      [ido_id]
+    );
 
     if (results.length === 0) {
       console.log('Az időpont már nem elérhető:', ido_id);
@@ -116,26 +134,27 @@ router.post('/foglalas', async (req, res) => {
       foglalo_tipus,
     };
 
-    console.log('Foglalás adat:', foglalasData);
-
-    // Foglalás rögzítése
     await db.query('INSERT INTO foglalasok SET ?', foglalasData);
     console.log('Foglalás sikeresen rögzítve');
 
-    // Időpont státusz frissítése
     await db.query('UPDATE idopontok SET statusz = "foglalt" WHERE ido_id = ?', [ido_id]);
     console.log('Időpont státusz frissítve:', ido_id);
 
-    //Vállalkozó lekérése, foglalások növelése a statisztikákban
-    const [rows] = await db.query('SELECT vallalkozo_id FROM vallalkozas WHERE id = ?', [vallalkozas_id]);
+    // Frissítsük a statisztikát
+    const [rows] = await db.query(
+      'SELECT vallalkozo_id FROM vallalkozas WHERE id = ?',
+      [vallalkozas_id]
+    );
 
     if (rows.length === 0) {
       return res.status(404).json({ message: 'Nem található vállalkozó ezzel az ID-vel' });
     }
 
-    const vallalkozo_id = rows[0].vallalkozo_id;
-    await db.query('UPDATE statisztika SET foglalasok = foglalasok + 1 WHERE vallalkozo_id = ?', [vallalkozo_id]);
-
+    const foglaltVallalkozoId = rows[0].vallalkozo_id;
+    await db.query(
+      'UPDATE statisztika SET foglalasok = foglalasok + 1 WHERE vallalkozo_id = ?',
+      [foglaltVallalkozoId]
+    );
 
     return res.status(201).json();
 
@@ -148,6 +167,7 @@ router.post('/foglalas', async (req, res) => {
     });
   }
 });
+
 
 // Szolgáltatások lekérdezése kategória alapján
 router.get("/szolgaltatasok/:category", async (req, res) => {

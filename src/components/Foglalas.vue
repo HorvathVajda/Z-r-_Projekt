@@ -16,8 +16,8 @@
           <label for="sortOptions">Rendezés:</label>
           <div class="input-wrapper">
             <select id="sortOptions" v-model="selectedSortOption" @change="sortServices">
-              <option value="nameAsc">Vállalkozás név szerint (ABC, növekvő)</option>
-              <option value="nameDesc">Vállalkozás név szerint (ABC, csökkenő)</option>
+              <option value="nameAsc">Szolgáltatás szerint (ABC, növekvő)</option>
+              <option value="nameDesc">Szolgáltatás szerint (ABC, csökkenő)</option>
               <option value="durationAsc">Időtartam szerint (növekvő)</option>
               <option value="durationDesc">Időtartam szerint (csökkenő)</option>
               <option value="priceAsc">Ár szerint (növekvő)</option>
@@ -130,6 +130,31 @@ export default {
   },
 
   methods: {
+    sortServices() {
+      switch (this.selectedSortOption) {
+        case 'nameAsc':
+          this.szolgaltatasok.sort((a, b) => a.szolgaltatas_neve.localeCompare(b.szolgaltatas_neve));
+          break;
+        case 'nameDesc':
+          this.szolgaltatasok.sort((a, b) => b.szolgaltatas_neve.localeCompare(a.szolgaltatas_neve));
+          break;
+        case 'durationAsc':
+          this.szolgaltatasok.sort((a, b) => a.idotartam - b.idotartam);
+          break;
+        case 'durationDesc':
+          this.szolgaltatasok.sort((a, b) => b.idotartam - a.idotartam);
+          break;
+        case 'priceAsc':
+          this.szolgaltatasok.sort((a, b) => a.ar - b.ar);
+          break;
+        case 'priceDesc':
+          this.szolgaltatasok.sort((a, b) => b.ar - a.ar);
+          break;
+        default:
+          break;
+      }
+    },
+
     fetchSzolgaltatasok(vallalkozasId, category) {
       const params = new URLSearchParams();
 
@@ -192,12 +217,16 @@ export default {
       };
 
       try {
-        await axios.post('/api/foglalasok/foglalas', payload);
+        const response = await axios.post('/api/foglalasok/foglalas', payload);
         this.showAlert("Sikeres foglalás!");
         this.modalVisible = false;
       } catch (error) {
-        console.error('Hiba a foglalás során:', error);
-        this.showAlert("Hiba történt a foglalás során.");
+        if (error.response && error.response.status === 400) {
+          this.showAlert(error.response.data.message); // Kiírása a hibaüzenetnek, pl. "Nem foglalhat saját magánál!"
+        } else {
+          console.error('Hiba a foglalás során:', error);
+          this.showAlert("Hiba történt a foglalás során.");
+        }
       }
     },
 

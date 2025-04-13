@@ -1,11 +1,11 @@
 -- phpMyAdmin SQL Dump
--- version 5.2.1
+-- version 5.2.0
 -- https://www.phpmyadmin.net/
 --
 -- Gép: 127.0.0.1
--- Létrehozás ideje: 2025. Ápr 08. 14:32
--- Kiszolgáló verziója: 10.4.32-MariaDB
--- PHP verzió: 8.2.12
+-- Létrehozás ideje: 2025. Ápr 13. 11:15
+-- Kiszolgáló verziója: 10.4.24-MariaDB
+-- PHP verzió: 8.1.6
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
 START TRANSACTION;
@@ -29,10 +29,10 @@ SET time_zone = "+00:00";
 
 CREATE TABLE `felhasznalo` (
   `felhasznalo_id` int(11) NOT NULL,
-  `nev` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `jelszo` varchar(255) NOT NULL,
-  `telefonszam` varchar(20) DEFAULT NULL
+  `nev` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `jelszo` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `telefonszam` varchar(20) COLLATE utf8_hungarian_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
@@ -40,11 +40,7 @@ CREATE TABLE `felhasznalo` (
 --
 
 INSERT INTO `felhasznalo` (`felhasznalo_id`, `nev`, `email`, `jelszo`, `telefonszam`) VALUES
-(1, 'Péter Kiss', 'peter.kiss@example.com', 'password123', '06123456788'),
-(2, 'Anna Varga', 'anna.varga@example.com', 'securepass', '06234567890'),
-(3, 'Zoltán Farkas', 'zoltan.farkas@example.com', 'strongpass', '06301234568'),
-(4, 'asd', 'asd@g.c', '$2b$10$UaLe5Axe/4L1j.RlqpAVzO5Ki29duSVduqKBDRb.bjwkXckY3vY1G', '25645454'),
-(8, 'asd', 'asd@gmail.com', '$2b$10$U.O.KU8YLt9kSEINHQHTVeeZjILNhjI8awcDtTWZQKz4bSUuTMM0y', '1115615156');
+(1, 'asd', 'as@g.c', '$2b$10$rA3PG3AzFIZqzLbaUU73quLQsspSwQ7lE1Cvg/Pf/LnHJ2CcZzXYC', '52591988');
 
 -- --------------------------------------------------------
 
@@ -58,19 +54,10 @@ CREATE TABLE `foglalasok` (
   `ido_id` int(11) NOT NULL,
   `felhasznalo_id` int(11) DEFAULT NULL,
   `vallalkozas_id` int(11) DEFAULT NULL,
-  `statusz` enum('szabad','foglalt') DEFAULT 'szabad',
+  `statusz` enum('szabad','foglalt') COLLATE utf8_hungarian_ci DEFAULT 'szabad',
   `foglalas_datum` datetime DEFAULT current_timestamp(),
-  `foglalo_tipus` enum('felhasznalo','vallalkozo') DEFAULT 'felhasznalo'
+  `foglalo_tipus` enum('felhasznalo','vallalkozo') COLLATE utf8_hungarian_ci DEFAULT 'felhasznalo'
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
-
---
--- A tábla adatainak kiíratása `foglalasok`
---
-
-INSERT INTO `foglalasok` (`foglalas_id`, `szolgaltatas_id`, `ido_id`, `felhasznalo_id`, `vallalkozas_id`, `statusz`, `foglalas_datum`, `foglalo_tipus`) VALUES
-(1, 8, 52, NULL, NULL, 'foglalt', '2025-03-03 10:39:52', 'vallalkozo'),
-(2, 7, 51, NULL, NULL, 'foglalt', '2025-03-03 10:41:27', 'vallalkozo'),
-(3, 8, 53, NULL, NULL, 'foglalt', '2025-03-03 10:42:41', 'vallalkozo');
 
 -- --------------------------------------------------------
 
@@ -81,39 +68,9 @@ INSERT INTO `foglalasok` (`foglalas_id`, `szolgaltatas_id`, `ido_id`, `felhaszna
 CREATE TABLE `idopontok` (
   `ido_id` int(11) NOT NULL,
   `szabad_ido` datetime NOT NULL,
-  `statusz` enum('szabad','foglalt') DEFAULT 'szabad',
+  `statusz` enum('szabad','foglalt') COLLATE utf8_hungarian_ci DEFAULT 'szabad',
   `szolgaltatas_id` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
-
---
--- A tábla adatainak kiíratása `idopontok`
---
-
-INSERT INTO `idopontok` (`ido_id`, `szabad_ido`, `statusz`, `szolgaltatas_id`) VALUES
-(38, '2025-02-20 09:00:00', 'szabad', 1),
-(39, '2025-02-20 09:30:00', 'szabad', 1),
-(40, '2025-02-20 10:00:00', 'szabad', 2),
-(41, '2025-02-20 10:30:00', 'szabad', 2),
-(42, '2025-02-20 11:00:00', 'szabad', 3),
-(43, '2025-02-20 11:30:00', 'szabad', 3),
-(44, '2025-02-20 08:00:00', 'szabad', 4),
-(45, '2025-02-20 08:30:00', 'szabad', 4),
-(46, '2025-02-20 09:00:00', 'szabad', 5),
-(47, '2025-02-20 09:30:00', 'szabad', 5),
-(48, '2025-02-20 10:00:00', 'szabad', 6),
-(49, '2025-02-20 10:30:00', 'szabad', 6),
-(50, '2025-02-20 13:00:00', 'szabad', 7),
-(51, '2025-02-20 13:30:00', 'foglalt', 7),
-(52, '2025-02-20 14:00:00', 'foglalt', 8),
-(53, '2025-02-20 14:30:00', 'foglalt', 8),
-(54, '2025-02-20 15:00:00', 'foglalt', 9),
-(55, '2025-02-20 15:30:00', 'szabad', 9),
-(56, '2025-02-20 09:00:00', 'szabad', 10),
-(57, '2025-02-20 09:30:00', 'szabad', 10),
-(58, '2025-02-20 10:00:00', 'szabad', 11),
-(59, '2025-02-20 10:30:00', 'szabad', 11),
-(60, '2025-02-20 11:00:00', 'szabad', 12),
-(61, '2025-02-20 11:30:00', 'szabad', 12);
 
 -- --------------------------------------------------------
 
@@ -134,7 +91,7 @@ CREATE TABLE `statisztika` (
 --
 
 INSERT INTO `statisztika` (`id`, `teljesitett_munkak`, `bevetel`, `foglalasok`, `vallalkozo_id`) VALUES
-(1, 0, 0, 0, 5);
+(1, 2, 8000, 2, 1);
 
 -- --------------------------------------------------------
 
@@ -144,7 +101,7 @@ INSERT INTO `statisztika` (`id`, `teljesitett_munkak`, `bevetel`, `foglalasok`, 
 
 CREATE TABLE `szolgaltatas` (
   `szolgaltatas_id` int(11) NOT NULL,
-  `szolgaltatas_neve` varchar(255) NOT NULL,
+  `szolgaltatas_neve` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
   `idotartam` int(11) NOT NULL,
   `ar` decimal(10,2) NOT NULL,
   `vallalkozas_id` int(11) NOT NULL
@@ -155,18 +112,7 @@ CREATE TABLE `szolgaltatas` (
 --
 
 INSERT INTO `szolgaltatas` (`szolgaltatas_id`, `szolgaltatas_neve`, `idotartam`, `ar`, `vallalkozas_id`) VALUES
-(1, 'Hajvágás', 30, 3000.00, 1),
-(2, 'Körömfestés', 45, 4000.00, 1),
-(3, 'Hajfestés', 60, 5000.00, 1),
-(4, 'Autóolaj csere', 60, 15000.00, 2),
-(5, 'Motorkerékpár javítás', 120, 25000.00, 2),
-(6, 'Gumiabroncs csere', 90, 12000.00, 2),
-(7, 'Belső festés', 180, 35000.00, 3),
-(8, 'Külső festés', 240, 45000.00, 3),
-(9, 'Dekoratív festés', 120, 25000.00, 3),
-(10, 'Hajvágás', 30, 3000.00, 5),
-(11, 'Körömfestés', 45, 4000.00, 5),
-(12, 'Hajformázás', 60, 3500.00, 5);
+(1, 'Hajfestés', 30, '4000.00', 1);
 
 -- --------------------------------------------------------
 
@@ -176,10 +122,10 @@ INSERT INTO `szolgaltatas` (`szolgaltatas_id`, `szolgaltatas_neve`, `idotartam`,
 
 CREATE TABLE `vallalkozas` (
   `id` int(11) NOT NULL,
-  `vallalkozas_neve` varchar(255) NOT NULL,
-  `helyszin` varchar(255) NOT NULL,
-  `nyitva_tartas` varchar(255) DEFAULT NULL,
-  `category` varchar(255) DEFAULT NULL,
+  `vallalkozas_neve` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `helyszin` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `nyitva_tartas` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `category` varchar(255) COLLATE utf8_hungarian_ci DEFAULT NULL,
   `vallalkozo_id` int(11) DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
@@ -188,12 +134,7 @@ CREATE TABLE `vallalkozas` (
 --
 
 INSERT INTO `vallalkozas` (`id`, `vallalkozas_neve`, `helyszin`, `nyitva_tartas`, `category`, `vallalkozo_id`) VALUES
-(1, 'Kovács Fodrászat', 'Budapest, Kossuth Lajos utca 10.', 'Hétfőtől Péntekig: 09:00 - 18:00', 'Szépségipar', 1),
-(2, 'Szabó Autószerviz', 'Budapest, Petőfi Sándor utca 5.', 'Hétfőtől Szombatig: 08:00 - 20:00', 'Autószerviz', 2),
-(3, 'Nagy Festészet', 'Budapest, Andrássy út 30.', 'Hétfőtől Péntekig: 10:00 - 17:00', 'Festészet', 3),
-(5, 'pityuka fodraszata', '6033 Városföld Béke 2', 'Hétfőtől Péntekig: 09:00 - 18:00', 'Fodraszat', 4),
-(6, 'asas', '7747 gdsfg gsgs 4', NULL, 'asad', NULL),
-(7, 'aaaaaaaaa', '44444 fdggsdf opohjkggf 25', NULL, 'gfdshg', NULL);
+(1, 'a', '6033 Városföld, Béke 2', '08:00-18:00', 'Fodrászat', 1);
 
 -- --------------------------------------------------------
 
@@ -203,23 +144,20 @@ INSERT INTO `vallalkozas` (`id`, `vallalkozas_neve`, `helyszin`, `nyitva_tartas`
 
 CREATE TABLE `vallalkozo` (
   `vallalkozo_id` int(11) NOT NULL,
-  `nev` varchar(255) NOT NULL,
-  `email` varchar(255) NOT NULL,
-  `jelszo` varchar(255) NOT NULL,
-  `telefonszam` varchar(20) DEFAULT NULL,
-  `bio` text DEFAULT NULL
+  `nev` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `email` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `jelszo` varchar(255) COLLATE utf8_hungarian_ci NOT NULL,
+  `telefonszam` varchar(20) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `adoszam` varchar(20) COLLATE utf8_hungarian_ci DEFAULT NULL,
+  `bio` text COLLATE utf8_hungarian_ci DEFAULT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_hungarian_ci;
 
 --
 -- A tábla adatainak kiíratása `vallalkozo`
 --
 
-INSERT INTO `vallalkozo` (`vallalkozo_id`, `nev`, `email`, `jelszo`, `telefonszam`, `bio`) VALUES
-(1, 'János Kovács', 'janos.kovacs@example.com', 'jelszo123', '06123456789', 'Szakértő fodrász, több éves tapasztalattal.'),
-(2, 'Erika Szabó', 'erika.szabo@example.com', 'titkosjelszo', '06201234567', 'Professzionális autószerelő, gyors és megbízható szolgáltatás.'),
-(3, 'Gábor Nagy', 'gabor.nagy@example.com', 'password456', '06301234567', 'Mindenféle festést vállalok, legyen szó belső vagy külső munkálatokról.'),
-(4, 'pista', 'p@g.c', '$2b$10$rpq9D3wlsr7O14qjK8I6pOCDrYL7HQRYgWu6ISqNo/o8mo.GJZ1Nm', '06044444', NULL),
-(5, 'asd', 'asd@g.c', '$2b$10$zj8vLF5CtGqh.Q7GFxXs2ubWES7i/qm/I72/Q6kqffNhVC5nwlsXm', '06656546550', NULL);
+INSERT INTO `vallalkozo` (`vallalkozo_id`, `nev`, `email`, `jelszo`, `telefonszam`, `adoszam`, `bio`) VALUES
+(1, 'Horváth Dániel', 'a@g.c', '$2b$10$wdg.0.x55pleGtwZ9sJhvuK/0dsnBERes26U3PLgG0ifCCjKW.K86', '0635050502', NULL, NULL);
 
 --
 -- Indexek a kiírt táblákhoz
@@ -232,17 +170,45 @@ ALTER TABLE `felhasznalo`
   ADD PRIMARY KEY (`felhasznalo_id`);
 
 --
+-- A tábla indexei `foglalasok`
+--
+ALTER TABLE `foglalasok`
+  ADD PRIMARY KEY (`foglalas_id`),
+  ADD KEY `vallalkozas_id` (`vallalkozas_id`),
+  ADD KEY `szolgaltatas_id` (`szolgaltatas_id`);
+
+--
+-- A tábla indexei `idopontok`
+--
+ALTER TABLE `idopontok`
+  ADD PRIMARY KEY (`ido_id`),
+  ADD KEY `szolgaltatas_id` (`szolgaltatas_id`);
+
+--
 -- A tábla indexei `statisztika`
 --
 ALTER TABLE `statisztika`
+  ADD PRIMARY KEY (`id`);
+
+--
+-- A tábla indexei `szolgaltatas`
+--
+ALTER TABLE `szolgaltatas`
+  ADD PRIMARY KEY (`szolgaltatas_id`),
+  ADD KEY `vallalkozas_id` (`vallalkozas_id`);
+
+--
+-- A tábla indexei `vallalkozas`
+--
+ALTER TABLE `vallalkozas`
   ADD PRIMARY KEY (`id`),
-  ADD KEY `vallalkozo_id` (`vallalkozo_id`);
+  ADD KEY `fk_vallalkozo_id` (`vallalkozo_id`);
 
 --
 -- A tábla indexei `vallalkozo`
 --
 ALTER TABLE `vallalkozo`
-  ADD KEY `idx_vallalkozo_id` (`vallalkozo_id`);
+  ADD PRIMARY KEY (`vallalkozo_id`);
 
 --
 -- A kiírt táblák AUTO_INCREMENT értéke
@@ -252,7 +218,19 @@ ALTER TABLE `vallalkozo`
 -- AUTO_INCREMENT a táblához `felhasznalo`
 --
 ALTER TABLE `felhasznalo`
-  MODIFY `felhasznalo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=9;
+  MODIFY `felhasznalo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT a táblához `foglalasok`
+--
+ALTER TABLE `foglalasok`
+  MODIFY `foglalas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
+
+--
+-- AUTO_INCREMENT a táblához `idopontok`
+--
+ALTER TABLE `idopontok`
+  MODIFY `ido_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=3;
 
 --
 -- AUTO_INCREMENT a táblához `statisztika`
@@ -261,20 +239,51 @@ ALTER TABLE `statisztika`
   MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
+-- AUTO_INCREMENT a táblához `szolgaltatas`
+--
+ALTER TABLE `szolgaltatas`
+  MODIFY `szolgaltatas_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
+-- AUTO_INCREMENT a táblához `vallalkozas`
+--
+ALTER TABLE `vallalkozas`
+  MODIFY `id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
+
+--
 -- AUTO_INCREMENT a táblához `vallalkozo`
 --
 ALTER TABLE `vallalkozo`
-  MODIFY `vallalkozo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=6;
+  MODIFY `vallalkozo_id` int(11) NOT NULL AUTO_INCREMENT, AUTO_INCREMENT=2;
 
 --
 -- Megkötések a kiírt táblákhoz
 --
 
 --
--- Megkötések a táblához `statisztika`
+-- Megkötések a táblához `foglalasok`
 --
-ALTER TABLE `statisztika`
-  ADD CONSTRAINT `statisztika_ibfk_1` FOREIGN KEY (`vallalkozo_id`) REFERENCES `vallalkozo` (`vallalkozo_id`);
+ALTER TABLE `foglalasok`
+  ADD CONSTRAINT `foglalasok_ibfk_1` FOREIGN KEY (`vallalkozas_id`) REFERENCES `vallalkozas` (`id`) ON DELETE SET NULL ON UPDATE CASCADE,
+  ADD CONSTRAINT `foglalasok_ibfk_2` FOREIGN KEY (`szolgaltatas_id`) REFERENCES `szolgaltatas` (`szolgaltatas_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Megkötések a táblához `idopontok`
+--
+ALTER TABLE `idopontok`
+  ADD CONSTRAINT `idopontok_ibfk_1` FOREIGN KEY (`szolgaltatas_id`) REFERENCES `szolgaltatas` (`szolgaltatas_id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Megkötések a táblához `szolgaltatas`
+--
+ALTER TABLE `szolgaltatas`
+  ADD CONSTRAINT `szolgaltatas_ibfk_1` FOREIGN KEY (`vallalkozas_id`) REFERENCES `vallalkozas` (`id`) ON DELETE CASCADE ON UPDATE CASCADE;
+
+--
+-- Megkötések a táblához `vallalkozas`
+--
+ALTER TABLE `vallalkozas`
+  ADD CONSTRAINT `fk_vallalkozo_id` FOREIGN KEY (`vallalkozo_id`) REFERENCES `vallalkozo` (`vallalkozo_id`) ON DELETE SET NULL ON UPDATE CASCADE;
 COMMIT;
 
 /*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;

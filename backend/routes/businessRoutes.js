@@ -72,6 +72,45 @@ router.get('/vallalkozasok/:id/details', async (req, res) => {
   }
 });
 
+router.put('/vallalkozasok/:id/modositas', async (req, res) => {
+  const { id } = req.params;
+  const { helyszin, nyitva_tartas, category } = req.body;
+
+  // Ellenőrizni kell, hogy minden szükséges adatot küldtek-e
+  if (!helyszin || !nyitva_tartas || !category) {
+    return res.status(400).json({ error: 'Hiányzó szükséges adat' });
+  }
+
+  // Frissítés SQL lekérdezés
+  const sql = `
+    UPDATE vallalkozas
+    SET helyszin = ?, nyitva_tartas = ?, category = ?
+    WHERE id = ?
+  `;
+
+  try {
+    const [result] = await db.query(sql, [helyszin, nyitva_tartas, category, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Nem található a megadott vállalkozás' });
+    }
+
+    // Válaszként visszaküldjük a frissített adatokat
+    const updatedBusiness = {
+      id,
+      helyszin,
+      nyitva_tartas,
+      category
+    };
+
+    res.status(200).json(updatedBusiness);
+  } catch (err) {
+    console.error('Adatbázis hiba:', err);
+    res.status(500).json({ error: 'Hiba történt az adatbázis művelet közben' });
+  }
+});
+
+
 router.post('/vallalkozasok/:id/szolgaltatasok', async (req, res) => {
   const { id } = req.params;
   const { szolgaltatas_neve, idotartam, ar } = req.body;
@@ -145,7 +184,7 @@ router.post('/:id/add-idopont', (req, res) => {
 
   const query = 'INSERT INTO idopontok (szabad_ido, statusz, szolgaltatas_id) VALUES (?, ?, ?)';
 
-  db.execute(query, [magyarIdo, 'szabad', szolgaltatas_id])
+  db.execute(query, [magyarIdo, 'szabad', szolgaltatas_id])  // Itt a szolgaltatas_id kerül be az adatbázisba
     .then(([results]) => {
       res.status(200).json({ message: 'Időpont sikeresen hozzáadva!', idopont_id: results.insertId });
     })
@@ -239,17 +278,25 @@ router.post('/update-user', (req, res) => {
 router.get('/bookings', async (req, res) => {
   const { felhasznalo_id } = req.query;
   if (!felhasznalo_id) {
-      return res.status(400).json({ error: 'Felhasználói azonosító szükséges' });
+    return res.status(400).json({ error: 'Felhasználói azonosító szükséges' });
   }
+
   try {
-      const [rows] = await db.execute(
-          'SELECT foglalas_id, DATE(foglalas_datum) AS datum, TIME(foglalas_datum) AS ora FROM foglalasok WHERE felhasznalo_id = ?',
-          [felhasznalo_id]
-      );
-      res.json(rows);
+    const [rows] = await db.execute(
+      `SELECT
+         f.foglalas_id,
+         DATE_FORMAT(i.szabad_ido, '%Y-%m-%d %H:%i') AS datum,
+         s.szolgaltatas_neve AS szolgaltatas
+       FROM foglalasok f
+       JOIN idopontok i ON f.ido_id = i.ido_id
+       JOIN szolgaltatas s ON f.szolgaltatas_id = s.szolgaltatas_id
+       WHERE f.felhasznalo_id = ?`,
+      [felhasznalo_id]
+    );
+    res.json(rows);
   } catch (error) {
-      console.error('Hiba a foglalások lekérésekor:', error);
-      res.status(500).json({ error: 'Szerverhiba' });
+    console.error('Hiba a foglalások lekérésekor:', error);
+    res.status(500).json({ error: 'Szerverhiba' });
   }
 });
 

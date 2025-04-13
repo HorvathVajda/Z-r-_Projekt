@@ -95,15 +95,15 @@
         <form @submit.prevent="addService" class="service-form">
           <div class="form-group">
             <label for="serviceName">Szolgáltatás neve</label>
-            <input type="text" id="serviceName" v-model="newService.name" required class="form-input" />
+            <input type="text" id="serviceName" v-model="newService.szolgaltatas_neve" required class="form-input" />
           </div>
           <div class="form-group">
             <label for="serviceDuration">Időtartam (perc)</label>
-            <input type="number" id="serviceDuration" v-model="newService.duration" required class="form-input" />
+            <input type="number" id="serviceDuration" v-model="newService.idotartam" required class="form-input" />
           </div>
           <div class="form-group">
             <label for="servicePrice">Ár (Ft)</label>
-            <input type="number" id="servicePrice" v-model="newService.price" required class="form-input" />
+            <input type="number" id="servicePrice" v-model="newService.ar" required class="form-input" />
           </div>
           <div class="form-actions">
             <button type="button" @click="toggleAddServiceForm" class="action-btn cancel-btn">Mégse</button>
@@ -212,7 +212,7 @@ const saveField = async (field) => {
   };
 
   try {
-    const response = await axios.put(`/api/businesses/vallalkozasok/${business.value.id}`, updatedBusiness);
+    const response = await axios.put(`/api/businesses/vallalkozasok/${business.value.id}/modositas`, updatedBusiness);
     business.value = response.data;
     isEditing.value[field] = false;
     showAlert('Sikeresen frissítve!');
@@ -230,17 +230,24 @@ const toggleAddServiceForm = () => {
 
 const addService = async () => {
   try {
-    const response = await axios.post('/api/businesses/szolgaltatasok', {
-      ...newService.value,
-      vallalkozas_id: business.value.id
+    console.log('Küldött adat:', newService.value);
+    const response = await axios.post(`/api/businesses/vallalkozasok/${business.value.id}/szolgaltatasok`, {
+      ...newService.value
     });
     services.value.push({ ...response.data, selectedTime: '' });
     toggleAddServiceForm();
     showAlert('Szolgáltatás sikeresen hozzáadva!');
+
+    // 🔁 Oldal frissítése
+    setTimeout(() => {
+      location.reload();
+    }, 1500); // adj neki egy kis időt az alert megjelenítéséhez
   } catch (error) {
     showAlert('Hiba a szolgáltatás hozzáadásakor: ' + error.message);
   }
 };
+
+
 
 const addAvailableTime = async (service) => {
   if (!service.selectedTime) {
@@ -254,7 +261,7 @@ const addAvailableTime = async (service) => {
 
     await axios.post(`/api/businesses/${businessId}/add-idopont`, {
       szabad_ido: service.selectedTime,
-      szolgaltatas_id: service.szolgaltatas_id
+      szolgaltatas_id: service.szolgaltatas_id  // Itt küldöd a szolgaltatas_id-t
     });
 
     showAlert('Időpont sikeresen hozzáadva!');
@@ -598,12 +605,8 @@ onMounted(fetchBusinessDetails);
 }
 
 .save-btn {
-  background-color: var(--primary-color);
+  background-color: black;
   color: white;
-}
-
-.save-btn:hover {
-  background-color: var(--primary-hover);
 }
 
 .add-time-btn {

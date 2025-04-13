@@ -10,7 +10,7 @@
           <h2>Ügyfél Regisztráció</h2>
           <p>Kérjük, töltse ki az alábbi mezőket</p>
         </div>
-        
+
         <form @submit.prevent="handleRegistration" class="register-form">
           <div class="form-grid">
             <!-- Row 1 -->
@@ -31,7 +31,7 @@
                 </span>
               </div>
             </div>
-            
+
             <div class="form-group">
               <label for="email">E-mail cím</label>
               <div class="input-wrapper">
@@ -50,7 +50,7 @@
                 </span>
               </div>
             </div>
-            
+
             <!-- Row 2 -->
             <div class="form-group">
               <label for="password">Jelszó</label>
@@ -76,7 +76,7 @@
                 <p v-if="!/[0-9]/.test(password)"><span class="icon">✗</span> szám</p>
               </div>
             </div>
-            
+
             <div class="form-group">
               <label for="confirmPassword">Jelszó megerősítése</label>
               <div class="input-wrapper">
@@ -98,7 +98,7 @@
                 A jelszavak nem egyeznek
               </p>
             </div>
-            
+
             <!-- Row 3 -->
             <div class="form-group">
               <label for="phone">Telefonszám</label>
@@ -120,7 +120,7 @@
                 Érvényes szám szükséges
               </p>
             </div>
-            
+
             <div class="form-group checkbox-group">
               <input type="checkbox" id="terms" v-model="termsAccepted" />
               <label for="terms">
@@ -136,7 +136,7 @@
               <polyline points="12 5 19 12 12 19"></polyline>
             </svg>
           </button>
-          
+
           <div class="login-link">
             Már van fiókja? <router-link to="/login">Bejelentkezés</router-link>
           </div>
@@ -181,36 +181,63 @@ export default {
   },
   methods: {
     handleRegistration() {
-      this.formSubmitted = true;
-      if (!this.isFormValid || !this.termsAccepted) {
-        alert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
-        return;
-      }
+  this.formSubmitted = true;
 
-      const userData = {
-        name: this.name,
-        email: this.email,
-        password: this.password,
-        phone: this.phone,
-        tipus: 'felhasznalo',
-      };
+  if (!this.isFormValid || !this.termsAccepted) {
+    this.showAlert('Kérjük, töltse ki helyesen az összes mezőt és fogadja el az ÁSZF-et!');
+    return;
+  }
 
-      axios.post('http://localhost:5000/api/auth/register', userData)
-        .then((response) => {
-          console.log('Regisztráció sikeres:', response.data);
-          alert(response.data.message);
-          this.$router.push('/login');
-        })
-        .catch((error) => {
-          console.error('Regisztráció hiba:', error.response?.data || error.message);
-          alert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
-        });
-    },
+  const userData = {
+    name: this.name,
+    email: this.email,
+    password: this.password,
+    phone: this.phone,
+    tipus: 'felhasznalo',
+  };
+
+  axios.post('http://localhost:5000/api/auth/register', userData)
+    .then((response) => {
+      console.log('Regisztráció sikeres:', response.data);
+      this.showAlert(response.data.message);
+      this.$router.push('/login');
+    })
+    .catch((error) => {
+      console.error('Regisztráció hiba:', error.response?.data || error.message);
+      this.showAlert(error.response?.data?.error || 'Hiba történt a regisztráció során.');
+    });
+},
+
+    showAlert(message) {
+      this.alertMessage = message;
+      setTimeout(() => {
+        this.alertMessage = null;
+      }, 5000);
+    }
   },
 };
 </script>
 
 <style scoped>
+/* Alert Box Styles */
+.alert-box {
+  position: fixed;
+  bottom: 2rem;
+  left: 2rem;
+  background-color: #6b00d0;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 0.4rem;
+  font-size: 0.9rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+  z-index: 100;
+  animation: slideIn 0.3s ease-out;
+}
+
+.alert-box.error {
+  background-color: #e53e3e;
+}
+
 .register-container {
   display: flex;
   min-height: 100vh;
@@ -471,25 +498,25 @@ export default {
     padding: 1rem;
     margin: 0;
   }
-  
+
   .dot {
     display: none;
   }
-  
+
   .form-grid {
     grid-template-columns: 1fr;
   }
-  
+
   .checkbox-group,
   .register-button,
   .login-link {
     grid-column: span 1;
   }
-  
+
   .register-card {
     padding: 1rem;
   }
-  
+
   .register-header h2 {
     font-size: 1.5rem;
   }
