@@ -1,5 +1,25 @@
 <template>
   <div class="profile-wrapper">
+    <!-- Közelgő foglalások kártya -->
+    <div class="card">
+      <h2>Közelgő foglalásaim</h2>
+      <div v-if="upcomingAppointments.length > 0" class="appointments-list">
+        <div v-for="appointment in upcomingAppointments" :key="appointment.id" class="appointment-item">
+          <div class="appointment-info">
+            <h3>{{ appointment.serviceName }}</h3>
+            <p class="business-name">{{ appointment.businessName }}</p>
+            <div class="appointment-details">
+              <span class="date">{{ formatDate(appointment.date) }}</span>
+              <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+            </div>
+          </div>
+          <button class="btn cancel" @click="cancelAppointment(appointment.id)">Lemondás</button>
+        </div>
+      </div>
+      <p v-else class="no-appointments">Nincsenek közelgő foglalások</p>
+    </div>
+
+    <!-- Profil összegzés -->
     <div class="card">
       <div class="profile-summary">
         <div class="avatar-wrapper">
@@ -28,6 +48,7 @@
       </div>
     </div>
 
+    <!-- Biztonság -->
     <div class="card">
       <h2>Biztonság</h2>
       <form @submit.prevent="updatePassword">
@@ -42,10 +63,11 @@
           <input v-model="confirmPassword" type="password" />
         </div>
 
-        <button type="submit">Jelszó frissítése</button>
+        <button type="submit" class="btn save">Jelszó frissítése</button>
       </form>
     </div>
 
+    <!-- Profilkép -->
     <div class="card">
       <h2>Profilkép</h2>
       <div class="field">
@@ -77,12 +99,14 @@ export default {
       newPassword: '',
       confirmPassword: '',
       id: null,
+      upcomingAppointments: []
     };
   },
   mounted() {
     const authData = JSON.parse(localStorage.getItem('authData'));
     this.id = authData?.id;
     this.fetchProfile();
+    this.fetchUpcomingAppointments(authData.id, authData.tipus);
   },
   methods: {
     async fetchProfile() {
@@ -99,6 +123,30 @@ export default {
       } catch (error) {
         console.error('Hiba:', error);
         alert('Nem töltődtek be az adatok!');
+      }
+    },
+    async fetchUpcomingAppointments(vallalkozo_id, tipus) {
+      try {
+        const response = await axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}&tipus=${tipus}`);
+        this.upcomingAppointments = response.data || [];
+      } catch (error) {
+        console.error('Hiba a foglalások betöltésekor:', error);
+      }
+    },
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('hu-HU', options);
+    },
+    async cancelAppointment(appointmentId) {
+      if (confirm('Biztosan le szeretnéd mondani ezt a foglalást?')) {
+        try {
+          await axios.delete(`/api/felhasznalo/${appointmentId}`);
+          this.upcomingAppointments = this.upcomingAppointments.filter(a => a.id !== appointmentId);
+          alert('Foglalás sikeresen lemondva!');
+        } catch (error) {
+          console.error('Hiba a foglalás lemondásakor:', error);
+          alert('Hiba történt a foglalás lemondása közben');
+        }
       }
     },
     async updateProfile() {
@@ -289,6 +337,56 @@ body {
   background-color: #c0392b;
 }
 
+/* Közelgő foglalások stílusai */
+.appointments-list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.appointment-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px;
+  background-color: #f9f5ff;
+  border-radius: 10px;
+  border-left: 4px solid #a271d2;
+}
+
+.appointment-info h3 {
+  font-size: 16px;
+  margin: 0 0 4px 0;
+  color: #6327a2;
+}
+
+.business-name {
+  font-size: 14px;
+  color: #666;
+  margin: 0 0 8px 0;
+}
+
+.appointment-details {
+  display: flex;
+  gap: 12px;
+  font-size: 14px;
+}
+
+.appointment-details .date {
+  color: #333;
+  font-weight: 500;
+}
+
+.appointment-details .time {
+  color: #666;
+}
+
+.no-appointments {
+  color: #666;
+  text-align: center;
+  padding: 16px 0;
+}
+
 @media (max-width: 600px) {
   .profile-summary {
     flex-direction: column;
@@ -302,6 +400,12 @@ body {
 
   .user-info h2 {
     font-size: 18px;
+  }
+
+  .appointment-item {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 12px;
   }
 }
 </style>
