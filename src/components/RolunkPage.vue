@@ -1,6 +1,6 @@
 <template>
-  <section class="about-section">
-    <div class="about-card">
+  <section class="profile-wrapper">
+    <div class="card">
       <h1>Rólunk</h1>
       <p>
         A <strong>BookMyTime</strong> célja, hogy megkönnyítse a vállalkozások számára az időpontfoglalások kezelését,
@@ -47,125 +47,128 @@
         amely leveszi a szervezés terhét a válladról.
       </p>
 
-      <h2>Lépj kapcsolatba velünk!</h2>
-      <p>
-        Kérdésed van? Ötleted, amit szívesen látnál a rendszerben? Vedd fel velünk a kapcsolatot az <strong>bookmytime884@gmail.com</strong> címen!
-      </p>
+      <div class="contact-card card">
+        <h2>Lépj kapcsolatba velünk!</h2>
+        <p>
+          Kérdésed van? Ötleted, amit szívesen látnál a rendszerben? Vedd fel velünk a kapcsolatot az <strong>bookmytime884@gmail.com</strong> címen!
+        </p>
+      </div>
     </div>
   </section>
 </template>
 
 <style scoped>
-.about-section {
-  padding: 40px 20px;
-  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-  background-color: #f9f9f9;
+.profile-wrapper {
+  max-width: 700px;
+  margin: 90px auto;
+  padding: 0 20px;
+  font-family: "Segoe UI", sans-serif;
   color: #333;
-  border-radius: 10px;
-  margin: auto;
-  max-width: 960px;
-  animation: fadeIn 0.8s ease-in-out;
 }
 
-.about-card {
-  background-color: #fff;
-  padding: 40px;
-  border-radius: 20px;
-  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.08);
+.card {
+  background: white;
+  padding: 24px;
+  border-radius: 14px;
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.05);
+  margin-bottom: 24px;
+}
+
+.contact-card {
+  background-color: #faf8ff;
+  border-left: 4px solid #6327a2;
 }
 
 h1 {
-  font-size: 2.5em;
+  font-size: 28px;
   text-align: center;
-  color: #6B00D0;
-  margin-bottom: 30px;
+  color: rgba(154, 46, 255, 0.8);;
+  margin-bottom: 24px;
+  font-weight: 600;
 }
 
 h2 {
-  font-size: 1.8em;
-  color: #6B00D0;
-  margin-top: 30px;
-  margin-bottom: 15px;
-  border-bottom: 2px solid #b8860b;
-  padding-bottom: 6px;
+  font-size: 20px;
+  color: rgba(154, 46, 255, 0.8);;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #e1d5f2;
 }
 
 h3 {
-  font-size: 1.4em;
+  font-size: 17px;
   color: #444;
   margin-bottom: 10px;
 }
 
 p {
-  font-size: 1.15em;
-  line-height: 1.8;
-  margin-bottom: 15px;
-  text-align: justify;
+  font-size: 15px;
+  line-height: 1.6;
+  margin-bottom: 16px;
+  color: #555;
 }
 
 .features {
   list-style: none;
   padding: 0;
-  margin: 0;
+  margin: 0 0 20px 0;
 }
 
 .features li {
-  font-size: 1.1em;
+  font-size: 14px;
   margin: 10px 0;
-  padding: 10px;
-  background-color: #f1ecfb;
-  border-left: 4px solid #6B00D0;
+  padding: 12px 16px;
+  background-color: #f9f5ff;
+  border-left: 3px solid #a271d2;
   border-radius: 8px;
 }
 
 .values {
   display: flex;
   flex-wrap: wrap;
-  gap: 20px;
-  margin-top: 20px;
+  gap: 16px;
+  margin: 20px 0;
 }
 
 .value-box {
   flex: 1;
-  min-width: 260px;
-  background-color: #f7f5ff;
-  border: 1px solid #ddd;
-  border-left: 4px solid #6B00D0;
-  padding: 20px;
+  min-width: 200px;
+  background-color: #f5f7fa;
+  padding: 18px;
   border-radius: 12px;
   box-shadow: 0 2px 8px rgba(0,0,0,0.05);
+  border: 1px solid #eee;
 }
 
-@keyframes fadeIn {
-  from {
-    opacity: 0;
-    transform: translateY(20px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+strong {
+  color: rgba(154, 46, 255, 0.8);;
 }
 
-@media (max-width: 768px) {
-  .about-card {
-    padding: 25px;
+@media (max-width: 600px) {
+  .profile-wrapper {
+    margin: 40px auto;
+    padding: 0 16px;
+  }
+
+  .card {
+    padding: 20px;
   }
 
   h1 {
-    font-size: 2em;
+    font-size: 24px;
   }
 
   h2 {
-    font-size: 1.5em;
-  }
-
-  p, .features li {
-    font-size: 1em;
+    font-size: 18px;
   }
 
   .values {
     flex-direction: column;
+  }
+
+  .value-box {
+    min-width: 100%;
   }
 }
 </style>
