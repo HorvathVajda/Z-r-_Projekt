@@ -276,9 +276,9 @@ router.post('/update-user', (req, res) => {
 });
 
 router.get('/bookings', async (req, res) => {
-  const { felhasznalo_id } = req.query;
+  const felhasznalo_id = Number(req.query.felhasznalo_id);
   if (!felhasznalo_id) {
-    return res.status(400).json({ error: 'Felhasználói azonosító szükséges' });
+    return res.status(400).json({ error: 'Érvényes felhasználói azonosító szükséges' });
   }
 
   try {
@@ -288,17 +288,19 @@ router.get('/bookings', async (req, res) => {
          DATE_FORMAT(i.szabad_ido, '%Y-%m-%d %H:%i') AS datum,
          s.szolgaltatas_neve AS szolgaltatas
        FROM foglalasok f
-       JOIN idopontok i ON f.ido_id = i.ido_id
-       JOIN szolgaltatas s ON f.szolgaltatas_id = s.szolgaltatas_id
+       INNER JOIN idopontok i ON f.ido_id = i.ido_id
+       INNER JOIN szolgaltatasok s ON f.szolgaltatas_id = s.szolgaltatas_id
        WHERE f.felhasznalo_id = ?`,
       [felhasznalo_id]
     );
+
     res.json(rows);
   } catch (error) {
     console.error('Hiba a foglalások lekérésekor:', error);
     res.status(500).json({ error: 'Szerverhiba' });
   }
 });
+
 
 router.get('/idopontok', async (req, res) => {
   let { vallalkozo_id } = req.query; // A frontend által küldött paraméter
