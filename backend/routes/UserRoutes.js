@@ -70,4 +70,59 @@ router.post('/jelszo-valtoztatas/:id', async (req, res) => {
   }
 });
 
+router.get('/bookings', async (req, res) => {
+  const felhasznalo_id = Number(req.query.felhasznalo_id);
+  const tipus = req.query.tipus;
+
+  if (!felhasznalo_id || !tipus || (tipus !== 'felhasznalo' && tipus !== 'vallalkozo')) {
+    return res.status(400).json({ error: 'Érvényes azonosító és típus szükséges (felhasznalo vagy vallalkozo)' });
+  }
+
+  try {
+    const [rows] = await db.execute(
+      `SELECT
+         f.foglalas_id,
+         DATE_FORMAT(i.szabad_ido, '%Y-%m-%d %H:%i') AS datum,
+         s.szolgaltatas_neve AS szolgaltatas
+       FROM foglalasok f
+       INNER JOIN idopontok i ON f.ido_id = i.ido_id
+       INNER JOIN szolgaltatas s ON f.szolgaltatas_id = s.szolgaltatas_id
+       WHERE f.felhasznalo_id = ? AND f.foglalo_tipus = ?`,
+      [felhasznalo_id, tipus]
+    );
+
+    res.json(rows);
+  } catch (error) {
+    console.error('Hiba a foglalások lekérésekor:', error);
+    res.status(500).json({ error: 'Szerverhiba' });
+  }
+});
+
+// Foglalás lemondása
+router.delete('/:id', async (req, res) => {
+  const foglalasId = req.params.id;
+
+  try {
+    // 1. Állítsuk vissza az időpont státuszát szabadra
+    await db.execute(
+      `UPDATE idopontok
+       SET statusz = 'szabad'
+       WHERE ido_id = (SELECT ido_id FROM foglalasok WHERE foglalas_id = ?)`,
+      [foglalasId]
+    );
+
+    // 2. Töröljük a foglalást
+    await db.execute(
+      `DELETE FROM foglalasok WHERE foglalas_id = ?`,
+      [foglalasId]
+    );
+
+    res.json({ message: 'Foglalás sikeresen törölve.' });
+  } catch (error) {
+    console.error('Hiba a foglalás törlésekor:', error);
+    res.status(500).json({ error: 'Szerverhiba történt a törlés során.' });
+  }
+});
+
+
 module.exports = router;

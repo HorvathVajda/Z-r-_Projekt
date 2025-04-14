@@ -224,7 +224,7 @@ export default {
     if (authData && authData.email) {
       // Fetch business profile and bookings based on the email
       this.getBusinessProfile(authData.email);
-      this.getBookings(authData.id); // Fetch bookings
+      this.getBookings(authData.id, authData.tipus); // Fetch bookings
       this.getIdopontok(authData.id);
       this.fetchStatisztika(authData.id);
     }
@@ -241,15 +241,16 @@ export default {
       return authData ? authData.id : null;
     },
 
-    getBookings(vallalkozo_id) {
+    getBookings(vallalkozo_id, tipus) {
       if (!vallalkozo_id) {
         console.error('Vállalkozó ID nem található!');
         return;
       }
 
       console.log('Küldött vállalkozó_id:', vallalkozo_id);
+      console.log('Küldött típus:', tipus);
 
-      axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}`)
+      axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}&tipus=${tipus}`)
         .then(response => {
           console.log('Backend válasz:', response.data);
           if (response.data && Array.isArray(response.data)) {

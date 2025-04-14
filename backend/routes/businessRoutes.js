@@ -277,8 +277,10 @@ router.post('/update-user', (req, res) => {
 
 router.get('/bookings', async (req, res) => {
   const felhasznalo_id = Number(req.query.felhasznalo_id);
-  if (!felhasznalo_id) {
-    return res.status(400).json({ error: 'Érvényes felhasználói azonosító szükséges' });
+  const tipus = req.query.tipus;
+
+  if (!felhasznalo_id || !tipus || (tipus !== 'felhasznalo' && tipus !== 'vallalkozo')) {
+    return res.status(400).json({ error: 'Érvényes azonosító és típus szükséges (felhasznalo vagy vallalkozo)' });
   }
 
   try {
@@ -289,9 +291,9 @@ router.get('/bookings', async (req, res) => {
          s.szolgaltatas_neve AS szolgaltatas
        FROM foglalasok f
        INNER JOIN idopontok i ON f.ido_id = i.ido_id
-       INNER JOIN szolgaltatasok s ON f.szolgaltatas_id = s.szolgaltatas_id
-       WHERE f.felhasznalo_id = ?`,
-      [felhasznalo_id]
+       INNER JOIN szolgaltatas s ON f.szolgaltatas_id = s.szolgaltatas_id
+       WHERE f.felhasznalo_id = ? AND f.foglalo_tipus = ?`,
+      [felhasznalo_id, tipus]
     );
 
     res.json(rows);
@@ -300,7 +302,6 @@ router.get('/bookings', async (req, res) => {
     res.status(500).json({ error: 'Szerverhiba' });
   }
 });
-
 
 router.get('/idopontok', async (req, res) => {
   let { vallalkozo_id } = req.query; // A frontend által küldött paraméter
