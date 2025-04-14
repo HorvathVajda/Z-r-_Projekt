@@ -10,7 +10,7 @@
           <h2>Kapcsolatfelvétel</h2>
           <p>Lépj kapcsolatba velünk az alábbi űrlap segítségével!</p>
         </div>
-        
+
         <form @submit.prevent="submitForm" class="contact-form">
           <div class="form-group">
             <label for="name">Név</label>
@@ -29,7 +29,7 @@
               </svg>
             </span>
           </div>
-          
+
           <div class="form-group">
             <label for="email">Email cím</label>
             <input
@@ -47,7 +47,7 @@
               </svg>
             </span>
           </div>
-          
+
           <div class="form-group">
             <label for="message">Üzenet</label>
             <textarea
@@ -64,7 +64,7 @@
               </svg>
             </span>
           </div>
-          
+
           <button type="submit" class="contact-button" @click="sendEmail">
             <span>Üzenet küldése</span>
             <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -72,7 +72,7 @@
               <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
             </svg>
           </button>
-          
+
           <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
           <p v-if="successMessage" class="success-message">{{ successMessage }}</p>
         </form>
@@ -310,11 +310,11 @@ textarea.form-input {
     padding: 2rem 1.5rem;
     margin: 0;
   }
-  
+
   .dot {
     display: none;
   }
-  
+
   .contact-content {
     background-color: #ffffff;
   }

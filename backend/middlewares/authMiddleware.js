@@ -1,8 +1,6 @@
 const jwt = require('jsonwebtoken');
-const SECRET_KEY = 'titkoskulcs';  // A titkos kulcs, amit a JWT-kódoláshoz használsz.
-
+const SECRET_KEY = 'titkoskulcs';
 const authenticateToken = (req, res, next) => {
-
   next();
 };
 
