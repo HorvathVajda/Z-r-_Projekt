@@ -1,17 +1,9 @@
 VÁLLALKOZÓI RÉSZ:
-- ne lehessen törölni vállalkozást és szolgáltatást amig van foglalás - közepes 
-- változtatásoknál mindig frissüljenek le az oldalak - könnyű
-- vállalkozás helyszínének és nevének megváltoztatása - könnyü
-- szolgáltatások időtartama és ára szerkeszthető legyen - könnyü
-- ne tudjon saját magánál foglalni a vállalkozó - közepes
-- le lehessen mondani egy már lefoglalt idöpontot de csak megfelelö indoklással
-
-FELHASZNÁLÓI RÉSZ:
+- ne lehessen törölni vállalkozást és szolgáltatást amig van foglalás  
+- szolgáltatások időtartama és ára szerkeszthető legyen 
+- foglalások lemondása
 
 MINDENHOL:
-- reszponzivitas
-- design
 - alertek helyett messagebox
 - jelszó változtatás
 - ha ugyan abban az idöpontban akar foglalni mint amiben már foglalt máshova akkor figyelmeztesse
-- foglalások lemondása

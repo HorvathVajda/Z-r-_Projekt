@@ -31,8 +31,8 @@
             <h3 class="link-title">Navigáció</h3>
             <router-link to="/" class="footer-link">Kezdőlap</router-link>
             <router-link to="/foglalas" class="footer-link">Foglalás</router-link>
-            <router-link v-if="felhasznalo" to="/felhasznaloProfil" class="footer-link">Profil</router-link>
-            <router-link v-if="vallalkozo" to="/Profil" class="footer-link">Profil</router-link>
+            <router-link v-if="felhasznalo" to="/felhasznaloHome/Profil" class="footer-link">Profil</router-link>
+            <router-link v-if="vallalkozo" to="/vallalkozoHome/Profil" class="footer-link">Profil</router-link>
           </div>
 
           <div class="link-group">
