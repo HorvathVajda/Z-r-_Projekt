@@ -23,6 +23,62 @@ router.get('/profil/:id', async (req, res) => {
   }
 });
 
+router.post('/profil/:id', async (req, res) => {
+  const felhasznaloId = Number(req.params.id);
+  const { nev, email, telefonszam } = req.body;
+
+  if (!felhasznaloId || !nev || !email || !telefonszam) {
+    return res.status(400).json({ error: 'Minden mező kitöltése kötelező' });
+  }
+
+  try {
+    const [result] = await db.execute(
+      `UPDATE felhasznalo SET nev = ?, email = ?, telefonszam = ? WHERE felhasznalo_id = ?`,
+      [nev, email, telefonszam, felhasznaloId]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ error: 'Felhasználó nem található' });
+    }
+
+    res.status(200).json({ message: 'Sikeres frissítés' });
+  } catch (error) {
+    console.error('Adatfrissítési hiba:', error);
+    res.status(500).json({ error: 'Szerverhiba történt az adatok frissítésekor' });
+  }
+});
+
+router.delete('/felhasznalo', async (req, res) => {
+  const { felhasznalo_id, foglalo_tipus } = req.body;  // Foglaló típust is át kell venni a request body-ból
+
+  try {
+    console.log(`Kapcsolódó foglalásokat keresek a felhasználóhoz (ID: ${felhasznalo_id}) és a foglaló típushoz: ${foglalo_tipus}`);
+
+    // Ellenőrizzük, van-e kapcsolódó foglalás
+    const [result] = await db.execute(
+      'SELECT COUNT(*) AS count FROM foglalasok WHERE felhasznalo_id = ? AND foglalo_tipus = ?',
+      [felhasznalo_id, foglalo_tipus]
+    );
+
+    const count = result[0].count;  // Az adatbázisban talált rekordok száma
+    console.log(`Talált foglalások száma: ${count}`);
+
+    if (count > 0) {
+      // Ha van kapcsolódó foglalás, nem engedjük törölni
+      console.log('Hiba: Van kapcsolódó foglalás.');
+      return res.status(400).json({ error: 'Nem törölhető a profil, mert van kapcsolódó foglalás.' });
+    } else {
+      // Ha nincs foglalás, töröljük a felhasználót
+      console.log('Nincs kapcsolódó foglalás, törlés történik.');
+      await db.execute('DELETE FROM felhasznalo WHERE felhasznalo_id = ?', [felhasznalo_id]);
+      return res.status(200).json({ message: 'Profil sikeresen törölve!' });
+    }
+  } catch (error) {
+    console.error('Hiba a profil törlésekor:', error);
+    res.status(500).json({ error: 'Szerverhiba történt a profil törlésekor.' });
+  }
+});
+
 router.post('/jelszo-valtoztatas/:id', async (req, res) => {
   const { jelszo, ujJelszo } = req.body;
   const felhasznaloId = req.params.id;

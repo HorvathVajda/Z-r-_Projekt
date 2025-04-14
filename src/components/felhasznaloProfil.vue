@@ -4,16 +4,14 @@
     <div class="card">
       <h2>Közelgő foglalásaim</h2>
       <div v-if="upcomingAppointments.length > 0" class="appointments-list">
-        <div v-for="appointment in upcomingAppointments" :key="appointment.id" class="appointment-item">
+        <div v-for="appointment in upcomingAppointments" :key="appointment.foglalas_id" class="appointment-item">
           <div class="appointment-info">
-            <h3>{{ appointment.serviceName }}</h3>
-            <p class="business-name">{{ appointment.businessName }}</p>
+            <h3>{{ appointment.szolgaltatas }}</h3>
             <div class="appointment-details">
-              <span class="date">{{ formatDate(appointment.date) }}</span>
-              <span class="time">{{ appointment.startTime }} - {{ appointment.endTime }}</span>
+              <span class="date">{{ appointment.datum }}</span>
             </div>
           </div>
-          <button class="btn cancel" @click="cancelAppointment(appointment.id)">Lemondás</button>
+          <button class="btn cancel" @click="cancelAppointment(appointment.foglalas_id)">Lemondás</button>
         </div>
       </div>
       <p v-else class="no-appointments">Nincsenek közelgő foglalások</p>
@@ -46,6 +44,11 @@
         <label>Telefonszám</label>
         <input v-model="user.telefonszam" type="text" />
       </div>
+
+      <!-- Új mentés gomb a személyes adatokhoz -->
+      <div class="action-bar personal-data-actions">
+        <button class="btn save" @click="savePersonalData">Mentés</button>
+      </div>
     </div>
 
     <!-- Biztonság -->
@@ -63,7 +66,7 @@
           <input v-model="confirmPassword" type="password" />
         </div>
 
-        <button type="submit" class="btn save">Jelszó frissítése</button>
+        <button type="submit" class="btn save" @click.prevent="updateProfile">Jelszó frissítése</button>
       </form>
     </div>
 
@@ -77,14 +80,19 @@
 
     <div class="action-bar">
       <button class="btn cancel" @click="reset">Mégse</button>
-      <button class="btn save" @click="updateProfile">Mentés</button>
+      <button class="btn save" @click="saveAll">Mentés</button>
       <button class="btn delete" @click="deleteProfile">Profil törlése</button>
     </div>
+    <div v-if="alertMessage" class="alert-box">
+      {{ alertMessage }}
+    </div>
   </div>
+
 </template>
 
 <script>
 import axios from 'axios';
+
 export default {
   data() {
     return {
@@ -99,7 +107,8 @@ export default {
       newPassword: '',
       confirmPassword: '',
       id: null,
-      upcomingAppointments: []
+      upcomingAppointments: [],
+      alertMessage: null,
     };
   },
   mounted() {
@@ -109,6 +118,10 @@ export default {
     this.fetchUpcomingAppointments(authData.id, authData.tipus);
   },
   methods: {
+    async saveAll() {
+      await this.updateProfile();
+      await this.savePersonalData();
+    },
     async fetchProfile() {
       if (!this.id) {
         console.error('Nincs ID megadva!');
@@ -120,17 +133,38 @@ export default {
           throw new Error('Üres válasz');
         }
         this.user = response.data;
+        this.originalUser = JSON.parse(JSON.stringify(response.data));
       } catch (error) {
         console.error('Hiba:', error);
-        alert('Nem töltődtek be az adatok!');
+        this.showAlert('Nem töltődtek be az adatok!');
       }
     },
     async fetchUpcomingAppointments(vallalkozo_id, tipus) {
       try {
-        const response = await axios.get(`/api/businesses/bookings?felhasznalo_id=${vallalkozo_id}&tipus=${tipus}`);
+        const response = await axios.get(`/api/felhasznalo/bookings?felhasznalo_id=${vallalkozo_id}&tipus=${tipus}`);
         this.upcomingAppointments = response.data || [];
       } catch (error) {
         console.error('Hiba a foglalások betöltésekor:', error);
+        this.showAlert('Hiba történt a foglalások betöltésekor!');
+      }
+    },
+    async savePersonalData() {
+      try {
+        const response = await axios.post(`/api/felhasznalo/profil/${this.id}`, {
+          nev: this.user.nev,
+          email: this.user.email,
+          telefonszam: this.user.telefonszam
+        });
+
+        if (response.status === 200) {
+          this.showAlert('Személyes adatok sikeresen frissítve!');
+          this.originalUser = JSON.parse(JSON.stringify(this.user));
+        } else {
+          throw new Error('Hiba történt a mentés során');
+        }
+      } catch (error) {
+        console.error('Hiba:', error);
+        this.showAlert('Hiba történt az adatok mentése közben!');
       }
     },
     formatDate(dateString) {
@@ -142,21 +176,24 @@ export default {
         try {
           await axios.delete(`/api/felhasznalo/${appointmentId}`);
           this.upcomingAppointments = this.upcomingAppointments.filter(a => a.id !== appointmentId);
-          alert('Foglalás sikeresen lemondva!');
+          this.showAlert('Foglalás sikeresen lemondva!');
+          setTimeout(() => {
+            location.reload();
+          }, 500);
         } catch (error) {
           console.error('Hiba a foglalás lemondásakor:', error);
-          alert('Hiba történt a foglalás lemondása közben');
+          this.showAlert('Hiba történt a foglalás lemondása közben');
         }
       }
     },
     async updateProfile() {
       if (!this.currentPassword || !this.newPassword || !this.confirmPassword) {
-        alert('Kérlek, töltsd ki az összes mezőt!');
+        this.showAlert('Kérlek, töltsd ki az összes mezőt!');
         return;
       }
 
       if (this.newPassword !== this.confirmPassword) {
-        alert('Az új jelszavak nem egyeznek!');
+        this.showAlert('Az új jelszavak nem egyeznek!');
         return;
       }
 
@@ -178,27 +215,74 @@ export default {
           throw new Error(data.error || 'Hiba történt');
         }
 
-        alert('Jelszó sikeresen megváltoztatva!');
+        this.showAlert('Jelszó sikeresen megváltoztatva!');
         this.currentPassword = '';
         this.newPassword = '';
         this.confirmPassword = '';
       } catch (error) {
-        alert(`Hiba: ${error.message}`);
+        this.showAlert(`${error.message}`);
       }
     },
     async deleteProfile() {
-      alert('Profil törölve!');
-    },
+  const userId = this.id;  // Vagy használj más módszert, hogy megkapd a felhasználó id-ját
+  const foglaloTipus = 'felhasznalo'; // Vagy egyéb logika, hogy ezt az értéket meghatározd
+
+  if (!userId) {
+    return this.showAlert('Hiba: Nincs megadva felhasználó azonosító.');
+  }
+
+  if (confirm('Biztosan törölni szeretnéd a profilodat? Ez nem visszavonható.')) {
+    try {
+      // Küldjük el a törlés kérését
+      const response = await axios.delete(`/api/felhasznalo/felhasznalo`, {
+        data: {
+          felhasznalo_id: userId,
+          foglalo_tipus: foglaloTipus,
+        }
+      });
+
+      console.log('Backend válasz:', response);
+
+      // Ha sikeres a törlés
+      if (response.status === 200) {
+        this.showAlert('Profil sikeresen törölve!');
+        localStorage.removeItem('authData');
+        setTimeout(() => {
+          this.$router.push('/login');
+        }, 2000);
+      }
+    } catch (error) {
+      console.error('Hiba a profil törlésekor:', error);
+
+      // Ha a backend 400-as hibát küld, akkor van kapcsolódó foglalás
+      if (error.response && error.response.status === 400) {
+        console.log('Backend hibája:', error.response.data);
+        this.showAlert(error.response.data.error || 'Nem törölhető a profil, mert van kapcsolódó foglalás.');
+      } else {
+        this.showAlert('Hiba történt a profil törlése közben!');
+      }
+    }
+  }
+},
+
+
     async reset() {
       this.user = JSON.parse(JSON.stringify(this.originalUser));
+      this.showAlert('Változtatások visszaállítva');
     },
     onFileChange(e) {
       const file = e.target.files[0];
       if (file) {
         this.user.profileImage = URL.createObjectURL(file);
       }
+    },
+    async showAlert(message) {
+      this.alertMessage = message;
+      setTimeout(() => {
+        this.alertMessage = null;
+      }, 5000);
     }
-  },
+  }
 };
 </script>
 
@@ -214,6 +298,25 @@ body {
   padding: 0 20px;
   font-family: "Segoe UI", sans-serif;
   color: #333;
+}
+
+.alert-box {
+  position: fixed;
+  bottom: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: black;
+  color: white;
+  padding: 1rem 1.5rem;
+  border-radius: 8px;
+  font-size: 0.95rem;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  max-width: 90%;
+  animation: slideIn 0.3s ease-out;
 }
 
 .card {
@@ -299,6 +402,11 @@ body {
   gap: 10px;
   justify-content: flex-end;
   margin-top: 30px;
+}
+
+.personal-data-actions {
+  margin-top: 20px;
+  margin-bottom: 0;
 }
 
 .btn {
