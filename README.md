@@ -1,35 +1,20 @@
-# bookmytime
+bookmytime
 
-This template should help get you started developing with Vue 3 in Vite.
 
-## Recommended IDE Setup
+Project Setup
+vue bővítmény telepítése visual studio code-ban
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur).
+frontend:
 
-## Customize configuration
-
-See [Vite Configuration Reference](https://vite.dev/config/).
-
-## Project Setup
-
-```sh
 npm install
-```
-
-### Compile and Hot-Reload for Development
-
-```sh
 npm run dev
-```
 
-### Compile and Minify for Production
+backend:
 
-```sh
-npm run build
-```
+cd backend/config
+npm install
+node server.js
 
-### Lint with [ESLint](https://eslint.org/)
+(ha szükséges a db.js-t módosítani kell a jelszó végett)
 
-```sh
-npm run lint
-```
+adatbázis feltöltése (bookmytime.sql)
